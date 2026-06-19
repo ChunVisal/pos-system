@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ALL your custom styles go here */
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f3f4f6;
+     max-width: 1500px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+ h1, h2, h3, h4, h5, h6 {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+        }
+
+.text-p {
+    color: #1063a2;
+}
+
+.text-xx {
+    font-size: 11px;
+}
+
+.text-color {
+    color: #111827; 
+}
+
+.bg-p {
+    background: #1063a2;
+}
+
+.primary-bg { background-color: #0F6E8C; }
+    .primary-text { color: #0F6E8C; }
+    .sidebar-width { width: 200px; }
+    .content-margin { margin-left: 200px};
+
+.btn-primary {
+    background: #1A8BB5;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: #0F6E8C;
+}
+
+.input-field {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #1A8BB5;
+    box-shadow: 0 0 0 3px rgba(26,139,181,0.1);
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: none;
+}

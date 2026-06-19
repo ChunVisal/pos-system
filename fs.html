@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApexPOS - Login</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            DEFAULT: '#1A8BB5',
+                            hover: '#147194',
+                            light: '#E6F3F7',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="h-full font-sans text-slate-800 antialiased flex items-center justify-center bg-slate-50 px-4">
+
+    <!-- IN-APP TOAST SYSTEM FOR USER FEEDBACK -->
+    <div id="toast-container"
+        class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-xs pointer-events-none">
+    </div>
+
+    <!-- MAIN LOGIN CARD -->
+    <main class="w-full max-w-sm bg-white rounded-2xl border border-slate-100 p-8 shadow-sm transition-all">
+
+        <!-- BRAND HEADER -->
+        <div class="flex flex-col items-center text-center mb-8">
+            <div
+                class="w-12 h-12 rounded-xl bg-brand text-white flex items-center justify-center mb-3 shadow-md shadow-brand/10">
+                <i data-lucide="store" class="w-6 h-6"></i>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Beauty World</h1>
+            <p class="text-[11px] text-brand font-bold uppercase tracking-widest mt-1">Cambodia POS Terminal</p>
+        </div>
+
+        <!-- CORE AUTHENTICATION FORM -->
+        <div class="space-y-4">
+
+            <!-- Input: Cashier Select -->
+            <div class="space-y-1.5">
+                <label for="cashier-select"
+                    class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Active
+                    Cashier</label>
+                <div class="relative">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                    </span>
+                    <select id="cashier-select" aria-label="Active Cashier"
+                        class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-750 outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition appearance-none cursor-pointer">
+                        <option value="visal">Chun Visal</option>
+                        <option value="raksa">Srey Raksa</option>
+                        <option value="sophea">Sophea</option>
+                    </select>
+                    <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Input: Terminal Passcode PIN -->
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Terminal PIN</label>
+                <div class="relative">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        <i data-lucide="lock" class="w-4 h-4"></i>
+                    </span>
+                    <input type="password" id="pin-input" maxlength="4" placeholder="••••"
+                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition tracking-widest text-center" />
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <button onclick="handleLoginSubmit()"
+                class="w-full py-3.5 bg-brand hover:bg-brand-hover text-white text-xs font-bold tracking-wide uppercase rounded-xl shadow-lg shadow-brand/10 transition-all duration-150 mt-2 active:scale-[0.98]">
+                Open Register Node
+            </button>
+
+        </div>
+
+        <!-- SIMPLE DEMO HINT -->
+        <div class="text-center mt-6">
+            <p class="text-[11px] text-slate-400 font-medium">Demo Terminal PIN: <span
+                    class="font-bold text-slate-600">1234</span></p>
+        </div>
+
+    </main>
+
+    <!-- SCRIPTS & LOGIN LOGIC -->
+    <script>
+        // Initialize crisp vector icon representations
+        lucide.createIcons();
+
+        // Direct Login Submission Check
+        function handleLoginSubmit() {
+            const pin = document.getElementById('pin-input').value;
+            const cashierSelect = document.getElementById('cashier-select');
+            const cashierName = cashierSelect.options[cashierSelect.selectedIndex].text;
+
+            if (!pin) {
+                showToast('Please enter your terminal PIN.', 'error');
+                return;
+            }
+
+            // Hardcoded Demo Passcode Validation
+            if (pin === '1234') {
+                showToast(`Welcome back, ${cashierName}! Opening register...`, 'success');
+
+                // Clear input state on successful login mock
+                document.getElementById('pin-input').value = '';
+            } else {
+                showToast('Incorrect terminal PIN. Please try again.', 'error');
+
+                // Soft error visual shake representation
+                const mainCard = document.querySelector('main');
+                mainCard.classList.add('translate-x-1');
+                setTimeout(() => mainCard.classList.remove('translate-x-1'), 100);
+            }
+        }
+
+        // Enter Key Support
+        document.getElementById('pin-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                handleLoginSubmit();
+            }
+        });
+
+        // Custom Lightweight Notification Toast Builder
+        function showToast(message, type) {
+            const container = document.getElementById('toast-container');
+
+            // Clean previous toasts to prevent visual clutter
+            container.innerHTML = '';
+
+            const toast = document.createElement('div');
+            const isSuccess = type === 'success';
+            const colorStyle = isSuccess ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white';
+            const iconType = isSuccess ? 'check-circle' : 'alert-circle';
+
+            toast.className = `flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-semibold shadow-md pointer-events-auto transition-all duration-300 transform -translate-y-2 opacity-0 ${colorStyle}`;
+            toast.innerHTML = `
+        <i data-lucide="${iconType}" class="w-4 h-4"></i>
+        <span>${message}</span>
+      `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            // Trigger animation entry frames
+            setTimeout(() => {
+                toast.classList.remove('-translate-y-2', 'opacity-0');
+            }, 50);
+
+            // Automated destruction
+            setTimeout(() => {
+                toast.classList.add('-translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Technology POS</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{{-- graph js --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     <!-- Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+</head>
+<body>
+    <!-- Navbar - Full width, outside flex -->
+    @include('components.navbar')
+    
+    <!-- Sidebar + Content - Below navbar -->
+    <div class="flex">
+        @include('components.sidebar')
+        <main class="flex-1 min-w-0 bg-gray-100 min-h-screen">
+            @yield('content')
+        </main>
+    </div>
+    @stack('scripts')
+</body>
+</html>

@@ -17,12 +17,12 @@
             </div>
             <div class="flex items-center gap-3 mt-3 sm:mt-0">
                 <div
-                    class="flex items-center text-xs gap-2 px-3 py-1.5 border border-gray-300/90 rounded-md hover:bg-gray-50 transition cursor-pointer">
+                    class="bg-white flex items-center text-xs gap-2 px-3 py-2 border border-gray-300/90 rounded-md hover:bg-gray-50 transition cursor-pointer">
                     <i class="fa-regular fa-calendar text-gray-800"></i>
                     <span class="text-xs text-gray-700">Nov 19, 2023 - Nov 26, 2023</span>
                     <i class="fa-solid fa-chevron-down text-gray-700"></i>
                 </div>
-                <button class="text-gray-600 flex text-center gap-2 px-3 py-1.5 text-xs border border-gray-300/90 rounded-md hover:bg-gray-50 transition">
+                <button class="bg-white text-gray-600 flex text-center gap-2 px-3 py-2 text-xs border border-gray-300/90 rounded-md hover:bg-gray-50 transition">
                     <x-heroicon-o-arrow-down-tray class="w-4 h-4" /> Export
                 </button>
             </div>
@@ -59,12 +59,6 @@
             @endforeach
         </div>
 
-        {{--
-    Sales Overview + Payment cards
-    Drop this into resources/views/components or any blade view.
-    Requires Chart.js (loaded via CDN below — remove the <script> tag if you
-    already load Chart.js globally in your app layout).
---}}
 
         <div class="flex gap-4 w-full min-w-0">
 
@@ -110,13 +104,13 @@
                     <canvas id="paymentChart"></canvas>
                 </div>
                 <div class="flex items-center justify-center gap-4 mt-2">
-                    <span class="flex items-center gap-1.5 text-[11px] text-gray-600">
+                    <span class="flex items-center gap-2 text-[11px] text-gray-600">
                         <span class="w-2.5 h-2.5 rounded-full" style="background:#a262e0"></span> Cash
                     </span>
-                    <span class="flex items-center gap-1.5 text-[11px] text-gray-600">
+                    <span class="flex items-center gap-2 text-[11px] text-gray-600">
                         <span class="w-2.5 h-2.5 rounded-full" style="background:#c9a3ec"></span> Credit/Debit
                     </span>
-                    <span class="flex items-center gap-1.5 text-[11px] text-gray-600">
+                    <span class="flex items-center gap-2 text-[11px] text-gray-600">
                         <span class="w-2.5 h-2.5 rounded-full" style="background:#e9d9f8"></span> KHQR
                     </span>
                 </div>
@@ -370,8 +364,8 @@
                                         ${{ number_format($product['revenue']) }}</td>
                                     <td class="py-3 w-48 ">
                                         <div class="flex items-center gap-2">
-                                            <div class="w-48 h-1.5 bg-gray-200 rounded-l-full">
-                                                <div class="h-1.5 bg-[#0F6E8C] rounded-l-full"
+                                            <div class="w-48 h-2 bg-gray-200 rounded-l-full">
+                                                <div class="h-2 bg-[#0F6E8C] rounded-l-full"
                                                     style="width: {{ $product['percent'] }}%;"></div>
                                             </div>
                                             <span
@@ -428,8 +422,8 @@
                                         ${{ number_format($category['revenue']) }}</td>
                                     <td class="py-3 w-48 ml-2">
                                         <div class="flex items-center gap-2">
-                                            <div class="w-48 flex-1 h-1.5 bg-gray-200 rounded-l-full">
-                                                <div class="h-1.5 bg-[#0F6E8C] rounded-l-full"
+                                            <div class="w-48 flex-1 h-2 bg-gray-200 rounded-l-full">
+                                                <div class="h-2 bg-[#0F6E8C] rounded-l-full"
                                                     style="width: {{ $category['percent'] }}%;"></div>
                                             </div>
                                             <span

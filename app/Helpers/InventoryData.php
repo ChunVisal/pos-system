@@ -30,6 +30,54 @@ class InventoryData
         }, $products);
     }
 
+    public static function getSummaryCards()
+    {
+        $summary = self::getSummary();
+
+        return [
+            [
+                'title' => 'Total Products',
+                'value' => $summary['total_products'],
+                'icon' => 'fa-solid fa-cube',
+                'iconBg' => '#0F6E8C',
+                'iconColor' => '#0F6E8C',
+                'trend' => 'up',
+                'percentage' => '4.0%',
+                'period' => ' last month',
+            ],
+            [
+                'title' => 'Low Stock',
+                'value' => $summary['low_stock'],
+                'icon' => 'fa-solid fa-triangle-exclamation',
+                'iconBg' => '#F59E0B',
+                'iconColor' => '#D97706',
+                'trend' => 'up',
+                'percentage' => '5.0%',
+                'period' => ' last week',
+            ],
+            [
+                'title' => 'Out of Stock',
+                'value' => $summary['out_of_stock'],
+                'icon' => 'fa-solid fa-circle-xmark',
+                'iconBg' => '#EF4444',
+                'iconColor' => '#EF4444',
+                'trend' => 'down',
+                'percentage' => '1.0%',
+                'period' => ' last week',
+            ],
+            [
+                'title' => 'Stock Value',
+                'value' => '$' . number_format($summary['total_value']),
+                'icon' => 'fa-solid fa-sack-dollar',
+                'iconBg' => '#10B981',
+                'iconColor' => '#10B981',
+                'trend' => 'up',
+                'percentage' => '7.5%',
+                'period' => ' last month',
+            ],
+        ];
+    }
+
     public static function getSummary()
     {
         $items = self::getStockItems();
@@ -44,6 +92,15 @@ class InventoryData
             'low_stock' => $lowStock,
             'out_of_stock' => $outOfStock,
             'total_value' => $totalValue,
+        ];
+    }
+
+    public static function getMovementTrend()
+    {
+        return [
+            'labels'    => ['Nov 19', 'Nov 20', 'Nov 21', 'Nov 22', 'Nov 23', 'Nov 24', 'Nov 25'],
+            'stock_in'  => [8, 0, 5, 12, 10, 15, 6],
+            'stock_out' => [4, 7, 3, 9, 6, 11, 5],
         ];
     }
 

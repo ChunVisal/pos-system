@@ -28,7 +28,7 @@
     </button>
 </div>
 
-    <!-- Menu (no logo) -->
+    <!-- Menu -->
     <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
 
         <!-- Open Button (appears when closed) -->

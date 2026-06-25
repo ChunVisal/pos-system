@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CashierController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -31,9 +32,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
 // Cashier Routes
 Route::middleware(['auth', 'role:cashier'])->group(function () {
-    Route::get('/cashier/pos', function () {
-        return view('cashier.pos');
-    })->name('cashier.pos');
+    Route::get('/cashier/pos', [CashierController::class, 'pos'])->name('cashier.pos');
 });
 
 // Auth routes (already there)

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
-            $table->string('image')->nullable();
+            $table->text('svg')->nullable();
             $table->string('name');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->integer('sort_order')->default(0);
@@ -32,6 +32,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::table('categories', function (Blueprint $table) {
+            $table->string('svg')->nullable()->change();
+        });
     }
 };

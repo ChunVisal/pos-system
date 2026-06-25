@@ -6,8 +6,8 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    background: #f3f4f6;
-     max-width: 1500px;
+     max-width: 1600px;
+   
   margin: 0 auto;
   width: 100%;
 }
@@ -17,56 +17,152 @@ body {
             font-weight: 500;
         }
 
-.text-p {
-    color: #1063a2;
-}
-
+/* light mode */
 .text-xx {
     font-size: 11px;
 }
 
+/* primary blue color */
+.text-p {
+    color: #1063a2;
+}
+
+/* main black color hover:text-[#0F6E8C] */
 .text-color {
     color: #111827; 
 }
 
+.text-white {
+    color: white;
+}
+
+/* soft gray color
+.text-gray-600 {
+} */
+
+/* border input form focus:ring-[#0F6E8C]*/
+.border-gray-400 {
+    border-color: #cbd5e0;
+}
+
+.bg-gray-300 {
+    background-color: #d1d5db;
+}
+
+/* primary blue background color hover:bg-gray-100 */
 .bg-p {
     background: #1063a2;
 }
 
-.primary-bg { background-color: #0F6E8C; }
-    .primary-text { color: #0F6E8C; }
-    .sidebar-width { width: 200px; }
-    .content-margin { margin-left: 200px};
-
-.btn-primary {
-    background: #1A8BB5;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
+.bg-white {
+    background-color: white;
 }
 
-.btn-primary:hover {
-    background: #0F6E8C;
+.text-xs {
+    font-size: 13px;
 }
 
-.input-field {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 14px;
+/* button is #1063a2 hover  */
+/* bg app bg-gray-100 */
+
+/* dark mode */
+/* bg color: bg-zinc-900,  text-gray-800 dark:text-zinc-200,text-gray-700 dark:text-zinc-400
+ text-gray-600 dark:text-zinc-300, text-gray-600 dark:text-zinc-400, hover:text-gray-900 dark:hover:text-zinc-200, text-gray-800 dark:text-zinc-100 */
+/* text-gray-600 dark:text-zinc-400,text-gray-800 dark:text-zinc-100, text-gray-800 dark:text-zinc-100, ext-gray-600 dark:text-zinc-400 */
+
+/* resources/css/app.css */
+@keyframes spin-slow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-.input-field:focus {
-    outline: none;
-    border-color: #1A8BB5;
-    box-shadow: 0 0 0 3px rgba(26,139,181,0.1);
+@keyframes pulse-ring {
+    0% { transform: scale(0.95); opacity: 0.7; }
+    50% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.animate-spin-slow {
+    animation: spin-slow 1.5s linear infinite;
+}
+
+.animate-pulse-ring {
+    animation: pulse-ring 1.5s ease-in-out infinite;
+}
+
+.shimmer {
+    background: linear-gradient(90deg, 
+        #f0f0f0 25%, 
+        #e0e0e0 50%, 
+        #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+.dark .shimmer {
+    background: linear-gradient(90deg, 
+        #27272a 25%, 
+        #3f3f46 50%, 
+        #27272a 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
 }
 
 select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
+  -webkit-appearance: none;  /* Safari and Chrome */
+  -moz-appearance: none;     /* Firefox */
+  appearance: none;          /* Modern standards */
   background: none;
+}
+
+/* 1. Chrome, Safari, and newer Edge versions */
+.tab-container::-webkit-scrollbar {
+  height: 4px;        /* Controls the thickness/height of the horizontal scrollbar */
+}
+
+.tab-container::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color of the scrollbar track */
+  border-radius: 10px;
+}
+
+/* Dark mode scrollbar track */
+.dark .tab-container::-webkit-scrollbar-track {
+  background: #27272a; /* zinc-800 */
+}
+
+.tab-container::-webkit-scrollbar-thumb {
+  background: #888;    /* Color of the scrollable handle */
+  border-radius: 10px;
+}
+
+/* Dark mode scrollbar handle */
+.dark .tab-container::-webkit-scrollbar-thumb {
+  background: #52525b; /* zinc-600 */
+}
+
+.tab-container::-webkit-scrollbar-thumb:hover {
+  background: #555;    /* Color when hovering */
+}
+
+/* Dark mode scrollbar handle hover */
+.dark .tab-container::-webkit-scrollbar-thumb:hover {
+  background: #71717a; /* zinc-500 */
+}
+
+/* 2. Firefox */
+.tab-container {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+/* Dark mode Firefox scrollbar */
+.dark .tab-container {
+  scrollbar-color: #52525b #27272a;
 }

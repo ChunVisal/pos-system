@@ -1,17 +1,19 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AdminController;
 
 // Root route - check if logged in first
 Route::get('/', function () {
-    if (Auth::check()) {    
+    if (Auth::check()) {
         if (Auth::user()->role === 'admin') {
             return redirect('/admin/dashboard');
         }
+
         return redirect('/cashier/pos');
     }
+
     return redirect('/login');
 });
 
@@ -23,6 +25,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
     Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+    Route::get('/customer', [AdminController::class, 'customer'])->name('admin.customer');
+    Route::get('/activitylog', [AdminController::class, 'activitylog'])->name('admin.activitylog');
 });
 
 // Cashier Routes

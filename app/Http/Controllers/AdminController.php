@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Categories;
+use App\Models\Product;
 
 class AdminController extends Controller
 {
@@ -13,12 +14,19 @@ class AdminController extends Controller
 
     public function products()
     {
-        return view('admin.products');
+        $products = Product::all();
+
+        return view('admin.products', compact('products'));
     }
 
     public function inventory()
     {
-        return view('admin.inventory');
+        // Fetch raw collections directly from your database tables
+        $categories = Categories::all();
+        $products = Product::with('category')->get();
+
+        // Send them cleanly to your UI file
+        return view('admin.inventory', compact('categories', 'products'));
     }
 
     public function users()
@@ -34,5 +42,15 @@ class AdminController extends Controller
     public function settings()
     {
         return view('admin.settings');
+    }
+
+    public function customer()
+    {
+        return view('admin.customer');
+    }
+
+    public function activitylog()
+    {
+        return view('admin.activitylog');
     }
 }

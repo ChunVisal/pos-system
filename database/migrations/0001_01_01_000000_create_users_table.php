@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->enum('role', ['admin', 'cashier'])->default('cashier');
+            $table->string('status')->default('active');
+            $table->dateTime('last_login')->nullable();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

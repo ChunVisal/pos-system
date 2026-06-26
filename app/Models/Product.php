@@ -11,16 +11,18 @@ class Product extends Model
 
     protected $fillable = [
         'code',
-        'image',
-        'brand',
+
         'name',
-        'barcode',
         'category_id',
-        'cost_price',
+        'barcode',
         'selling_price',
         'stock_quantity',
-        'low_stock_threshold',
         'status',
+        'cost_price',
+        'brand',
+        'image',
+        'low_stock_threshold',
+
     ];
 
     public function category(): BelongsTo

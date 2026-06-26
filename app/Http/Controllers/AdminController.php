@@ -12,13 +12,6 @@ class AdminController extends Controller
         return view('admin.dashboard');
     }
 
-    public function products()
-    {
-        $products = Product::all();
-
-        return view('admin.products', compact('products'));
-    }
-
     public function inventory()
     {
         // Fetch raw collections directly from your database tables

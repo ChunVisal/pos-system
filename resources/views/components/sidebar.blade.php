@@ -32,7 +32,7 @@
 
     <div x-show="open" class="absolute top-1/3 -translate-y-1/2 right-0 z-50 flex items-center justify-center">
         <button @click="toggle(false)"
-            class="w-6 h-12 bg-gray-100 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-800 rounded-l-lg shadow-sm flex items-center justify-center hover:bg-gray-200/30 dark:hover:bg-zinc-800/50 transition">
+            class="w-6 h-12 bg-gray-100 dark:bg-zinc-800 border-r border-gray-300 dark:border-zinc-800 rounded-l-lg shadow-sm flex items-center justify-center hover:bg-gray-200/30 dark:hover:bg-zinc-800/50 transition">
             <x-heroicon-o-chevron-left class="w-10 text-gray-600 dark:text-zinc-400" />
         </button>
     </div>

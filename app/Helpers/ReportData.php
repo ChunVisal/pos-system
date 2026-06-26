@@ -5,75 +5,75 @@ namespace App\Helpers;
 class ReportData
 {
     public static function getSummary()
-{
-    return [
-        'total_revenue' => 32450.00,
-        'total_transactions' => 318,
-        'avg_sale' => 102.04,
-        'items_sold' => 612,
-        'revenue_trend' => 'up',
-        'revenue_change' => '12.5%',
-        'transactions_trend' => 'up',
-        'transactions_change' => '8.2%',
-        'avg_trend' => 'down',
-        'avg_change' => '1.8%',
-        'items_trend' => 'up',
-        'items_change' => '5.4%',
-    ];
-}
+    {
+        return [
+            'total_revenue' => 32450.00,
+            'total_transactions' => 318,
+            'avg_sale' => 102.04,
+            'items_sold' => 612,
+            'revenue_trend' => 'up',
+            'revenue_change' => '12.5%',
+            'transactions_trend' => 'up',
+            'transactions_change' => '8.2%',
+            'avg_trend' => 'down',
+            'avg_change' => '1.8%',
+            'items_trend' => 'up',
+            'items_change' => '5.4%',
+        ];
+    }
 
-public static function getSummaryCards()
-{
-    $summary = self::getSummary();
-    
-    return [
-        [
-            'title' => 'Total Revenue',
-            'value' => '$' . number_format($summary['total_revenue']),
-            'icon' => 'fa-solid fa-dollar-sign',
-            'iconColor' => '#10B981',
-            'iconBg' => '#10B981',
-            'trend' => $summary['revenue_trend'],
-            'percentage' => $summary['revenue_change'],
-            'period' => 'previous period',
-        ],
-        [
-            'title' => 'Transactions',
-            'value' => $summary['total_transactions'],
-            'icon' => 'fa-solid fa-receipt',
-            'iconColor' => '#8B5CF6',
-            'iconBg' => '#8B5CF6',
-            'trend' => $summary['transactions_trend'],
-            'percentage' => $summary['transactions_change'],
-            'period' => 'previous period',
-        ],
-        [
-            'title' => 'Avg Sale Value',
-            'value' => '$' . number_format($summary['avg_sale'], 2),
-            'icon' => 'fa-solid fa-chart-simple',
-            'iconColor' => '#0F6E8C',
-            'iconBg' => '#0F6E8C',
-            'trend' => $summary['avg_trend'],
-            'percentage' => $summary['avg_change'],
-            'period' => 'previous period',
-        ],
-        [
-            'title' => 'Items Sold',
-            'value' => $summary['items_sold'],
-            'icon' => 'fa-solid fa-box-open',
-            'iconColor' => '#D97706',
-            'iconBg' => '#F59E0B',
-            'trend' => $summary['items_trend'],
-            'percentage' => $summary['items_change'],
-            'period' => 'previous period',
-        ],
-    ];
-}
+    public static function getSummaryCards()
+    {
+        $summary = self::getSummary();
+
+        return [
+            [
+                'title' => 'Total Revenue',
+                'value' => '$'.number_format($summary['total_revenue']),
+                'icon' => 'fa-solid fa-dollar-sign',
+                'iconColor' => '#10B981',
+                'iconBg' => '#10B981',
+                'trend' => $summary['revenue_trend'],
+                'percentage' => $summary['revenue_change'],
+                'period' => 'previous period',
+            ],
+            [
+                'title' => 'Transactions',
+                'value' => $summary['total_transactions'],
+                'icon' => 'fa-solid fa-receipt',
+                'iconColor' => '#8B5CF6',
+                'iconBg' => '#8B5CF6',
+                'trend' => $summary['transactions_trend'],
+                'percentage' => $summary['transactions_change'],
+                'period' => 'previous period',
+            ],
+            [
+                'title' => 'Avg Sale Value',
+                'value' => '$'.number_format($summary['avg_sale'], 2),
+                'icon' => 'fa-solid fa-chart-simple',
+                'iconColor' => '#0F6E8C',
+                'iconBg' => '#0F6E8C',
+                'trend' => $summary['avg_trend'],
+                'percentage' => $summary['avg_change'],
+                'period' => 'previous period',
+            ],
+            [
+                'title' => 'Items Sold',
+                'value' => $summary['items_sold'],
+                'icon' => 'fa-solid fa-box-open',
+                'iconColor' => '#D97706',
+                'iconBg' => '#F59E0B',
+                'trend' => $summary['items_trend'],
+                'percentage' => $summary['items_change'],
+                'period' => 'previous period',
+            ],
+        ];
+    }
 
     public static function getRevenueTrend()
     {
         return [
-            'labels'  => ['Nov 19', 'Nov 20', 'Nov 21', 'Nov 22', 'Nov 23', 'Nov 24', 'Nov 25'],
+            'labels' => ['Nov 19', 'Nov 20', 'Nov 21', 'Nov 22', 'Nov 23', 'Nov 24', 'Nov 25'],
             'revenue' => [3800, 2950, 4200, 5100, 4600, 6300, 5500],
         ];
     }
@@ -182,17 +182,21 @@ public static function getSummaryCards()
         ];
     }
 
-    public static function getStockByCategory()
+    public function byCategory(Request $request)
     {
-        $items = collect(InventoryData::getStockItems());
+        $category = Categories::where('code', $request->category_code)->first();
 
-        return $items->groupBy('category_name')->map(function ($group, $name) {
-            return [
-                'category' => $name,
-                'products' => $group->count(),
-                'total_stock' => $group->sum('stock'),
-                'stock_value' => $group->sum(fn ($i) => $i['price'] * $i['stock']),
-            ];
-        })->sortByDesc('stock_value')->values()->all();
+        if (! $category) {
+            return response()->json([]);
+        }
+
+        $products = Product::where('category_id', $category->id)
+            ->select('id', 'name', 'code', 'barcode', 'selling_price')
+            ->get();
+
+        return response()->json([
+            'category_id' => $category->id,  // ← include this
+            'products' => $products,
+        ]);
     }
 }

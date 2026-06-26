@@ -55,7 +55,13 @@
                         {{ $card['title'] }}</p>
                 </div>
                 <div class="flex flex-col items-start gap-1">
-                    <h2 class="text-xl font-bold text-gray-800 dark:text-zinc-100">{{ $card['value'] }}</h2>
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-zinc-100">
+                        @if ($card['title'] === 'Stock Value')
+                            ${{ number_format($card['value'], 2) }}
+                        @else
+                            {{ number_format($card['value']) }}
+                        @endif
+                    </h2>
                     <div class="flex items-start gap-1 text-[12px]">
                         <span
                             class="font-semibold {{ $card['trend'] === 'up' ? 'text-green-500' : 'text-red-500' }} flex items-center gap-0.5">

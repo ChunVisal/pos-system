@@ -116,9 +116,9 @@
 
                     {{-- DYNAMIC BEAUTIFUL EMPTY STATE DESIGN WITH BLADE HEROICONS --}}
                     <div x-show="!hasProducts()" x-cloak
-                        class="mt-8 w-full py-16 flex flex-col items-center justify-center border border-dashed border-gray-300 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 rounded-sm text-center p-6 transition-all">
+                        class="mt-8 w-full py-16 flex flex-col items-center justify-center rounded-sm text-center p-6 transition-all">
                         <div
-                            class="p-4 bg-gray-50 dark:bg-zinc-800/50 rounded-full text-gray-400 dark:text-zinc-500 mb-4 w-16 h-16 flex items-center justify-center">
+                            class=" rounded-full text-gray-400 dark:text-zinc-500 mb-4 w-16 h-16 flex items-center justify-center">
                             <x-heroicon-o-cube-transparent class="w-8 h-8 text-gray-400 dark:text-zinc-500" />
                         </div>
                         <h3 class="text-base font-semibold text-gray-800 dark:text-zinc-200">No Products Found</h3>

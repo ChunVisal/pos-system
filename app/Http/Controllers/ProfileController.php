@@ -37,6 +37,13 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
+    public function countByCategory($categoryCode)
+    {
+        $count = Product::where('category_code', $categoryCode)->count();
+
+        return response()->json(['count' => $count]);
+    }
+
     /**
      * Delete the user's account.
      */

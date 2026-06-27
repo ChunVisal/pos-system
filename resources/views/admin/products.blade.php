@@ -1,7 +1,11 @@
 @extends('layouts.app')
 
 @php
-    $categories = \App\Models\Categories::all();
+    $categories = \App\Models\Categories::withCount([
+        'products as total_stock' => function ($q) {
+            $q->select(\DB::raw('sum(stock_quantity)'));
+        },
+    ])->get();
     $products = \App\Models\Product::with('category')
         ->when(request('search'), function ($q) {
             $search = request('search');
@@ -19,8 +23,8 @@
 
         {{-- <x-skeleton.product> --}}
 
-            @include('admin.partials.products.header-filters')
-            @include('admin.partials.products.slide-over')
+        @include('admin.partials.products.header-filters')
+        @include('admin.partials.products.slide-over')
 
         {{-- </x-skeleton.product> --}}
     </div>

@@ -44,11 +44,48 @@
                         class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] disabled:opacity-50">
                         <option value="">Select product</option>
                         <template x-for="product in categoryProducts" :key="product.id">
-                            <option :value="product.name" x-text="product.name + ' - $' + product.selling_price">
-                            </option>
+                            <option :value="product.name" x-text="product.name"></option>
                         </template>
                     </select>
                 </div>
+
+                {{-- Image --}}
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Product Image</label>
+
+                    {{-- Preview --}}
+                    <div x-show="form.image_preview || form.image_url" class="mb-2 relative inline-block">
+                        <img :src="form.image_preview || form.image_url"
+                            class="h-24 w-24 object-cover rounded-md border border-gray-200 dark:border-zinc-700">
+                        <button type="button"
+                            @click="form.image_preview = ''; form.image_url = ''; form.image_file = null;"
+                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    {{-- URL Input --}}
+                    <input type="url" x-model="form.image_url"
+                        @input="form.image_preview = ''; form.image_file = null;" placeholder="Paste image URL..."
+                        class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] mb-2">
+
+                    {{-- Divider --}}
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="flex-1 h-px bg-gray-200 dark:bg-zinc-700"></div>
+                        <span class="text-xs text-gray-400 dark:text-zinc-500">or upload file</span>
+                        <div class="flex-1 h-px bg-gray-200 dark:bg-zinc-700"></div>
+                    </div>
+
+                    {{-- File Upload --}}
+                    <label
+                        class="flex items-center justify-center gap-2 w-full px-3 py-2 border border-dashed border-gray-300 dark:border-zinc-600 rounded-md cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
+                        <i class="fa-solid fa-arrow-up-from-bracket text-gray-400 text-sm"></i>
+                        <span class="text-xs text-gray-500 dark:text-zinc-400"
+                            x-text="form.image_file ? form.image_file.name : 'Click to upload image'"></span>
+                        <input type="file" accept="image/*" class="hidden" @change="handleImageFile($event)">
+                    </label>
+                </div>
+
 
                 {{-- Price + Stock --}}
                 <div class="grid grid-cols-2 gap-3">
@@ -87,7 +124,6 @@
                 <button type="submit" :disabled="submitting"
                     class="px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] disabled:opacity-60 disabled:cursor-not-allowed flex items-center text-center gap-1">
                     <i x-show="submitting" class="fa-solid fa-spinner fa-spin"></i>
-                    Submit
                     <span
                         x-text="submitting ? (editMode ? 'Saving...' : 'Adding...') : (editMode ? 'Save Changes' : 'Add Product')"></span>
                 </button>

@@ -9,11 +9,11 @@
             class="mt-3 sm:mt-0 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-p rounded-md hover:bg-[#0c5972] transition">
             <i class="fa-solid fa-plus"></i> Add Product
         </button>
-        <button
+        {{-- <button
             class="bg-white dark:bg-zinc-900 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-300 border border-gray-300 dark:border-zinc-800 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
             <x-heroicon-o-arrow-down-tray class="w-5 h-5" />
             Export
-        </button>
+        </button> --}}
     </div>
 </div>
 
@@ -44,9 +44,11 @@
         <select id="categoryFilter"
             class="bg-white dark:bg-zinc-900 bg-none appearance-none text-xs text-gray-800 dark:text-zinc-200 border border-gray-300 dark:border-zinc-800 rounded-md pl-3 pr-8 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] cursor-pointer">
             <option value="all">All Categories</option>
-            @foreach ($categories as $category)
-                <option value="{{ $category->name }}">{{ $category->name }}</option>
-            @endforeach
+@foreach ($categories as $category)
+    <option value="{{ $category->name }}">
+        {{ $category->name }} ({{ (int) $category->total_stock }})
+    </option>
+@endforeach
         </select>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
             stroke="currentColor"
@@ -101,6 +103,7 @@
                     <th class="pb-2 px-4 font-medium text-center">Stock</th>
                     <th class="pb-2 px-4 font-medium">Barcode</th>
                     <th class="pb-2 px-4 font-medium text-center">Status</th>
+                    <th class="pb-2 px-4 font-medium">Date</th>
                     <th class="pb-2 pl-4 font-medium text-right">Actions</th>
                 </tr>
             </thead>
@@ -141,6 +144,7 @@
                         <td class="py-3 pr-4 text-gray-500 dark:text-zinc-500 text-xs">
                             {{ $product->barcode ?? '-' }}
                         </td>
+
                         <td class="py-3 text-center">
                             <span
                                 class="px-2 py-0.5 text-[11px] font-semibold rounded-full
@@ -148,9 +152,20 @@
                                 {{ ucfirst($product->status) }}
                             </span>
                         </td>
+                        <td class="py-3 px-4 text-xs text-gray-500 dark:text-zinc-500 whitespace-nowrap">
+                            <p class="text-gray-500 dark:text-zinc-700">Created
+                                <label
+                                    class="text-gray-600 font-semibold">{{ $product->created_at->format('M d, Y') }}</label>
+                            </p>
+                            <p class="text-gray-500 dark:text-zinc-700">Updated
+                                <label
+                                    class="text-gray-600 font-semibold">{{ $product->updated_at->format('H:i, M d') }}</label>
+                            </p>
+                        </td>
                         <td class="py-3">
                             <div class="flex items-center justify-end gap-3">
-                                <button @click="openEdit({{ json_encode($product) }})" type="button"
+                                <button @click="openEdit({{ json_encode($product->load('category')) }})"
+                                    type="button"
                                     class="text-gray-400 dark:text-zinc-500 hover:text-[#0F6E8C] dark:hover:text-[#0F6E8C]"
                                     title="Edit">
                                     <x-heroicon-m-pencil-square class="w-5 h-5" />

@@ -65,14 +65,21 @@
             .catch(console.error);
     }
 
-    // ── Alpine component ──────────────────────────────────────────
     function productPage() {
+
+        let _isSubmitting = false;
+
         return {
+
+            categoryProducts: [],
             search: '',
             open: false,
             editMode: false,
-            categoryProducts: [],
+            submitting: false,
             selectedCategoryId: null,
+            pendingName: '',
+
+
 
             form: {
                 id: null,
@@ -84,6 +91,9 @@
                 stock: null,
                 status: 'active',
                 uoms: [],
+                image_url: '',
+                image_file: null,
+                image_preview: '',
             },
 
             emptyForm() {
@@ -97,7 +107,18 @@
                     stock: null,
                     status: 'active',
                     uoms: [],
+                    image_url: '',
+                    image_file: null,
+                    image_preview: '',
                 };
+            },
+
+            handleImageFile(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                this.form.image_file = file;
+                this.form.image_preview = URL.createObjectURL(file);
+                this.form.image_url = ''; // clear url if file chosen
             },
 
             clearSearch() {
@@ -105,9 +126,12 @@
             },
 
             openAdd() {
+                _isSubmitting = false
                 this.editMode = false;
+                this.submitting = false; // ← reset
                 this.categoryProducts = [];
                 this.selectedCategoryId = null;
+                this.pendingName = '';
                 this.form = this.emptyForm();
                 this.open = true;
             },
@@ -117,40 +141,46 @@
                 this.submitting = false;
                 this.categoryProducts = [];
                 this.selectedCategoryId = product.category_id ?? null;
+                this.pendingName = product.name ?? '';
 
                 this.form = {
                     id: product.id ?? null,
                     code: product.code ?? '',
-                    name: product.name ?? '',
+                    name: '',
                     category_code: product.category?.code ?? '',
                     barcode: product.barcode ?? '',
                     price: product.selling_price ?? null,
                     stock: product.stock_quantity ?? null,
                     status: product.status ?? 'active',
                     uoms: [],
+                    image_url: product.image ?? '',
+                    image_file: null,
+                    image_preview: '',
                 };
 
-                // Pre-load products for the category dropdown
-                if (this.form.category_code) {
-                    fetch(`/admin/products/by-category?category_code=${this.form.category_code}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            this.categoryProducts = Array.isArray(data.products) ? data.products : [];
-                            this.selectedCategoryId = data.category_id ?? null;
-                        });
-                }
-
                 this.open = true;
+
+                if (!this.form.category_code) return;
+
+                fetch(`/admin/products/by-category?category_code=${this.form.category_code}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        this.categoryProducts = Array.isArray(data.products) ? data.products : [];
+                        this.selectedCategoryId = data.category_id ?? null;
+                        this.form.name = this.pendingName;
+                    })
+                    .catch(() => {
+                        this.categoryProducts = [];
+                        this.form.name = this.pendingName;
+                    });
             },
+
             closePanel() {
                 this.open = false;
             },
 
             loadProducts() {
                 this.form.name = '';
-                this.form.code = '';
-                this.form.barcode = '';
-                this.categoryProducts = [];
                 this.selectedCategoryId = null;
 
                 if (!this.form.category_code) return;
@@ -158,78 +188,72 @@
                 fetch(`/admin/products/by-category?category_code=${this.form.category_code}`)
                     .then(res => res.json())
                     .then(data => {
-                        // data = { category_id: 1, products: [...] }
                         this.categoryProducts = Array.isArray(data.products) ? data.products : [];
                         this.selectedCategoryId = data.category_id ?? null;
+                    })
+                    .catch(() => {
+                        this.categoryProducts = [];
                     });
             },
 
             autoFillDetails() {
                 const selected = this.categoryProducts.find(p => p.name === this.form.name);
                 if (!selected) return;
-
-                // Generate new unique code instead of reusing existing
-                const prefix = this.form.category_code.replace('CAT-', '');
-                const rand = Math.floor(Math.random() * 90000) + 10000;
-                this.form.code = ''; // ← backend generates this
-                this.form.barcode = '';
                 this.form.price = selected.selling_price ?? null;
             },
 
-            generateBarcode() {
-                this.form.barcode = 'BC' + Math.floor(Math.random() * 1_000_000_000);
-            },
-
-            addUomRow() {
-                this.form.uoms.push({
-                    description: '',
-                    quantity_per_unit: 1,
-                    price: null
-                });
-            },
-
-            removeUomRow(index) {
-                this.form.uoms.splice(index, 1);
-            },
             submitForm() {
-                if (this.submitting) return; // ← block double calls
+                if (_isSubmitting) {
+                    console.log('Blocked duplicate submit');
+                    return;
+                }
+                _isSubmitting = true;
                 this.submitting = true;
 
                 const url = this.editMode ? `/admin/products/${this.form.id}` : `/admin/products`;
-                const method = this.editMode ? 'PUT' : 'POST';
 
-                const payload = {
-                    name: this.form.name,
-                    category_id: this.selectedCategoryId,
-                    selling_price: this.form.price,
-                    stock_quantity: this.form.stock,
-                    status: this.form.status,
-                };
+                const fd = new FormData();
+                fd.append('name', this.form.name);
+                fd.append('category_id', this.selectedCategoryId);
+                fd.append('selling_price', this.form.price);
+                fd.append('stock_quantity', this.form.stock);
+                fd.append('status', this.form.status);
+
+                if (this.form.image_file) {
+                    fd.append('image_file', this.form.image_file);
+                } else if (this.form.image_url) {
+                    fd.append('image_url', this.form.image_url);
+                }
+
+                if (this.editMode) fd.append('_method', 'PUT');
 
                 fetch(url, {
-                        method,
+                        method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
-                        body: JSON.stringify(payload)
+                        body: fd
                     })
                     .then(res => {
-                        if (!res.ok) return res.text().then(text => {
-                            throw new Error(text);
+                        if (!res.ok) return res.text().then(t => {
+                            throw new Error(t);
                         });
                         return res.json();
                     })
                     .then(data => {
                         if (data && data.id) {
+                            _isSubmitting = false;
                             window.location.href = window.location.pathname;
                         }
                     })
                     .catch(err => {
-                        this.submitting = false; // ← reset on error so user can retry
+                        _isSubmitting = false;
+                        this.submitting = false;
                         alert('Error: ' + err.message);
                     });
             },
+
+            
         };
     }
 </script>

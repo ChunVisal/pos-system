@@ -91,6 +91,7 @@
                                     <p class="text-xs font-medium truncate w-full text-gray-800 dark:text-zinc-100">
                                         {{ $category->name }}
                                     </p>
+
                                 </div>
                             </div>
                         @endforeach
@@ -142,8 +143,8 @@
 
                                 {{-- Image Container --}}
                                 <div class="w-full h-[140px] bg-gray-50 dark:bg-zinc-600 overflow-hidden">
-                                    <img src="{{ $product->image }}" alt="{{ $product->name }}"
-                                        class="w-full h-full object-cover">
+                                    <img src="{{ $product->image ?? 'https://res.cloudinary.com/dexr27qho/image/upload/v1782723706/8fc9e618-ca35-4366-a173-ae4d15ec0aef_vyjksv.png' }}"
+                                        alt="{{ $product->name }}" class="w-full h-full object-cover">
                                 </div>
 
                                 {{-- Content Layout --}}
@@ -152,7 +153,10 @@
                                         class="text-sm font-medium text-gray-800 dark:text-zinc-100 line-clamp-2 min-h-[40px]">
                                         {{ $product->name }}
                                     </p>
-
+                                    {{-- <p
+                                        class="text-sm font-medium text-gray-800 dark:text-zinc-100 line-clamp-2 min-h-[40px]">
+                                        {{ $product-> }}
+                                    </p> --}}
                                     {{-- Pricing & Stock Metrics --}}
                                     <div
                                         class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-zinc-800">

@@ -88,8 +88,8 @@
                                     stock</span>
                             @endif
                         </td>
-                        <td class="py-3 pl-4 text-gray-500 dark:text-zinc-500 text-xs">
-                            {{ $product->updated_at->format('M d, Y') }}
+                        <td class="py-3 pl-4 text-gray-500 dark:text-zinc-500 text-xs whitespace-nowrap">
+                            {{ $product->updated_at->format('H:i, M d, Y') }}
                         </td>
                         <td class="py-3">
                             <div class="flex items-center justify-end gap-3">

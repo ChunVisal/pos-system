@@ -274,6 +274,5 @@ class DatabaseSeeder extends Seeder
                 'status' => 'active',
             ]
         );
-
     }
 }

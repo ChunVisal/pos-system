@@ -239,7 +239,6 @@
                         ctx.textBaseline = 'middle';
                         ctx.fillText(paymentData[i], endX + dir * 4, midY);
                     });
-                    ctx.restore();
                 },
             }],
         });

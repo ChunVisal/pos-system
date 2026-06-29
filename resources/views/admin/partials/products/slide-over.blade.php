@@ -1,4 +1,4 @@
-<div x-show="open" x-cloak class="fixed inset-0 z-50" style="display: none;">
+<div x-show="open" x-cloak class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
 
     <div x-show="open" x-transition.opacity @click="closePanel()"
         class="absolute inset-0 bg-gray-900/40 dark:bg-black/60"></div>
@@ -10,29 +10,31 @@
 
         {{-- Header --}}
         <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-zinc-800">
-            <h2 class="text-base font-semibold text-gray-800 dark:text-zinc-100"
-                x-text="editMode ? 'Edit Product' : 'Add Product'"></h2>
+            <div>
+                <h2 class="text-base font-semibold text-gray-800 dark:text-zinc-100"
+                    x-text="editMode ? 'Edit Product' : 'Add Product'"></h2>
+                <p x-show="!editMode && draftList.length > 0" class="text-xs text-[#0F6E8C] mt-0.5"
+                    x-text="draftList.length + ' product(s) in draft'"></p>
+            </div>
             <button @click="closePanel()" type="button"
                 class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
 
-        {{-- ONE form wrapping fields + footer --}}
-        <form @submit.prevent="submitForm()" class="flex-1 flex flex-col overflow-hidden">
-
-            {{-- Scrollable fields --}}
+        <form @submit.prevent="submitForm()" x-ref="productForm" class="flex-1 flex flex-col overflow-hidden">
             <div class="flex-1 overflow-y-auto px-5 py-4 space-y-4">
 
                 {{-- Category --}}
                 <div>
                     <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Category *</label>
-                    <select x-model="form.category_code" @change="loadProducts()" required
+                    <select x-model="form.category_code" @change.one="loadProducts()" required
                         class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C]">
                         <option value="">Select category</option>
                         @foreach ($categories as $category)
                             <option value="{{ $category->code }}">{{ $category->name }}</option>
                         @endforeach
+
                     </select>
                 </div>
 
@@ -40,11 +42,13 @@
                 <div>
                     <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Product Name
                         *</label>
-                    <select x-model="form.name" @change="autoFillDetails()" required :disabled="!form.category_code"
+                    <select x-model="form.name" @change.one="autoFillDetails()"
+                        :required="!editMode ? draftList.length === 0 : true" :disabled="!form.category_code"
                         class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] disabled:opacity-50">
                         <option value="">Select product</option>
-                        <template x-for="product in categoryProducts" :key="product.id">
-                            <option :value="product.name" x-text="product.name"></option>
+                        <template x-for="product in categoryProducts" :key="product.name">
+                            <option :value="product.name" :selected="product.name === form.name" x-text="product.name">
+                            </option>
                         </template>
                     </select>
                 </div>
@@ -52,8 +56,6 @@
                 {{-- Image --}}
                 <div>
                     <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Product Image</label>
-
-                    {{-- Preview --}}
                     <div x-show="form.image_preview || form.image_url" class="mb-2 relative inline-block">
                         <img :src="form.image_preview || form.image_url"
                             class="h-24 w-24 object-cover rounded-md border border-gray-200 dark:border-zinc-700">
@@ -63,41 +65,34 @@
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
-
-                    {{-- URL Input --}}
                     <input type="url" x-model="form.image_url"
                         @input="form.image_preview = ''; form.image_file = null;" placeholder="Paste image URL..."
                         class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] mb-2">
-
-                    {{-- Divider --}}
                     <div class="flex items-center gap-2 mb-2">
                         <div class="flex-1 h-px bg-gray-200 dark:bg-zinc-700"></div>
                         <span class="text-xs text-gray-400 dark:text-zinc-500">or upload file</span>
                         <div class="flex-1 h-px bg-gray-200 dark:bg-zinc-700"></div>
                     </div>
-
-                    {{-- File Upload --}}
                     <label
                         class="flex items-center justify-center gap-2 w-full px-3 py-2 border border-dashed border-gray-300 dark:border-zinc-600 rounded-md cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
                         <i class="fa-solid fa-arrow-up-from-bracket text-gray-400 text-sm"></i>
                         <span class="text-xs text-gray-500 dark:text-zinc-400"
                             x-text="form.image_file ? form.image_file.name : 'Click to upload image'"></span>
-                        <input type="file" accept="image/*" class="hidden" @change="handleImageFile($event)">
+                        <input type="file" accept="image/*" class="hidden" @change.one="handleImageFile($event)">
                     </label>
                 </div>
-
 
                 {{-- Price + Stock --}}
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Price ($)
                             *</label>
-                        <input type="number" step="0.01" x-model.number="form.price" required placeholder="0.00"
+                        <input type="number" step="0.01" x-model.number="form.price" placeholder="0.00"
                             class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C]">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Stock *</label>
-                        <input type="number" x-model.number="form.stock" required placeholder="0"
+                        <input type="number" x-model.number="form.stock" placeholder="0"
                             class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C]">
                     </div>
                 </div>
@@ -113,23 +108,82 @@
                     </button>
                 </div>
 
+                <div x-show="!editMode">
+                    <button type="button" id="addToDraftBtn"
+                        :class="draftEditIndex !== null ?
+                            'text-green-600 border-[#0F6E8C] hover:bg-green-50 dark:hover:bg-[#0F6E8C]/20' :
+                            'text-[#0F6E8C] border-[#0F6E8C] hover:bg-[#0F6E8C]/10'"
+                        class="w-full px-4 py-2 text-xs font-semibold border rounded-md transition flex items-center justify-center gap-2">
+                        <i x-show="draftEditIndex === null" class="fa-solid fa-plus"></i>
+                        <i x-show="draftEditIndex !== null" class="fa-solid fa-check"></i>
+                        <span x-text="draftEditIndex !== null ? 'Save to Draft' : 'Add to Draft'"></span>
+                    </button>
+                </div>
+
+                {{-- Draft List --}}
+                <div x-show="!editMode && draftList.length > 0" class="space-y-2">
+                    <p
+                        class="text-xs font-semibold text-gray-600 dark:text-zinc-400 border-b border-gray-200 dark:border-zinc-700 pb-1">
+                        Draft List (<span x-text="draftList.length"></span>)
+                    </p>
+                    <template x-for="(item, index) in draftList" :key="item._id">
+                        <div
+                            class="flex items-center justify-between bg-gray-50 dark:bg-zinc-800 rounded-md px-3 py-2 gap-2">
+
+                            {{-- Image --}}
+                            <div class="w-10 h-10 shrink-0 rounded overflow-hidden bg-gray-200 dark:bg-zinc-700">
+                                <img :src="item.image_url || item.image_preview ||
+                                    'https://res.cloudinary.com/dexr27qho/image/upload/v1782723706/8fc9e618-ca35-4366-a173-ae4d15ec0aef_vyjksv.png'"
+                                    style="width:100%;height:100%;object-fit:cover;">
+                            </div>
+
+                            {{-- Info --}}
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-medium text-gray-800 dark:text-zinc-100 truncate"
+                                    x-text="item.name"></p>
+                                <p class="text-[10px] text-gray-400 dark:text-zinc-500">
+                                    $<span x-text="item.price"></span> · Stock: <span x-text="item.stock"></span>
+                                </p>
+                                {{-- Status badge --}}
+                                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                                    :class="item.status === 'active' ?
+                                        'bg-green-50 text-green-600 dark:bg-green-950/40 dark:text-green-400' :
+                                        'bg-gray-100 text-gray-500 dark:bg-zinc-700 dark:text-zinc-400'"
+                                    x-text="item.status === 'active' ? 'Active' : 'Inactive'">
+                                </span>
+                            </div>
+
+                            {{-- Actions --}}
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button type="button" @click="editDraft(index)"
+                                    class="text-gray-400 hover:text-[#0F6E8C] transition">
+                                    <i class="fa-solid fa-pen text-xs"></i>
+                                </button>
+                                <button type="button" @click="removeDraft(index)"
+                                    class="text-red-400 hover:text-red-600 transition">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
             </div>
 
-            {{-- Footer inside the same form --}}
+            {{-- Footer --}}
             <div class="flex items-center justify-end gap-3 px-5 py-4 border-t border-gray-200 dark:border-zinc-800">
                 <button @click="closePanel()" type="button"
                     class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-300 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800">
                     Cancel
                 </button>
                 <button type="submit" :disabled="submitting"
-                    class="px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] disabled:opacity-60 disabled:cursor-not-allowed flex items-center text-center gap-1">
+                    class="px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md
+                     hover:bg-[#0c5972] disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-1">
                     <i x-show="submitting" class="fa-solid fa-spinner fa-spin"></i>
                     <span
-                        x-text="submitting ? (editMode ? 'Saving...' : 'Adding...') : (editMode ? 'Save Changes' : 'Add Product')"></span>
+                        x-text="submitting ? (editMode ? 'Saving...' : 'Adding...') : (editMode ? 'Save Changes' : draftList.length > 0 ? 'Submit All (' + draftList.length + ')' : 'Add Product')"></span>
                 </button>
             </div>
-
-        </form>{{-- ← only one closing form tag --}}
-
+        </form>
     </div>
 </div>

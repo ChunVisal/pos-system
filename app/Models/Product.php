@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Product extends Model
 {
+
     protected $table = 'products';
 
     protected $fillable = [
@@ -22,7 +23,6 @@ class Product extends Model
         'brand',
         'image',
         'low_stock_threshold',
-
     ];
 
     public function category(): BelongsTo

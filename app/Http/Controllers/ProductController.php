@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ProductData;
 use App\Models\Categories;
 use App\Models\Product;
+use App\Models\ProductCatalog;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -12,13 +12,14 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $products = Product::when($request->search, function ($query) use ($request) {
+            $search = $request->search;
+
             return $query->whereAny([
                 'name',
                 'code',
                 'barcode',
             ], 'like', '%'.$request->search.'%');
         })->with('category')->get();
-
         $categories = Categories::all();
 
         return view('admin.products', compact('products', 'categories'));
@@ -101,33 +102,43 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
-        Product::where('id', $id)->delete();
+        Product::findOrFail($id)->delete(); // hard delete, no soft delete
+
+        return response()->json(['message' => 'Deleted']);
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        Product::whereIn('id', $request->ids)->delete();
 
         return response()->json(['message' => 'Deleted']);
     }
 
     public function byCategory(Request $request)
     {
-        $category = Categories::where('code', $request->category_code)->first();
+        $category = Categories::select('id', 'code', 'name')->where('code', $request->category_code)->first();
 
         if (! $category) {
             return response()->json(['category_id' => null, 'products' => []]);
         }
 
-        $helperProducts = ProductData::getProductsByCategory($request->category_code);
+        // Get names from catalog — NEVER deleted, always there!
+        $catalogProducts = ProductCatalog::where('category_code', $request->category_code)->get();
+
+        // Get DB products for price/code/stock info
         $dbProducts = Product::where('category_id', $category->id)
             ->select('id', 'name', 'code', 'barcode', 'selling_price')
             ->get()->keyBy('name');
 
-        $products = collect($helperProducts)->map(function ($item) use ($dbProducts) {
-            $db = $dbProducts->get($item['name']);
+        $products = $catalogProducts->map(function ($item) use ($dbProducts) {
+            $db = $dbProducts->get($item->name);
 
             return [
                 'id' => $db?->id ?? null,
-                'name' => $item['name'],
+                'name' => $item->name,
                 'code' => $db?->code ?? '',
                 'barcode' => $db?->barcode ?? '',
-                'selling_price' => $db?->selling_price ?? $item['price'],
+                'selling_price' => $db?->selling_price ?? $item->default_price,
             ];
         })->values();
 
@@ -139,23 +150,13 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        // Prevent duplicate submissions within 5 seconds
         $cacheKey = 'store_product_'.md5($request->name.$request->category_id.$request->ip());
 
         if (\Cache::has($cacheKey)) {
-            \Log::info('=== DUPLICATE BLOCKED ===', ['name' => $request->name]);
-
             return response()->json(\Cache::get($cacheKey));
         }
 
         try {
-            \Log::info('=== STORE CALLED ===', [
-                'time' => now()->format('H:i:s.u'),
-                'name' => $request->name,
-                'user_agent' => $request->header('User-Agent'),
-                'ip' => $request->ip(),
-            ]);
-
             $prefix = 'PROD-'.strtoupper(substr($request->name, 0, 3));
             do {
                 $code = $prefix.'-'.rand(1000, 9999);
@@ -186,7 +187,6 @@ class ProductController extends Controller
                 'low_stock_threshold' => $request->low_stock_threshold ?? 5,
             ]);
 
-            // Cache the result for 5 seconds to block duplicates
             \Cache::put($cacheKey, $product, 5);
 
             return response()->json($product);

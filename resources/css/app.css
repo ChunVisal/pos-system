@@ -4,6 +4,7 @@
 
 /* ALL your custom styles go here */
 
+
 body {
     font-family: 'Inter', sans-serif;
      max-width: 1600px;
@@ -11,6 +12,7 @@ body {
   margin: 0 auto;
   width: 100%;
 }
+
 
  h1, h2, h3, h4, h5, h6 {
             font-family: 'Roboto', sans-serif;

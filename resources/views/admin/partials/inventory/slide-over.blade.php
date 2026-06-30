@@ -101,9 +101,10 @@
                 class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-300 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800">
                 Cancel
             </button>
-            <button @click="submitForm()" type="button"
-                class="px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972]">
-                Save Adjustment
+            <button @click="submitForm()" type="button" :disabled="submitting"
+                class="px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] disabled:opacity-60">
+                Submit
+                <span x-text="submitting ? 'Saving...' : 'Save Adjustment'"></span>
             </button>
         </div>
     </div>

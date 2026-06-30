@@ -1,18 +1,30 @@
 <script>
     // ── Filter table ──────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function() {
-        const btn = document.getElementById('addToDraftBtn');
-        if (btn) {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                const alpine = Alpine.$data(document.querySelector('[x-data="productPage()"]'));
-                alpine.addToDraft();
-            }, {
-                once: false
+
+        $(document).ready(function() {
+            let searchTimer;
+
+            $('#search').on('input', function() {
+                clearTimeout(searchTimer);
+                const query = $(this).val();
+                $('#clearSearch').toggle(query.length > 0);
+
+                searchTimer = setTimeout(function() {
+                    $.get('{{ route('admin.products') }}', {
+                        search: query,
+                        ajax: 1
+                    }, function(data) {
+                        $('#productsTableBody').html(data.table);
+                        $('#productsGridBody').html(data.grid);
+                    });
+                }, 400); // debounce 400ms
             });
-        }
+
+            $('#clearSearch').on('click', function() {
+                $('#search').val('').trigger('input');
+            });
+        });
 
         var categoryFilter = document.getElementById('categoryFilter');
         var statusFilter = document.getElementById('statusFilter');
@@ -64,7 +76,7 @@
                 cards.forEach(function(card) {
                     // Skip empty state divs (they don't have product data)
                     if (card.querySelector('img') === null && card.querySelector('svg') !== null)
-                return;
+                        return;
 
                     // Get data from the card's content
                     var nameEl = card.querySelector('p:first-of-type'); // First paragraph is name
@@ -343,6 +355,14 @@
                     image_preview: '',
                 };
 
+                const existsInDB = this.categoryProducts.find(p => p.name === this.form.name && p.id !== null);
+                if (existsInDB && this.draftEditIndex === null) {
+                    alert(
+                        `"${this.form.name}" already exists in database.`);
+                    this.addingToDraft = false;
+                    return;
+                }
+
                 this.form = {
                     ...original
                 };
@@ -372,6 +392,7 @@
 
             addToDraft() {
 
+                console.log('addToDraft called, addingToDraft:', this.addingToDraft);
                 // ← ADD HERE
                 const existsInDB = this.categoryProducts.find(p => p.name === this.form.name && p.id !== null);
                 if (existsInDB && this.draftEditIndex === null) {
@@ -385,8 +406,8 @@
                 this.addingToDraft = true;
 
 
-                if (!this.form.name || !this.form.price) {
-                    alert('Please select a product and enter price!');
+                if (!this.form.name) {
+                    alert('Please select a product!');
                     this.addingToDraft = false;
                     return;
                 }
@@ -523,13 +544,13 @@
 
             submitForm() {
 
-                // ← ADD HERE
-                const existsInDB = this.categoryProducts.find(p => p.name === this.form.name && p.id !== null);
-                if (existsInDB && this.draftEditIndex === null) {
-                    alert(
-                        `"${this.form.name}" already exists in database.`);
-                    this.addingToDraft = false;
-                    return;
+                if (!this.editMode) {
+                    const existsInDB = this.categoryProducts.find(p => p.name === this.form.name && p.id !== null);
+                    if (existsInDB && this.draftEditIndex === null) {
+                        alert(`"${this.form.name}" already exists in database.`);
+                        this.addingToDraft = false;
+                        return;
+                    }
                 }
 
                 if (_isSubmitting) {

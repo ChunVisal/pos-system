@@ -12,7 +12,7 @@
             </span>
         </div>
     </div>
-    <div class="items-center flex gap-4">
+    <div  class="items-center flex gap-4">
         <button @click="openAdd()"
             class="mt-3 sm:mt-0 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-p rounded-md hover:bg-[#0c5972] transition">
             <i class="fa-solid fa-plus"></i> Add Product
@@ -41,19 +41,13 @@
     <div class="relative flex-1 min-w-[200px]">
         <i
             class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-xs"></i>
-        <form action="{{ route('admin.products') }}" method="GET" class="flex items-center gap-3">
-            <input id="search" name="search" type="text" value="{{ request('search') }}"
-                placeholder="Search by name, categories, code, or barcode..."
-                class="w-full pl-8 pr-8 py-1.5 text-xs bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200 border border-gray-300 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-1 focus:ring-p placeholder-gray-400 dark:placeholder-zinc-500">
-            @if (request('search'))
-                <button type="button" onclick="document.getElementById('search').value=''; this.form.submit();"
-                    class="absolute right-[90px] top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 z-10">
-                    ✕
-                </button>
-            @endif
-            <button type="submit"
-                class="bg-p font-medium text-sm py-[5px] px-2 hover:bg-p text-white rounded-md">Submit</button>
-        </form>
+        <input id="search" type="text" value="{{ request('search') }}"
+            placeholder="Search by name, categories, code, or barcode..."
+            class="w-full pl-8 pr-8 py-1.5 text-xs bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200 border border-gray-300 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-1 focus:ring-p placeholder-gray-400 dark:placeholder-zinc-500">
+        <button type="button" id="clearSearch" style="display:none;"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 z-10">
+            ✕
+        </button>
     </div>
 
     {{-- Category --}}
@@ -129,11 +123,10 @@
 <div class="bg-white dark:bg-zinc-900 p-4 rounded-md shadow-xs border border-gray-200 dark:border-zinc-800/60">
     <div class="overflow-x-auto">
         <div x-show="viewMode === 'table'">
-            <table class="w-full text-sm">
+            <table id="productsTableBody" class="w-full text-sm ">
                 <thead>
                     <tr
                         class="text-left text-xs text-gray-500 dark:text-zinc-400 border-b border-gray-200 dark:border-zinc-800">
-
                         <th class="pb-2 pr-4 font-medium">Product</th>
                         <th class="pb-2 px-4 font-medium">Category</th>
                         <th class="pb-2 px-4 font-medium text-right">Price</th>
@@ -275,37 +268,38 @@
                             </td>
                         </tr>
                     @endforelse
-                    {{-- Empty state for category filter --}}
-                    <tr id="noCategoryRow" style="display:none;">
-                        <td colspan="7" class="text-center py-16">
-                            <div class="col-span-full flex flex-col items-center justify-center py-16">
-                                <div
-                                    class="w-16 h-16 mb-4 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center">
-                                    <svg class="w-8 h-8 text-gray-400 dark:text-zinc-500" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                    </svg>
-                                </div>
-                                <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-1">No products
-                                    found</h3>
-                                <p class="text-xs text-gray-400 dark:text-zinc-500">Get started by adding your first
-                                    product.</p>
-                                <button @click="openAdd()"
-                                    class="mt-4 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition">
-                                    <i class="fa-solid fa-plus text-[10px]"></i> Add Your First Product
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+
                 </tbody>
+                {{-- Empty state for category filter --}}
+                <tr id="noCategoryRow" class="" style="display:none;">
+                    <td class="text-center py-5">
+                        <div class="col-span-full flex flex-col items-center justify-center py-16">
+                            <div
+                                class="w-16 h-16 mb-4 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center">
+                                <svg class="w-8 h-8 text-gray-400 dark:text-zinc-500" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                            </div>
+                            <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-1">No products
+                                found</h3>
+                            <p class="text-xs text-gray-400 dark:text-zinc-500">Get started by adding your first
+                                product.</p>
+                            <button @click="openAdd()"
+                                class="mt-4 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition">
+                                <i class="fa-solid fa-plus text-[10px]"></i> Add Your First Product
+                            </button>
+                        </div>
+                    </td>
+                </tr>
             </table>
 
         </div>
     </div>
 
     {{-- Grid View --}}
-    <div x-show="viewMode === 'grid'">
+    <div id="productsGridBody" x-show="viewMode === 'grid'">
         @include('admin.partials.products.grid')
     </div>
 </div>

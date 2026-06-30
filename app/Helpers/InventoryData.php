@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\Product;
+use App\Models\StockMovement;
 
 class InventoryData
 {
@@ -56,12 +57,11 @@ class InventoryData
                 'iconColor' => '#0F6E8C',
                 'trend' => 'up',
                 'percentage' => '4.0%',
-                'period' => 'last month',
+                'period' => 'Today',
             ],
             [
                 'title' => 'Low Stock',
-                'value' => Product::query()
-                    ->whereColumn('stock_quantity', '<=', 'low_stock_threshold', 'and')
+                'value' => Product::whereColumn('stock_quantity', '<', 'low_stock_threshold', 'and')
                     ->where('stock_quantity', '>', 0, 'and')
                     ->count(),
                 'icon' => 'fa-solid fa-triangle-exclamation',
@@ -69,7 +69,7 @@ class InventoryData
                 'iconColor' => '#D97706',
                 'trend' => 'up',
                 'percentage' => '5.0%',
-                'period' => 'last week',
+                'period' => 'Today',
             ],
             [
                 'title' => 'Out of Stock',
@@ -79,19 +79,17 @@ class InventoryData
                 'iconColor' => '#EF4444',
                 'trend' => 'down',
                 'percentage' => '1.0%',
-                'period' => 'last week',
+                'period' => 'Today',
             ],
             [
                 'title' => 'Stock Value',
-                'value' => Product::query()
-                    ->selectRaw('SUM(stock_quantity * cost_price) as total', [])
-                    ->value('total') ?? 0,
+                'value' => Product::selectRaw('SUM(stock_quantity * selling_price) as total', [])->value('total') ?? 0,
                 'icon' => 'fa-solid fa-sack-dollar',
                 'iconBg' => '#10B981',
                 'iconColor' => '#10B981',
                 'trend' => 'up',
                 'percentage' => '7.5%',
-                'period' => 'last month',
+                'period' => 'Today',
             ],
         ];
     }
@@ -113,78 +111,102 @@ class InventoryData
         ];
     }
 
-    public static function getMovementTrend()
+    private function getMovementTrend()
     {
+        $movements = StockMovement::orderBy('created_at', 'asc')->get();
+
+        if ($movements->isEmpty()) {
+            return [
+                'labels' => [],
+                'stock_in' => [],
+                'stock_out' => [],
+            ];
+        }
+
+        $grouped = $movements->groupBy(function ($item) {
+            return $item->created_at->format('d M');
+        });
+
+        $labels = [];
+        $stockIn = [];
+        $stockOut = [];
+
+        foreach ($grouped as $time => $items) {
+            $labels[] = $time;
+            $stockIn[] = $items->where('type', 'in')->sum('quantity');
+            $stockOut[] = $items->where('type', 'out')->sum('quantity');
+        }
+
         return [
-            'labels' => ['Nov 19', 'Nov 20', 'Nov 21', 'Nov 22', 'Nov 23', 'Nov 24', 'Nov 25'],
-            'stock_in' => [8, 0, 5, 12, 10, 15, 6],
-            'stock_out' => [4, 7, 3, 9, 6, 11, 5],
+            'labels' => $labels,
+            'stock_in' => $stockIn,
+            'stock_out' => $stockOut,
         ];
     }
 
-    public static function getMovements()
-    {
-        return [
-            [
-                'id' => 1,
-                'product_name' => 'NVIDIA RTX 4090',
-                'product_code' => 'PRD-0001',
-                'type' => 'in',
-                'quantity' => 5,
-                'reason' => 'Restock',
-                'user' => 'Admin',
-                'date' => '2024-11-24 10:32',
-            ],
-            [
-                'id' => 2,
-                'product_name' => 'Samsung 990 Pro 1TB NVMe',
-                'product_code' => 'PRD-0007',
-                'type' => 'out',
-                'quantity' => 2,
-                'reason' => 'Sale',
-                'user' => 'Cashier 1',
-                'date' => '2024-11-24 09:15',
-            ],
-            [
-                'id' => 3,
-                'product_name' => 'Seagate Barracuda 2TB HDD',
-                'product_code' => 'PRD-0008',
-                'type' => 'out',
-                'quantity' => 3,
-                'reason' => 'Sale',
-                'user' => 'Cashier 2',
-                'date' => '2024-11-23 16:48',
-            ],
-            [
-                'id' => 4,
-                'product_name' => 'Noctua NH-D15 Air Cooler',
-                'product_code' => 'PRD-0013',
-                'type' => 'in',
-                'quantity' => 10,
-                'reason' => 'Restock',
-                'user' => 'Admin',
-                'date' => '2024-11-23 11:02',
-            ],
-            [
-                'id' => 5,
-                'product_name' => 'ASUS ROG Strix Z790-E',
-                'product_code' => 'PRD-0009',
-                'type' => 'out',
-                'quantity' => 1,
-                'reason' => 'Damaged',
-                'user' => 'Admin',
-                'date' => '2024-11-22 14:20',
-            ],
-            [
-                'id' => 6,
-                'product_name' => 'Kingston Fury 16GB DDR4',
-                'product_code' => 'PRD-0006',
-                'type' => 'out',
-                'quantity' => 4,
-                'reason' => 'Sale',
-                'user' => 'Cashier 1',
-                'date' => '2024-11-22 13:05',
-            ],
-        ];
-    }
+    // public static function getMovements()
+    // {
+    //     return [
+    //         [
+    //             'id' => 1,
+    //             'product_name' => 'NVIDIA RTX 4090',
+    //             'product_code' => 'PRD-0001',
+    //             'type' => 'in',
+    //             'quantity' => 5,
+    //             'reason' => 'Restock',
+    //             'user' => 'Admin',
+    //             'date' => '2024-11-24 10:32',
+    //         ],
+    //         [
+    //             'id' => 2,
+    //             'product_name' => 'Samsung 990 Pro 1TB NVMe',
+    //             'product_code' => 'PRD-0007',
+    //             'type' => 'out',
+    //             'quantity' => 2,
+    //             'reason' => 'Sale',
+    //             'user' => 'Cashier 1',
+    //             'date' => '2024-11-24 09:15',
+    //         ],
+    //         [
+    //             'id' => 3,
+    //             'product_name' => 'Seagate Barracuda 2TB HDD',
+    //             'product_code' => 'PRD-0008',
+    //             'type' => 'out',
+    //             'quantity' => 3,
+    //             'reason' => 'Sale',
+    //             'user' => 'Cashier 2',
+    //             'date' => '2024-11-23 16:48',
+    //         ],
+    //         [
+    //             'id' => 4,
+    //             'product_name' => 'Noctua NH-D15 Air Cooler',
+    //             'product_code' => 'PRD-0013',
+    //             'type' => 'in',
+    //             'quantity' => 10,
+    //             'reason' => 'Restock',
+    //             'user' => 'Admin',
+    //             'date' => '2024-11-23 11:02',
+    //         ],
+    //         [
+    //             'id' => 5,
+    //             'product_name' => 'ASUS ROG Strix Z790-E',
+    //             'product_code' => 'PRD-0009',
+    //             'type' => 'out',
+    //             'quantity' => 1,
+    //             'reason' => 'Damaged',
+    //             'user' => 'Admin',
+    //             'date' => '2024-11-22 14:20',
+    //         ],
+    //         [
+    //             'id' => 6,
+    //             'product_name' => 'Kingston Fury 16GB DDR4',
+    //             'product_code' => 'PRD-0006',
+    //             'type' => 'out',
+    //             'quantity' => 4,
+    //             'reason' => 'Sale',
+    //             'user' => 'Cashier 1',
+    //             'date' => '2024-11-22 13:05',
+    //         ],
+    //     ];
+    // }
 }

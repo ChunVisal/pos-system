@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -31,7 +32,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
     Route::post('/products/bulk-delete', [ProductController::class, 'bulkDestroy'])->name('products.bulk-delete');
 
-    Route::get('/inventory', [AdminController::class, 'inventory'])->name('admin.inventory');
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('admin.inventory');
+    Route::post('/inventory/adjust', [InventoryController::class, 'adjustStock'])->name('admin.inventory.adjust');
+
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
     Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');

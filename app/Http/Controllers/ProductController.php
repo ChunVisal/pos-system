@@ -11,16 +11,30 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $products = Product::when($request->search, function ($query) use ($request) {
-            $search = $request->search;
+        $products = Product::query()
+            ->when($request->search, function ($query) use ($request) {
+                $search = $request->search;
 
-            return $query->whereAny([
-                'name',
-                'code',
-                'barcode',
-            ], 'like', '%'.$request->search.'%');
-        })->with('category')->get();
+                return $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('code', 'like', '%'.$search.'%')
+                        ->orWhere('barcode', 'like', '%'.$search.'%')
+                        ->orWhereHas('category', function ($cat) use ($search) {
+                            $cat->where('name', 'like', '%'.$search.'%');
+                        });
+                });
+            })
+            ->with('category')
+            ->get();
+
         $categories = Categories::all();
+
+        if ($request->ajax === '1') {
+            return response()->json([
+                'table' => view('admin.partials.products.table-rows', compact('products'))->render(),
+                'grid' => view('admin.partials.products.grid-rows', compact('products'))->render(),
+            ]);
+        }
 
         return view('admin.products', compact('products', 'categories'));
     }

@@ -109,7 +109,7 @@
                 </div>
 
                 <div x-show="!editMode">
-                    <button type="button" id="addToDraftBtn"
+                    <button type="button" id="addToDraftBtn" @click.prevent="addToDraft()"
                         :class="draftEditIndex !== null ?
                             'text-green-600 border-[#0F6E8C] hover:bg-green-50 dark:hover:bg-[#0F6E8C]/20' :
                             'text-[#0F6E8C] border-[#0F6E8C] hover:bg-[#0F6E8C]/10'"

@@ -9,6 +9,7 @@ use App\Models\StockMovement;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class InventoryController extends Controller
 {
@@ -129,9 +130,10 @@ class InventoryController extends Controller
         $request->validate([
             'product_code' => 'required|exists:products,code',
             'type' => 'required|in:in,out',
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer|min:0',
             'reason' => 'required|string',
             'notes' => 'nullable|string',
+            'low_stock_threshold' => 'nullable|integer|min:0',
         ]);
 
         $product = Product::where('code', $request->product_code)->firstOrFail();
@@ -145,15 +147,91 @@ class InventoryController extends Controller
             $product->decrement('stock_quantity', $request->quantity);
         }
 
+        if ($request->low_stock_threshold !== null) {
+            $product->update(['low_stock_threshold' => $request->low_stock_threshold]);
+        }
+
         StockMovement::create([
             'product_id' => $product->id,
             'type' => $request->type,
             'quantity' => $request->quantity,
             'reason' => $request->reason,
             'notes' => $request->notes,
-            'user_id' => auth()->id,
+            'user_id' => Auth::id(),
         ]);
 
-        return response()->json(['message' => 'Stock adjusted', 'new_stock' => $product->stock_quantity]);
+        // Always update threshold if provided
+        if ($request->low_stock_threshold !== null) {
+            $product->update(['low_stock_threshold' => $request->low_stock_threshold]);
+        }
+
+        return response()->json(['message' => 'Stock adjusted', 'new_stock' => $product->stock_quantity, 'low_stock_threshold' => $product->low_stock_threshold]);
+    }
+
+    public function export(Request $request)
+    {
+        $products = Product::with('category')->get();
+        $movements = StockMovement::whereBetween('created_at', [
+            now()->subDays(6)->startOfDay(),
+            now()->endOfDay(),
+        ])->get();
+
+        $filename = 'inventory_'.now()->format('Y_m_d').'.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function () use ($products, $movements) {
+            $file = fopen('php://output', 'w');
+
+            // ── Section 1: Summary ──
+            fputcsv($file, ['INVENTORY SUMMARY']);
+            fputcsv($file, ['Metric', 'Value']);
+            fputcsv($file, ['Total Products', $products->count()]);
+            fputcsv($file, ['Low Stock', $products->filter(fn ($p) => $p->stock_quantity > 0 && $p->stock_quantity <= $p->low_stock_threshold)->count()]);
+            fputcsv($file, ['Out of Stock', $products->where('stock_quantity', 0)->count()]);
+            fputcsv($file, ['Stock Value ($)', number_format($products->sum(fn ($p) => $p->stock_quantity * $p->selling_price), 2)]);
+            fputcsv($file, []); // empty row spacer
+
+            // ── Section 2: Products ──
+            fputcsv($file, ['PRODUCT INVENTORY']);
+            fputcsv($file, ['Name', 'Code', 'Category', 'Stock', 'Low Stock Threshold', 'Status', 'Selling Price', 'Last Updated']);
+            foreach ($products as $product) {
+                fputcsv($file, [
+                    $product->name,
+                    $product->code,
+                    $product->category->name ?? 'Unassigned',
+                    $product->stock_quantity,
+                    $product->low_stock_threshold,
+                    ucfirst($product->status),
+                    '$'.number_format($product->selling_price, 2),
+                    $product->updated_at->format('M d, Y H:i'),
+                ]);
+            }
+            fputcsv($file, []); // spacer
+
+            // ── Section 3: Stock Movement (last 7 days raw numbers) ──
+            fputcsv($file, ['STOCK MOVEMENTS (Last 7 Days)']);
+            fputcsv($file, ['Date', 'Stock In', 'Stock Out']);
+
+            // Group by day
+            $grouped = collect();
+            for ($i = 6; $i >= 0; $i--) {
+                $date = now()->subDays($i)->format('Y-m-d');
+                $label = now()->subDays($i)->format('M d, Y');
+                $dayMovements = $movements->filter(fn ($m) => $m->created_at->format('Y-m-d') === $date);
+                fputcsv($file, [
+                    $label,
+                    $dayMovements->where('type', 'in')->sum('quantity'),
+                    $dayMovements->where('type', 'out')->sum('quantity'),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

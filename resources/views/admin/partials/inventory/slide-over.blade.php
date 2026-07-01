@@ -64,10 +64,24 @@
 
             <div>
                 <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Quantity</label>
-                <input type="number" min="1" x-model.number="form.quantity" required placeholder="0"
+                <input type="number" min="1" x-model.number="form.quantity" placeholder="0"
                     class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] placeholder-gray-400 dark:placeholder-zinc-500">
                 <p class="text-[11px] text-gray-400 dark:text-zinc-500 mt-1" x-show="currentStock !== null">
                     Current stock: <span x-text="currentStock"
+                        class="font-medium text-gray-600 dark:text-zinc-300"></span>
+                </p>
+
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">
+                    Warning Number
+                    <span class="text-gray-400 dark:text-zinc-500 font-normal">(show warning when stock drops to
+                        this)</span>
+                </label>
+                <input type="number" min="0" x-model.number="form.low_stock_threshold" placeholder="5"
+                    class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] placeholder-gray-400 dark:placeholder-zinc-500">
+                <p class="text-[11px] text-gray-400 dark:text-zinc-500 mt-1">
+                    Current warning number: <span x-text="currentThreshold ?? '-'"
                         class="font-medium text-gray-600 dark:text-zinc-300"></span>
                 </p>
             </div>

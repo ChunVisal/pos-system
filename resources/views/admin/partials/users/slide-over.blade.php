@@ -1,5 +1,5 @@
 <!-- ADD / EDIT USER SLIDE-OVER PANEL -->
-<div x-show="open" x-cloak class="fixed inset-0 z-50" style="display: none;">
+<div x-show="open && viewMode !== 'detail'" x-cloak class="fixed inset-0 z-50" style="display: none;">
     <div x-show="open" x-transition.opacity @click="closePanel()"
         class="absolute inset-0 bg-gray-900/40 dark:bg-black/60"></div>
 
@@ -48,6 +48,63 @@
                 </div>
             </div>
 
+            {{-- Employee ID --}}
+            <div>
+                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Employee ID</label>
+                <input type="text" x-model="form.employee_id" placeholder="e.g. EMP-001"
+                    class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200">
+            </div>
+
+            {{-- Phone --}}
+            <div>
+                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Phone Number</label>
+                <input type="text" x-model="form.phone" placeholder="e.g. 012 345 678"
+                    class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200">
+            </div>
+
+            {{-- Address --}}
+            <div>
+                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Address</label>
+                <textarea x-model="form.address" rows="2" placeholder="Enter address..."
+                    class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200"></textarea>
+            </div>
+
+            {{-- Shift --}}
+            <div>
+                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Shift</label>
+                <select x-model="form.shift"
+                    class="appearance-none w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md pl-3 pr-8 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200">
+                    <option value="">Select shift</option>
+                    <option value="morning-afternoon">Morning - Afternoon</option>
+                    <option value="afternoon-night">Afternoon - Night</option>
+                    <option value="night-morning">Night - Morning</option>
+                    <option value="full-morning">Full Time (Morning - Afternoon)</option>
+                    <option value="full-night">Full Time (Night - Morning)</option>
+                </select>
+            </div>
+
+            {{-- PIN (Cashier only) --}}
+            <div x-show="form.role === 'cashier'">
+                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Quick Login PIN (4
+                    digits)</label>
+                <input type="password" x-model="form.pin" maxlength="4" placeholder="••••"
+                    class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200">
+            </div>
+
+            {{-- Hire Date --}}
+            <div>
+                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Hire Date</label>
+                <input type="date" x-model="form.hire_date"
+                    class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200">
+            </div>
+
+            {{-- Salary --}}
+            <div>
+                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Salary ($)</label>
+                <input type="number" x-model="form.salary" step="0.01" placeholder="0.00"
+                    class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200">
+            </div>
+
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">
@@ -80,12 +137,9 @@
         </form>
 
         <div class="flex items-center justify-end gap-3 px-5 py-4 border-t border-gray-200 dark:border-zinc-800">
-            <button @click="closePanel()" type="button"
-                class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-300 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
-                Cancel
-            </button>
-            <button @click="submitForm()" type="button"
-                class="px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition">
+            <button @click="submitForm()" type="button" :disabled="submitting"
+                class="px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition disabled:opacity-50 disabled:cursor-not-allowed">
+                <i x-show="submitting" class="fa-solid fa-spinner fa-spin mr-1"></i>
                 <span x-text="editMode ? 'Save Changes' : 'Save User'"></span>
             </button>
         </div>

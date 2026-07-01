@@ -1,8 +1,32 @@
 <script>
+    // OUTSIDE userPage() - at the top
+    function deleteUser(id, button) {
+        if (!confirm('Delete this user?')) return;
+        fetch(`/admin/users/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                }
+            })
+            .then(res => res.json())
+            .then(() => button.closest('tr').remove())
+            .catch(err => alert('Error: ' + err.message));
+    }
+
+
     function userPage() {
+        console.log('userPage loaded');
         return {
             open: false,
             editMode: false,
+            showProfile: false,
+            viewMode: 'edit',
+            test: function() {
+                alert('works');
+            },
+            submitting: false,
+
             form: {
                 id: null,
                 name: '',
@@ -11,6 +35,41 @@
                 password: '',
                 password_confirmation: '',
                 status: 'active',
+                employee_id: '',
+                phone: '',
+                address: '',
+                shift: '',
+                pin: '',
+                hire_date: '',
+                salary: '',
+            },
+
+            users: @json($users),
+
+            openDetail(userId) {
+                const user = this.users.find(u => u.id == userId);
+                if (!user) return;
+
+                this.viewMode = 'detail';
+                this.form = {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    status: user.status,
+                    employee_id: user.employee_id,
+                    phone: user.phone,
+                    address: user.address,
+                    shift: user.shift,
+                    pin: user.pin,
+                    hire_date: user.hire_date,
+                    salary: user.salary,
+                    last_login: user.last_login,
+                    is_online: user.is_online,
+                    created_at: user.created_at,
+                };
+                this.showProfile = true;
+                this.open = false;
             },
 
             emptyForm() {
@@ -22,6 +81,13 @@
                     password: '',
                     password_confirmation: '',
                     status: 'active',
+                    employee_id: '',
+                    phone: '',
+                    address: '',
+                    shift: '',
+                    pin: '',
+                    hire_date: '',
+                    salary: '',
                 };
             },
 
@@ -41,17 +107,94 @@
                     password: '',
                     password_confirmation: '',
                     status: user.status ?? 'active',
+                    employee_id: user.employee_id ?? '',
+                    phone: user.phone ?? '',
+                    address: user.address ?? '',
+                    shift: user.shift ?? '',
+                    pin: user.pin ?? '',
+                    hire_date: user.hire_date ?? '',
+                    salary: user.salary ?? '',
                 };
                 this.open = true;
             },
 
             closePanel() {
                 this.open = false;
+                this.showProfile = false;
+                this.viewMode = 'edit';
             },
-
             submitForm() {
-                console.log('Submitting user:', this.form);
-                this.closePanel();
+                if (this.submitting) return;
+                this.submitting = true;
+
+                const isEdit = this.editMode;
+                const url = isEdit ? `/admin/users/${this.form.id}` : '/admin/users';
+
+                // Validate
+                if (!this.form.name || !this.form.email || !this.form.role) {
+                    alert('Please fill all required fields');
+                    this.submitting = false;
+                    return;
+                }
+
+                if (!isEdit && !this.form.password) {
+                    alert('Password is required');
+                    this.submitting = false;
+                    return;
+                }
+
+                if (this.form.password && this.form.password !== this.form.password_confirmation) {
+                    alert('Passwords do not match');
+                    this.submitting = false;
+                    return;
+                }
+
+                // Build data object
+                const data = {
+                    name: this.form.name,
+                    email: this.form.email,
+                    role: this.form.role,
+                    password: this.form.password || undefined,
+                    password_confirmation: this.form.password_confirmation || undefined,
+                    status: this.form.status,
+                    employee_id: this.form.employee_id || null,
+                    phone: this.form.phone || null,
+                    address: this.form.address || null,
+                    shift: this.form.shift || null,
+                    pin: this.form.pin || null,
+                    hire_date: this.form.hire_date || null,
+                    salary: this.form.salary || null,
+                };
+
+                // Remove undefined values
+                Object.keys(data).forEach(key => {
+                    if (data[key] === undefined) delete data[key];
+                    if (data[key] === '') data[key] = null;
+                });
+
+                fetch(url, {
+                        method: isEdit ? 'PUT' : 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    })
+                    .then(res => {
+                        if (!res.ok) return res.json().then(err => {
+                            throw new Error(JSON.stringify(err.errors || err.message || err));
+                        });
+                        return res.json();
+                    })
+                    .then(() => {
+                        this.submitting = false; // ← ADD
+                        window.location.reload();
+                    })
+                    .catch(err => {
+                        this.submitting = false; // ← ADD
+                        alert('Error: ' + err.message);
+                    });
             },
         }
     }

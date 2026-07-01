@@ -182,21 +182,15 @@ class ReportData
         ];
     }
 
-    public function byCategory(Request $request)
+    public static function getStockByCategory($request = null)
     {
-        $category = Categories::where('code', $request->category_code)->first();
-
-        if (! $category) {
-            return response()->json([]);
-        }
-
-        $products = Product::where('category_id', $category->id)
-            ->select('id', 'name', 'code', 'barcode', 'selling_price')
-            ->get();
-
-        return response()->json([
-            'category_id' => $category->id,  // ← include this
-            'products' => $products,
+        return collect([
+            ['category' => 'Graphics Cards', 'products' => 12, 'total_stock' => 45, 'stock_value' => 28500.00],
+            ['category' => 'Processors', 'products' => 8, 'total_stock' => 32, 'stock_value' => 19600.00],
+            ['category' => 'Motherboards', 'products' => 10, 'total_stock' => 28, 'stock_value' => 15400.00],
+            ['category' => 'Memory RAM', 'products' => 15, 'total_stock' => 60, 'stock_value' => 9200.00],
+            ['category' => 'Storage SSD', 'products' => 14, 'total_stock' => 55, 'stock_value' => 11200.00],
+            ['category' => 'Power Supplies', 'products' => 6, 'total_stock' => 20, 'stock_value' => 4800.00],
         ]);
     }
 }

@@ -164,12 +164,15 @@
         return {
 
             open: false,
+            submitting: false,
             stockMap: {{ \Illuminate\Support\Js::from($products->pluck('stock_quantity', 'code')) }},
+            thresholdMap: {{ \Illuminate\Support\Js::from($products->pluck('low_stock_threshold', 'code')) }},
 
             form: {
                 product_code: '',
                 type: 'in',
                 quantity: null,
+                low_stock_threshold: null,
                 reason: '',
                 notes: '',
             },
@@ -178,11 +181,16 @@
                 return this.form.product_code ? (this.stockMap[this.form.product_code] ?? null) : null;
             },
 
+            get currentThreshold() {
+                return this.form.product_code ? (this.thresholdMap[this.form.product_code] ?? null) : null;
+            },
+
             openAdjust(item = null) {
                 this.form = {
                     product_code: item ? item.code : '',
                     type: 'in',
                     quantity: null,
+                    low_stock_threshold: item ? item.low_stock_threshold : null,
                     reason: '',
                     notes: '',
                 };
@@ -195,6 +203,16 @@
 
             submitForm() {
                 if (this.submitting) return;
+
+                if (!this.form.product_code) {
+                    alert('Please select a product!');
+                    return;
+                }
+                if (!this.form.reason) {
+                    alert('Please select a reason!');
+                    return;
+                }
+
                 this.submitting = true;
 
                 fetch('{{ route('admin.inventory.adjust') }}', {

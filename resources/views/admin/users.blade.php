@@ -11,7 +11,8 @@
         <x-skeleton.userCustomers>
             @include('admin.partials.users.header-cards')
             @include('admin.partials.users.filters-table')
-        @include('admin.partials.users.slide-over')
+            @include('admin.partials.users.slide-over')
+            @include('admin.partials.users.users-detail')
         </x-skeleton.userCustomers>
     </div>
 

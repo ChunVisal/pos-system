@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $users = User::latest()->get();
 
@@ -20,6 +20,25 @@ class UserController extends Controller
             ['title' => 'Cashiers', 'value' => User::where('role', 'cashier')->count(), 'icon' => 'fa-solid fa-cash-register', 'iconBg' => '#10B981', 'iconColor' => '#10B981', 'trend' => 'up', 'percentage' => '', 'period' => ''],
             ['title' => 'Active', 'value' => User::where('status', 'active')->count(), 'icon' => 'fa-solid fa-circle-check', 'iconBg' => '#F59E0B', 'iconColor' => '#D97706', 'trend' => 'up', 'percentage' => '', 'period' => ''],
         ];
+
+        $users = User::query()
+            ->when($request->search, function ($query) use ($request) {
+                $search = $request->search;
+
+                return $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('email', 'like', '%'.$search.'%')
+                        ->orWhere('role', 'like', '%'.$search.'%');
+                });
+            })
+            ->orderByRaw("FIELD(role, 'admin', 'cashier')")
+            ->get();
+
+        if ($request->ajax == '1') {
+            $html = view('admin.partials.users.table-rows', compact('users'))->render();
+
+            return response()->json(['html' => $html]);
+        }
 
         return view('admin.users', compact('users', 'summaryCards'));
     }
@@ -68,7 +87,7 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
-            'status' => 'active',
+            'status' => $request->status ?? 'active',
             'employee_id' => $employeeId,
             'phone' => $request->phone,
             'address' => $request->address,
@@ -125,5 +144,20 @@ class UserController extends Controller
         User::findOrFail($id)->delete();
 
         return response()->json(['message' => 'User deleted']);
+    }
+    // UserController.php
+
+    public function bulkDeactivate(Request $request)
+    {
+        User::whereIn('id', $request->ids)->update(['status' => 'inactive']);
+
+        return response()->json(['message' => 'Users deactivated']);
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        User::whereIn('id', $request->ids)->delete();
+
+        return response()->json(['message' => 'Users deleted']);
     }
 }

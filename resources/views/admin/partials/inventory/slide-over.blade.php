@@ -16,7 +16,7 @@
             </button>
         </div>
 
-        <form @submit.prevent="submitForm()" class="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+        <form class="flex-1 overflow-y-auto px-5 py-4 space-y-5">
             <div>
                 <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Product</label>
                 <div class="relative">
@@ -115,9 +115,9 @@
                 class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-300 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800">
                 Cancel
             </button>
-            <button @click="submitForm()" type="button" :disabled="submitting"
+            <button @click="submitForm()" :disabled="submitting" type="button"
                 class="px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] disabled:opacity-60">
-                Submit
+                Save Adjustment
                 <span x-text="submitting ? 'Saving...' : 'Save Adjustment'"></span>
             </button>
         </div>

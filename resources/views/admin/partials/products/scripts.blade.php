@@ -18,7 +18,7 @@
                         $('#productsTableBody').html(data.table);
                         $('#productsGridBody').html(data.grid);
                     });
-                }, 400); // debounce 400ms
+                }, 400);
             });
 
             $('#clearSearch').on('click', function() {
@@ -157,14 +157,12 @@
             const trashBtn = row.querySelector('.trash-btn');
             const checkbox = row.querySelector('.bulk-checkbox');
 
-            if (trashBtn && checkbox) {
+            if (trashBtn) {
                 if (isBulkMode) {
                     trashBtn.style.display = 'none'; // Hide trash
-                    checkbox.style.display = 'block'; // Show checkbox
                     checkbox.checked = true; // Check it
                 } else {
                     trashBtn.style.display = ''; // Show trash
-                    checkbox.style.display = 'none'; // Hide checkbox
                     checkbox.checked = false; // Uncheck it
                 }
             }
@@ -199,12 +197,9 @@
         // Show trash, hide checkboxes
         document.querySelectorAll('tbody tr').forEach(row => {
             const trashBtn = row.querySelector('.trash-btn');
-            const checkbox = row.querySelector('.bulk-checkbox');
 
-            if (trashBtn && checkbox) {
+            if (trashBtn) {
                 trashBtn.style.display = '';
-                checkbox.style.display = 'none';
-                checkbox.checked = false;
             }
         });
 

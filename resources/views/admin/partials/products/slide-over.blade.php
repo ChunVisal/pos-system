@@ -99,13 +99,21 @@
 
                 {{-- Status --}}
                 <div class="flex items-center justify-between">
-                    <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400">Active</label>
-                    <button type="button" @click="form.status = form.status === 'active' ? 'inactive' : 'active'"
-                        class="relative inline-flex items-center h-6 w-11 rounded-full transition"
-                        :class="form.status === 'active' ? 'bg-[#0F6E8C]' : 'bg-gray-300 dark:bg-zinc-700'">
-                        <span class="inline-block h-4 w-4 transform bg-white rounded-full transition"
-                            :class="form.status === 'active' ? 'translate-x-6' : 'translate-x-1'"></span>
-                    </button>
+                    <label class="text-xs font-medium text-gray-600 dark:text-zinc-400">Status</label>
+                    <div class="flex gap-1">
+                        <button type="button" @click="form.status = 'active'"
+                            class="px-3 py-1 text-[11px] font-medium rounded-l-md transition"
+                            :class="form.status === 'active' ? 'bg-green-500 text-white' :
+                                'bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400'">
+                            Active
+                        </button>
+                        <button type="button" @click="form.status = 'inactive'"
+                            class="px-3 py-1 text-[11px] font-medium rounded-r-md transition"
+                            :class="form.status === 'inactive' ? 'bg-red-500 text-white' :
+                                'bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400'">
+                            Inactive
+                        </button>
+                    </div>
                 </div>
 
                 <div x-show="!editMode">

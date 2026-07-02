@@ -1,5 +1,6 @@
 {{-- Profile Modal - Desktop PC Design --}}
-<div x-show="showProfile" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/10 backdrop-blur-sm" style="display: none;">
+<div x-show="showProfile" x-cloak
+    class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/10 backdrop-blur-sm" style="display: none;">
     {{-- Overlay --}}
     <div x-show="showProfile" @click="closePanel()" class="absolute inset-0 bg-black/50"></div>
 
@@ -9,11 +10,17 @@
 
         {{-- Header --}}
         <div class="px-6 py-5 border-b border-gray-200 dark:border-zinc-800 flex items-center gap-4">
-            <div class="w-14 h-14 rounded-full bg-[#0F6E8C] flex items-center justify-center text-white text-xl font-bold shrink-0"
-                x-text="form.name ? form.name.charAt(0).toUpperCase() : '?'"></div>
+            <div class="relative">
+                <div class="w-14 h-14 rounded-full bg-[#0F6E8C] flex items-center justify-center text-white text-xl font-bold shrink-0"
+                    x-text="form.name ? form.name.charAt(0).toUpperCase() : '?'"></div>
+
+                <div x-show="form.is_online"
+                    class="w-3.5 h-3.5 bg-green-500 rounded-full absolute top-0 right-0 border-2 border-white dark:border-zinc-800">
+                </div>
+            </div>
             <div class="flex-1">
                 <h2 class="text-lg font-bold text-gray-800 dark:text-zinc-100" x-text="form.name"></h2>
-                <p class="text-sm text-gray-500 dark:text-zinc-400 dark:text-zinc-400"
+                <p class="text-sm text-gray-500 dark:text-zinc-400"
                     x-text="form.role?.toUpperCase() + ' • ' + (form.employee_id || 'No ID')"></p>
                 {{-- Created At --}}
                 <p class="text-xs text-gray-400 dark:text-zinc-400 mt-0.5">

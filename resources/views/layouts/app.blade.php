@@ -20,7 +20,6 @@
         rel="stylesheet">
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script>
         // Runs immediately — before Alpine, before CSS, no flicker

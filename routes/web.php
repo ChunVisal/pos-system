@@ -42,6 +42,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::put('/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
     Route::post('/users/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('admin.users.toggle-status');
     Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+    Route::post('/users/bulk-deactivate', [UserController::class, 'bulkDeactivate'])->name('admin.users.bulk-deactivate');
+    Route::post('/users/bulk-delete', [UserController::class, 'bulkDestroy'])->name('admin.users.bulk-delete');
 
     Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
@@ -52,6 +54,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 // Cashier Routes
 Route::middleware(['auth', 'role:cashier'])->group(function () {
     Route::get('/cashier/pos', [CashierController::class, 'pos'])->name('cashier.pos');
+    Route::post('/cashier/checkout', [CashierController::class, 'checkout'])->name('cashier.checkout');
 });
 
 // Auth routes (already there)

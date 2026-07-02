@@ -4,21 +4,10 @@
         <h1 class="text-xl font-bold text-gray-800 dark:text-zinc-100">Users</h1>
         <p class="text-xs text-gray-500 dark:text-zinc-400">Manage admin and cashier accounts</p>
     </div>
-    <div class="flex items-center gap-2 mt-3 sm:mt-0">
-        <button @click="openAdd()"
-            class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition">
-            <i class="fa-solid fa-plus"></i> Add User
-        </button>
-        <button
-            class="bg-white dark:bg-zinc-900 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-300 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-            </svg>
-            Export
-        </button>
-    </div>
+    <button @click="openAdd()"
+        class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition">
+        <i class="fa-solid fa-plus"></i> Add User
+    </button>
 </div>
 
 <!-- Summary Cards -->

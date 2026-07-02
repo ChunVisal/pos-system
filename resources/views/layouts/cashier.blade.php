@@ -11,12 +11,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
     <script>
         if (localStorage.getItem('sidebar') === 'closed') {
             document.documentElement.classList.add('sidebar-closed');
@@ -32,11 +32,11 @@
     <div class="flex">
         @include('components.cashier-sidebar')
 
-        <main class=" bg-gray-100 dark:bg-black transition-colors duration-300 flex-1 min-w-0 min-h-screen">
+        <main class="bg-gray-100 dark:bg-black transition-colors duration-300 flex-1 min-w-0 min-h-screen">
             @yield('content')
         </main>
     </div>
-    @stack('scripts')
+    @stack('head-scripts')
 </body>
 
 </html>

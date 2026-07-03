@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
@@ -47,7 +48,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
     Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+
     Route::get('/customer', [AdminController::class, 'customer'])->name('admin.customer');
+
     Route::get('/activitylog', [AdminController::class, 'activitylog'])->name('admin.activitylog');
 });
 
@@ -55,6 +58,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 Route::middleware(['auth', 'role:cashier'])->group(function () {
     Route::get('/cashier/pos', [CashierController::class, 'pos'])->name('cashier.pos');
     Route::post('/cashier/checkout', [CashierController::class, 'checkout'])->name('cashier.checkout');
+
+    Route::get('/cashier/customers/search', [CustomerController::class, 'search']);
+    Route::post('/cashier/customers', [CustomerController::class, 'store']);
+    Route::put('/cashier/customers/{id}', [CustomerController::class, 'update']);
+
 });
 
 // Auth routes (already there)

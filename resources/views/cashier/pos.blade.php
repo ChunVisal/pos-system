@@ -13,6 +13,10 @@
                 @include('cashier.partials.pos.cart-panel')
             </div>
         </div>
+
+        @include('cashier.partials.pos.checkout-slideover')
+        @include('cashier.partials.pos.receipt')
+        @include('cashier.partials.pos.customer-slideover')
     </div>
 @endsection
 

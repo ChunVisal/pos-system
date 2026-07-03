@@ -95,13 +95,4 @@
         @endforelse
 
     </div>
-
-    <div class="col-span-full flex flex-col items-center justify-center py-16">
-        <div class=" w-16 h-16 mb-4 bg-gray-200/80 dark:bg-zinc-800 rounded-full flex items-center justify-center">
-            <i class="fa-solid fa-box-open text-2xl text-gray-400 dark:text-zinc-500"></i>
-        </div>
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-1">No products found</h3>
-        <p class="text-xs text-gray-400 dark:text-zinc-500">Try a different search term</p>
-    </div>
-
 </div>

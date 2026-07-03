@@ -24,7 +24,8 @@
                 {{-- Name + Controls --}}
                 <div class="flex-1 min-w-0">
                     <p class="text-xs font-medium text-gray-800 dark:text-zinc-200 truncate" x-text="item.name"></p>
-                    <p class="text-xs text-gray-600 dark:text-zinc-400">$<span x-text="(item.price * item.qty).toFixed(2)"></span></p>
+                    <p class="text-xs text-gray-600 dark:text-zinc-400">$<span
+                            x-text="(item.price * item.qty).toFixed(2)"></span></p>
 
                     {{-- Quantity Controls --}}
                     <div class="flex items-center gap-1.5 mt-1.5">
@@ -66,7 +67,7 @@
             <span class="font-medium" x-text="'$' + subtotal.toFixed(2)"></span>
         </div>
         <div class="flex text-gray-500 dark:text-zinc-300 justify-between text-xs">
-            <span class="">Tax (10%)</span>
+            <span class="">Tax (0.5%)</span>
             <span class="font-medium" x-text="'$' + tax.toFixed(2)"></span>
         </div>
         <div class="flex justify-between text-sm font-bold border-t border-gray-200 dark:border-zinc-700 pt-2">

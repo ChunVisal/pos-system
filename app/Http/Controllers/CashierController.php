@@ -69,6 +69,20 @@ class CashierController extends Controller
         try {
             DB::beginTransaction();
 
+            // Handle customer - create/find only during payment
+            $customerId = null;
+            if ($request->customer && $request->customer['name'] && $request->customer['phone']) {
+                $customer = Customer::firstOrCreate(
+                    ['phone' => $request->customer['phone']],
+                    [
+                        'name' => $request->customer['name'],
+                        'email' => $request->customer['email'] ?? null,
+                        'segment' => 'new',
+                    ]
+                );
+                $customerId = $customer->id;
+            }
+
             // 1. Generate order number
             $lastOrder = Order::latest()->first();
             $nextNumber = $lastOrder ? intval(substr($lastOrder->order_number, 4)) + 1 : 1;
@@ -87,32 +101,17 @@ class CashierController extends Controller
             $order = Order::create([
                 'order_number' => $orderNumber,
                 'cashier_id' => Auth::id(),
-                'customer_id' => $request->customer_id ?? null,
+                'customer_id' => $customerId,
                 'subtotal' => $subtotal,
                 'tax' => $tax,
                 'total' => $total,
                 'status' => 'completed',
             ]);
 
-            // Update customer stats
-            if ($order->customer_id) {
-                $customer = Customer::find($order->customer_id);
-                $customer->increment('total_orders');
-                $customer->increment('total_spent', $total);
-                $customer->update(['last_order_at' => now()]);
-
-                // Update segment
-                if ($customer->total_orders >= 6 || $customer->total_spent >= 5000) {
-                    $customer->update(['segment' => 'vip']);
-                } elseif ($customer->total_orders >= 3 || $customer->total_spent >= 2000) {
-                    $customer->update(['segment' => 'regular']);
-                }
-            }
-
             // 4. Create order items + Update stock
             foreach ($request->items as $item) {
 
-                $product = Product::findOrFail($item['id']);
+                $product = Product::lockForUpdate()->findOrFail($item['id']);
 
                 // Check stock
                 if ($product->stock_quantity < $item['qty']) {
@@ -145,6 +144,21 @@ class CashierController extends Controller
                 'status' => 'completed',
             ]);
 
+            // Update customer stats
+            if ($customerId) {
+                $customer = Customer::find($customerId);
+                $customer->increment('total_orders');
+                $customer->increment('total_spent', $total);
+                $customer->update(['last_order_at' => now()]);
+
+                // Update segment
+                if ($customer->total_orders >= 6 || $customer->total_spent >= 5000) {
+                    $customer->update(['segment' => 'vip']);
+                } elseif ($customer->total_orders >= 3 || $customer->total_spent >= 2000) {
+                    $customer->update(['segment' => 'regular']);
+                }
+            }
+
             DB::commit();
 
             return response()->json([
@@ -159,6 +173,7 @@ class CashierController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Checkout error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,

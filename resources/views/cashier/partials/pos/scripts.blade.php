@@ -34,7 +34,18 @@
             paymentMethod: 'cash',
             amountReceived: 0,
             change: 0,
-            receiptData: {},
+            // In posPage() data:
+            receiptData: {
+                customer: null,
+                items: [],
+                subtotal: 0,
+                tax: 0,
+                total: 0,
+                payment_method: 'cash',
+                amount_received: 0,
+                change: 0,
+            },
+
             receiptOpen: false,
             lastOrder: {},
             submitting: false,
@@ -148,48 +159,23 @@
             saveCustomer() {
                 if (!this.customerForm.name || !this.customerForm.phone) return;
 
-                const url = this.selectedCustomer ? `/cashier/customers/${this.selectedCustomer.id}` :
-                    '/cashier/customers';
-                const method = this.selectedCustomer ? 'PUT' : 'POST';
-                console.log('Saving to:', url, 'Method:', method);
-                fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            ...this.customerForm,
-                            _method: method
-                        })
-                    })
-                    .then(res => {
-                        if (!res.ok) {
-                            return res.json().then(err => {
-                                throw new Error(err.message || Object.values(err.errors).flat().join(', '));
-                            });
-                        }
-                        return res.json();
-                    })
-                    .then(data => {
-                        this.selectedCustomer = data.customer;
-                        this.customerOpen = false;
-                        this.customerSaved = true;
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert('Error saving customer');
-                    });
+                this.selectedCustomer = {
+                    name: this.customerForm.name,
+                    phone: this.customerForm.phone,
+                    email: this.customerForm.email || null,
+                };
+                this.customerSaved = true;
+                this.customerOpen = false;
             },
 
             processPayment() {
+
                 if (this.paymentMethod === 'cash' && (!this.amountReceived || parseFloat(this.amountReceived) < this
                         .total)) {
                     alert('Insufficient amount');
                     return;
                 }
-
+                console.log('selectedCustomer:', this.selectedCustomer);
                 this.submitting = true;
 
                 fetch('{{ route('cashier.checkout') }}', {
@@ -208,15 +194,18 @@
                             total: this.total,
                             amount_received: this.paymentMethod === 'cash' ? parseFloat(this
                                 .amountReceived) : this.total,
-                            subtotal: this.subtotal,
-                            tax: this.tax,
-                            customer_id: this.selectedCustomer?.id || null,
-                        })
+                            customer: this.selectedCustomer ? {
+                                name: this.selectedCustomer.name,
+                                phone: this.selectedCustomer.phone,
+                                email: this.selectedCustomer.email,
+                            } : null,
+                        }),
                     })
                     .then(res => {
                         return res.json();
                     })
                     .then(data => {
+
                         this.submitting = false;
                         if (data.success) {
                             this.receiptData = {
@@ -231,9 +220,16 @@
                                 customer: this.selectedCustomer ? {
                                     ...this.selectedCustomer
                                 } : null,
-                            }; // ← Close receiptData here
+                            };
 
-                            // Reset customer - OUTSIDE receiptData
+                            this.lastOrder = data.order;
+                            this.checkoutOpen = false;
+                            this.receiptOpen = true;
+
+                            // 2. THEN clear everything
+                            this.cartItems = [];
+                            this.amountReceived = '';
+                            this.change = 0;
                             this.selectedCustomer = null;
                             this.customerSaved = false;
                             this.customerForm = {
@@ -241,14 +237,6 @@
                                 phone: '',
                                 email: ''
                             };
-
-                            this.lastOrder = data.order;
-                            this.checkoutOpen = false;
-                            this.receiptOpen = true;
-
-                            this.cartItems = [];
-                            this.amountReceived = '';
-                            this.change = 0;
                         }
                     })
                     .catch(err => {

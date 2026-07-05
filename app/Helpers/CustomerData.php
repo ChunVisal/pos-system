@@ -2,50 +2,59 @@
 
 namespace App\Helpers;
 
+use App\Models\Customer;
+use Illuminate\Support\Facades\Auth;
+
 class CustomerData
 {
     public static function getSummary()
     {
+        $userId = Auth::id();
+
+        $baseQuery = Customer::whereHas('orders', function ($q) use ($userId) {
+            $q->where('cashier_id', $userId);
+        });
+
         return [
             [
                 'title' => 'Total Customers',
-                'value' => '1,284',
+                'value' => (clone $baseQuery)->count(),
                 'icon' => 'fa-solid fa-users',
-                'iconBg' => '#0F6E8C',
-                'iconColor' => '#0F6E8C',
-                'trend' => 'up',
-                'percentage' => '12.5%',
-                'period' => 'vs last month',
-            ],
-            [
-                'title' => 'New Customers',
-                'value' => '86',
-                'icon' => 'fa-solid fa-user-plus',
-                'iconBg' => '#10B981',
-                'iconColor' => '#10B981',
-                'trend' => 'up',
-                'percentage' => '8.2%',
-                'period' => 'this month',
+                'iconBg' => 'bg-[#0F6E8C]/10',
+                'iconColor' => 'text-[#0F6E8C]',
+                'trend' => '+12%',
+                'trendColor' => 'text-green-500',
+                'subtitle' => 'Your customers',
             ],
             [
                 'title' => 'VIP Members',
-                'value' => '342',
+                'value' => (clone $baseQuery)->where('segment', 'vip')->count(),
                 'icon' => 'fa-solid fa-crown',
-                'iconBg' => '#F59E0B',
-                'iconColor' => '#F59E0B',
-                'trend' => 'up',
-                'percentage' => '5.7%',
-                'period' => 'vs last month',
+                'iconBg' => 'bg-yellow-500/10',
+                'iconColor' => 'text-yellow-600',
+                'trend' => '+5%',
+                'trendColor' => 'text-green-500',
+                'subtitle' => 'Spent over $5,000',
             ],
             [
-                'title' => 'Avg Order Value',
-                'value' => '$156.80',
-                'icon' => 'fa-solid fa-chart-line',
-                'iconBg' => '#8B5CF6',
-                'iconColor' => '#8B5CF6',
-                'trend' => 'up',
-                'percentage' => '3.1%',
-                'period' => 'vs last month',
+                'title' => 'Regular',
+                'value' => (clone $baseQuery)->where('segment', 'regular')->count(),
+                'icon' => 'fa-solid fa-repeat',
+                'iconBg' => 'bg-blue-500/10',
+                'iconColor' => 'text-blue-600',
+                'trend' => '+8%',
+                'trendColor' => 'text-green-500',
+                'subtitle' => '3+ orders',
+            ],
+            [
+                'title' => 'New Customers',
+                'value' => (clone $baseQuery)->where('segment', 'new')->count(),
+                'icon' => 'fa-solid fa-walking',
+                'iconBg' => 'bg-green-500/10',
+                'iconColor' => 'text-green-600',
+                'trend' => '+15%',
+                'trendColor' => 'text-green-500',
+                'subtitle' => '1-2 orders',
             ],
         ];
     }
@@ -78,7 +87,7 @@ class CustomerData
                 'recent_orders' => [
                     ['id' => '001', 'date' => 'Jun 20, 2024', 'amount' => 156.50, 'status' => 'Completed'],
                     ['id' => '002', 'date' => 'Jun 15, 2024', 'amount' => 89.00, 'status' => 'Completed'],
-                ]
+                ],
             ],
             [
                 'id' => 2,

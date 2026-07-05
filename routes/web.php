@@ -61,7 +61,9 @@ Route::middleware(['auth', 'role:cashier'])->group(function () {
 
     Route::get('/cashier/customers/search', [CustomerController::class, 'search']);
     Route::post('/cashier/customers', [CustomerController::class, 'store']);
+    Route::get('/cashier/customers', [CustomerController::class, 'index'])->name('cashier.customers');
     Route::put('/cashier/customers/{id}', [CustomerController::class, 'update']);
+    Route::get('/cashier/customers/{id}', [CustomerController::class, 'show'])->name('cashier.customers.show');
 
 });
 

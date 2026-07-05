@@ -39,8 +39,8 @@
                 </div>
                 <div class="flex justify-between">
                     <span class="text-gray-500 dark:text-zinc-300">Customer:</span>
-                    <span class="text-gray-800 dark:text-zinc-200"
-                        x-text="receiptData.customer ? receiptData.customer.name + ' - Walk-in' : 'Walk-in Customer'"></span>
+                    <span
+                        x-text="(receiptData.customer && receiptData.customer.name) ? receiptData.customer.name : 'Walk-in Customer'"></span>
                 </div>
             </div>
 

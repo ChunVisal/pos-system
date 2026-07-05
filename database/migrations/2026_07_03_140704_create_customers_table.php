@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('phone')->unique();
             $table->string('email')->nullable();
-            $table->string('segment')->default('walk-in');
+            $table->string('segment')->default('new');
             $table->integer('total_orders')->default(0);
             $table->decimal('total_spent', 10, 2)->default(0);
             $table->timestamp('last_order_at')->nullable();

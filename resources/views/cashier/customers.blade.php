@@ -13,5 +13,6 @@
     </div>
     @push('head-scripts')
         @include('cashier.partials.customer.script')
+        @include('cashier.partials.pos.customer-slideover')
     @endpush
 @endsection

@@ -9,6 +9,10 @@ class Customer extends Model
 {
     protected $fillable = ['name', 'phone', 'email', 'segment', 'total_orders', 'total_spent', 'last_order_at', 'notes'];
 
+    protected $casts = [
+        'last_order_at' => 'datetime',
+    ];
+
     public function orders()
     {
         return $this->hasMany(Order::class);

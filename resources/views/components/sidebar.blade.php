@@ -75,11 +75,11 @@
             <span x-show="open" class="text-sm font-medium whitespace-nowrap">Users</span>
         </a>
 
-        <a href="{{ route('admin.customer') }}"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {{ request()->routeIs('admin.customer') ? 'bg-blue-50 dark:bg-zinc-900 text-p dark:text-zinc-100' : 'text-gray-700 dark:text-zinc-400 hover:bg-gray-200/30 dark:hover:bg-zinc-900/50' }}"
+        <a href="{{ route('admin.customers') }}"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {{ request()->routeIs('admin.customers') ? 'bg-blue-50 dark:bg-zinc-900 text-p dark:text-zinc-100' : 'text-gray-700 dark:text-zinc-400 hover:bg-gray-200/30 dark:hover:bg-zinc-900/50' }}"
             :class="open ? '' : 'justify-center'">
             <x-heroicon-o-user-group class="w-5 h-5 shrink-0" />
-            <span x-show="open" class="text-sm font-medium whitespace-nowrap">Customer</span>
+            <span x-show="open" class="text-sm font-medium whitespace-nowrap">Customers</span>
         </a>
 
         <a href="{{ route('admin.reports') }}"

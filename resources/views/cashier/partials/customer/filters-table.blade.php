@@ -94,7 +94,7 @@
                                     'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400': customer
                                         .segment === 'new'
                                 }"
-                                x-text="customer.segment">
+                                x-text="customer.segment.toUpperCase()">>
                             </span>
                         </td>
                         <td class="py-3 px-4 text-center text-gray-600 dark:text-zinc-400"
@@ -106,12 +106,7 @@
                         </td>
 
                         <td class="py-3 pl-4">
-                            <div class="flex items-center justify-end gap-3">
-                                {{-- edit btn --}}
-                                <button @click="alert('Edit ' + customer.name)"
-                                    class="text-gray-400 hover:text-[#0F6E8C]" title="Edit Customer">
-                                    <i class="fa-solid fa-pen-to-square text-[18px]"></i>
-                                </button>
+                            <div class="flex items-center justify-end">
                                 {{-- yellow --}}
                                 <button @click="openCustomerDetail(customer.id)"
                                     class="text-yellow-400 hover:text-yellow-500" title="View Orders">

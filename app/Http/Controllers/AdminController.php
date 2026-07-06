@@ -37,9 +37,9 @@ class AdminController extends Controller
         return view('admin.settings');
     }
 
-    public function customer()
+    public function customers()
     {
-        return view('admin.customer');
+        return view('admin.customers');
     }
 
     public function activitylog()

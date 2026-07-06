@@ -2,7 +2,7 @@
 
 @php
     use App\Helpers\DashboardData;
-    $cards = DashboardData::getCards();
+    $summaryCards = DashboardData::getSummaryCards();
     $topProducts = DashboardData::getTopProducts();
     $topCategories = DashboardData::getTopCategories();
 @endphp

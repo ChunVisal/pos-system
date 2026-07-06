@@ -1,8 +1,11 @@
-
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
     <div>
         <h1 class="text-xl font-bold text-gray-800 dark:text-zinc-100">Dashboard</h1>
-        <p class="text-xs text-gray-500 dark:text-zinc-400">Welcome back, {{ auth()->user()->name }}</p>
+        <div class="flex gap-1 items-center">
+
+            <p class=" text-xs text-gray-500 dark:text-zinc-400">Welcome back,</p>
+            <h4 class="pb-[1px] text-[15px] text text-gray-600 dark:text-zinc-300"> {{ auth()->user()->name }}</h4>
+        </div>
     </div>
     <div class="flex items-center gap-3 mt-3 sm:mt-0">
         <div
@@ -19,7 +22,7 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-    @foreach ($cards as $card)
+    @foreach ($summaryCards as $card)
         <div
             class="bg-white dark:bg-zinc-900 p-3 rounded-md shadow-xs border border-gray-200 dark:border-zinc-800/60 flex flex-col justify-between relative overflow-hidden h-32">
 

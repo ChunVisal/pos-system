@@ -2,9 +2,7 @@
 
  @php
      use App\Helpers\CustomerData;
-     $summary = CustomerData::getSummary();
-     $customers = CustomerData::getCustomers();
-     $segments = CustomerData::getSegments();
+     $summaryCards = CustomerData::getAdminSummary();
  @endphp
 
  @section('content')
@@ -19,6 +17,7 @@
 
              @include('admin.partials.customers.detail-panel')
 
+             @include('cashier.partials.customer.customer-detail')
          </x-skeleton.userCustomers>
      </div>
      @include('admin.partials.customers.scripts')

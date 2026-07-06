@@ -4,6 +4,21 @@
             open: false,
             editMode: false,
             viewOpen: false,
+
+            customers: @json($customers),
+            searchQuery: '',
+            filterSegment: '',
+            sortBy: 'recent',
+            customerDetailOpen: false,
+            customerProfile: {},
+            customerOrders: [],
+            filterSegment: '',
+            searchQuery: '',
+            sortBy: 'recent',
+
+            currentPage: 1,
+            perPage: 12,
+
             viewCustomerData: {},
             form: {
                 id: null,
@@ -45,6 +60,84 @@
                     loyalty_points: customer.loyalty_points ?? 0,
                 };
                 this.open = true;
+            },
+
+            get filteredCustomers() {
+                let result = [...this.customers];
+
+                // Filter by segment
+                if (this.filterSegment) {
+                    result = result.filter(c => c.segment === this.filterSegment);
+                }
+
+                // Search
+                if (this.searchQuery) {
+                    const q = this.searchQuery.toLowerCase();
+                    result = result.filter(c =>
+                        c.name.toLowerCase().includes(q) ||
+                        c.phone.includes(q) ||
+                        c.email.toLowerCase().includes(q)
+                    );
+                }
+
+                // Sort
+                if (this.sortBy === 'spent') {
+                    result.sort((a, b) => (b.total_spent || 0) - (a.total_spent || 0));
+                } else if (this.sortBy === 'orders') {
+                    result.sort((a, b) => b.total_orders - a.total_orders);
+                } else {
+                    result.sort((a, b) => new Date(b.last_order_at || 0) - new Date(a.last_order_at || 0));
+                }
+
+                return result;
+            },
+
+            filterCustomers() {},
+
+            get totalPages() {
+                return Math.ceil(this.filteredCustomers.length / this.perPage);
+            },
+
+            get paginatedCustomers() {
+                const start = (this.currentPage - 1) * this.perPage;
+                return this.filteredCustomers.slice(start, start + this.perPage);
+            },
+
+            get showingText() {
+                const start = (this.currentPage - 1) * this.perPage + 1;
+                const end = Math.min(this.currentPage * this.perPage, this.filteredCustomers.length);
+                return `Showing ${start}-${end} of ${this.filteredCustomers.length} customers`;
+            },
+
+            nextPage() {
+                if (this.currentPage < this.totalPages) {
+                    this.currentPage++;
+                }
+            },
+
+            prevPage() {
+                if (this.currentPage > 1) {
+                    this.currentPage--;
+                }
+            },
+
+            goToPage(page) {
+                if (typeof page === 'number') {
+                    this.currentPage = page;
+                }
+            },
+
+            get pageNumbers() {
+                const pages = [];
+                for (let i = 1; i <= this.totalPages; i++) {
+                    if (i === 1 || i === this.totalPages || (i >= this.currentPage - 1 && i <= this.currentPage +
+                            1)) {
+                        pages.push(i);
+                    } else if (pages[pages.length - 1] !== '...') {
+                        pages.push('...');
+                    }
+                }
+                return pages;
             },
 
             viewCustomer(customer) {
@@ -102,6 +195,20 @@
                     console.log('Deleting customer:', customer);
                     // Implement delete logic
                 }
+            },
+
+            openCustomerDetail(customerId) {
+                fetch(`/admin/customers/${customerId}`, {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.customerProfile = data.customer;
+                        this.customerOrders = data.orders;
+                        this.customerDetailOpen = true;
+                    });
             },
 
             submitForm() {

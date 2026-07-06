@@ -17,11 +17,11 @@
                 <div>
                     <h3 class="text-base font-semibold text-gray-800 dark:text-zinc-100" x-text="customerProfile.name">
                     </h3>
-                    <p class="text-[11px] text-gray-500 dark:text-zinc-300"
+                    <p class="text-[11px] text-gray-500 dark:text-zinc-x300"
                         x-text="customerProfile.created_at ? 'Joined: ' + new Date(customerProfile.created_at).toLocaleDateString() : ''">
                     </p>
                     <span class="px-2 py-0.5 text-xs rounded-full font-medium"
-                        :class="customerProfile.segment === 'vip' ? 'bg-yellow-100 text-yellow-700' : customerProfile
+                        :class="customerProfile.segment === 'vip' ? 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' : customerProfile
                             .segment === 'regular' ?
                             'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' :
                             'bg-green-300/30 text-green-700 dark:bg-green-900/30 dark:text-green-400'"

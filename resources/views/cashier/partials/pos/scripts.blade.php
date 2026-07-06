@@ -97,6 +97,11 @@
                 }
             },
 
+            showAllCustomers() {
+                this.customerSearch = '';
+                this.searchCustomers();
+            },
+
             increaseQty(index) {
                 const item = this.cartItems[index];
                 if (item.qty >= item.stock) {
@@ -136,11 +141,8 @@
 
 
             searchCustomers() {
-                if (this.customerSearch.length < 2) {
-                    this.customerResults = [];
-                    return;
-                }
-                fetch(`/cashier/customers/search?q=${encodeURIComponent(this.customerSearch)}`)
+                const query = this.customerSearch || '';
+                fetch(`/cashier/customers/search?q=${encodeURIComponent(query)}`)
                     .then(res => res.json())
                     .then(data => this.customerResults = data);
             },
@@ -154,6 +156,16 @@
                 };
                 this.customerResults = [];
                 this.customerSearch = '';
+            },
+
+            openAddCustomer() {
+                this.customerForm = {
+                    name: '',
+                    phone: '',
+                    email: ''
+                };
+                this.selectedCustomer = null;
+                this.customerOpen = true;
             },
 
             saveCustomer() {
@@ -217,11 +229,11 @@
                                 payment_method: this.paymentMethod,
                                 amount_received: this.amountReceived,
                                 change: data.order.change,
-                                customer: this.selectedCustomer ? {
-                                    ...this.selectedCustomer
-                                } : null,
+                                customer: this.selectedCustomer ? JSON.parse(JSON.stringify(this
+                                    .selectedCustomer)) : null,
                             };
 
+                            console.log('receiptData.customer.name:', this.receiptData.customer?.name);
                             this.lastOrder = data.order;
                             this.checkoutOpen = false;
                             this.receiptOpen = true;

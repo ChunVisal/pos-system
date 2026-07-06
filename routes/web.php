@@ -49,7 +49,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
 
-    Route::get('/customer', [AdminController::class, 'customer'])->name('admin.customer');
+    Route::get('/customers', [AdminController::class, 'customers'])->name('admin.customers');
+    Route::get('/customers', [CustomerController::class, 'adminIndex'])->name('admin.customers');
+    Route::get('/customers/{id}', [CustomerController::class, 'adminShow'])->name('admin.customers.show');
+    Route::get('/customers/export/all', [CustomerController::class, 'adminExport'])->name('admin.customers.export');
 
     Route::get('/activitylog', [AdminController::class, 'activitylog'])->name('admin.activitylog');
 });
@@ -62,9 +65,9 @@ Route::middleware(['auth', 'role:cashier'])->group(function () {
     Route::get('/cashier/customers/search', [CustomerController::class, 'search']);
     Route::post('/cashier/customers', [CustomerController::class, 'store']);
     Route::get('/cashier/customers', [CustomerController::class, 'index'])->name('cashier.customers');
+    Route::get('/cashier/customers/export', [CustomerController::class, 'export'])->name('cashier.customers.export');
     Route::put('/cashier/customers/{id}', [CustomerController::class, 'update']);
     Route::get('/cashier/customers/{id}', [CustomerController::class, 'show'])->name('cashier.customers.show');
-
 });
 
 // Auth routes (already there)

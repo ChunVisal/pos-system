@@ -4,20 +4,20 @@
         <p class="text-xs text-gray-500 dark:text-zinc-400">Manage your customer relationships and loyalty</p>
     </div>
     <div class="flex items-center gap-2 mt-3 sm:mt-0">
-        <button @click="openAdd()"
+        <button {{-- @click="openAdd()" --}} onclick="alert('unavailable yet!')"
             class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition">
             <i class="fa-solid fa-user-plus"></i> Add Customer
         </button>
-        <button
+        <a href="{{ route('admin.customers.export') }}"
             class="bg-white dark:bg-zinc-900 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-300 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
             <x-heroicon-m-arrow-down-tray class="w-4 h-4" />
             Export
-        </button>
+        </a>
     </div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-    @foreach ($summary as $card)
+    @foreach ($summaryCards as $card)
         <div
             class="bg-white dark:bg-zinc-900 p-3 rounded-md shadow-xs border border-gray-200 dark:border-zinc-800/60 flex flex-col justify-between relative overflow-hidden h-32">
             <div class="flex justify-between items-center">
@@ -40,6 +40,10 @@
                         <span class="text-gray-600 dark:text-zinc-400">{{ $card['period'] }}</span>
                     </div>
                 @endif
+            </div>
+            <div class="flex items-center text-center justify-start gap-1">
+                <p class="text-xs text-gray-500 dark:text-zinc-400">{{ $card['subtitle'] }}</p>
+
             </div>
         </div>
     @endforeach

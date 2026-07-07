@@ -62,7 +62,7 @@ class CustomerData
 
     public static function getAdminSummary()
     {
-        $totalCustomers = Customer::count();
+        $totalCustomers = Customer::count('*');
 
         // Calculate segments based on actual order data
         $customers = Customer::withCount('orders as total_orders')

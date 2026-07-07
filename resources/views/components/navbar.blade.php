@@ -1,5 +1,5 @@
 <nav
-    class="bg-white dark:bg-black border-b border-gray-300 dark:border-zinc-800 px-5 py-2 flex items-center justify-between sticky top-0 z-40 transition-colors duration-200">
+    class="bg-white dark:bg-black border-b border-gray-300 dark:border-zinc-800 px-5 py-2 pb-[10px] flex items-center justify-between sticky top-0 z-40 transition-colors duration-200">
 
     <img x-data="{
         isDark: document.documentElement.classList.contains('dark'),
@@ -10,7 +10,7 @@
             // Listen for dark mode changes
             const observer = new MutationObserver(() => {
                 this.isDark = document.documentElement.classList.contains('dark');
-            });
+            }); 
             observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
         }
     }"

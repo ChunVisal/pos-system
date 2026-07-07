@@ -8,29 +8,23 @@
     <div
         class="w-2/3 min-w-0 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm p-5 overflow-hidden border border-gray-200 dark:border-zinc-800/50">
 
-        <div class="flex items-center justify-between mb-2">
-            <h3 class="text-[15px] font-semibold text-gray-800 dark:text-zinc-100">Sales Overview</h3>
-            <button type="button" class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                    <circle cx="12" cy="5" r="1.6" />
-                    <circle cx="12" cy="12" r="1.6" />
-                    <circle cx="12" cy="19" r="1.6" />
-                </svg>
+        <div class="flex items-center justify-between mb-3">
+            <div>
+                <h3 class="text-[15px] font-semibold text-gray-800 dark:text-zinc-100">Sales Overview</h3>
+                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                    Total: <span
+                        class="font-semibold text-[#0F6E8C]">${{ number_format(array_sum(array_column($salesChart, 'total')), 2) }}</span>
+                    · {{ count($salesChart) }} days
+                </p>
+            </div>
+            <button type="button" class="text-gray-500 dark:text-zinc-400 hover:text-gray-600 dark:hover:text-zinc-300">
+                <x-heroicon-s-ellipsis-vertical class="w-6 h-6" />
             </button>
+
         </div>
 
-        <div class="relative min-w-0" style="height: 180px;">
+        <div class="relative min-w-0" style="height: 200px;">
             <canvas id="salesOverviewChart"></canvas>
-
-            {{-- Floating tooltip --}}
-            <div id="salesTooltip"
-                class="hidden absolute -translate-x-1/2 -translate-y-full bg-gray-900 dark:bg-zinc-800 text-white dark:text-zinc-100 text-xs rounded-lg px-3 py-2 shadow-lg whitespace-nowrap pointer-events-none border border-transparent dark:border-zinc-700">
-                <div class="text-gray-300 dark:text-zinc-400 text-[11px] leading-tight">June 2023</div>
-                <div class="font-semibold text-[13px] leading-tight">16,5K</div>
-                <div
-                    class="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-zinc-800 rotate-45 border-r border-b border-transparent dark:border-zinc-700">
-                </div>
-            </div>
         </div>
     </div>
 
@@ -69,6 +63,12 @@
 
 </div>
 
+<style>
+    #salesTooltip {
+        transition: opacity 0.15s ease;
+    }
+</style>
+
 {{-- ── Chart JS ── --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -81,11 +81,9 @@
         gradient.addColorStop(0, 'rgba(249, 115, 22, 0.25)');
         gradient.addColorStop(1, 'rgba(249, 115, 22, 0)');
 
-        const labels = ['May', '', 'Jun', '', 'Jul', '', 'Aug', '', 'Sep', '', 'Oct', '', 'Nov', ''];
-        const data = [20000, 14000, 14500, 10000, 15500, 19000, 22000, 18500, 16500, 15500, 12000, 23000, 15500,
-            11000
-        ];
-        const highlightIndex = 8;
+        const labels = @json(array_column($salesChart, 'label_short'));
+        const fullLabels = @json(array_column($salesChart, 'label_full'));
+        const data = @json(array_column($salesChart, 'total'));
 
         new Chart(salesCtx, {
             type: 'line',
@@ -98,7 +96,7 @@
                     backgroundColor: gradient,
                     fill: true,
                     tension: 0.35,
-                    pointRadius: (ctx) => ctx.dataIndex === highlightIndex ? 5 : 0,
+                    pointRadius: 0,
                     pointHoverRadius: 5,
                     pointBackgroundColor: '#f97316',
                     pointBorderColor: '#fff',
@@ -117,7 +115,19 @@
                         display: false
                     },
                     tooltip: {
-                        enabled: false
+                        enabled: true,
+                        backgroundColor: '#1a1a1a',
+                        titleColor: '#d1d5db',
+                        bodyColor: '#f9fafb',
+                        borderColor: '#374151',
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: false,
+                        callbacks: {
+                            title: function(context) {
+                                return fullLabels[context[0].dataIndex];
+                            },
+                        }
                     },
                 },
                 scales: {
@@ -127,10 +137,13 @@
                         },
                         ticks: {
                             color: labelColor,
+                            color: labelColor,
                             font: {
                                 size: 11
                             },
-                            autoSkip: false
+                            autoSkip: true,
+                            maxTicksLimit: 12,
+                            maxRotation: 0,
                         },
                         border: {
                             display: false
@@ -138,14 +151,18 @@
                     },
                     y: {
                         min: 0,
-                        max: 25000,
+                        max: Math.ceil(Math.max(...data) / 5000) * 5000 || 5000,
                         ticks: {
-                            stepSize: 5000,
+                            stepSize: Math.ceil(Math.max(...data) / 5 / 1000) * 1000 || 5000,
                             color: labelColor,
                             font: {
                                 size: 11
                             },
-                            callback: (v) => v === 0 ? '0' : (v / 1000) + 'k'
+                            callback: function(value) {
+                                if (value === 0) return '0';
+                                if (value >= 1000) return (value / 1000).toFixed(0) + 'k';
+                                return value;
+                            }
                         },
                         grid: {
                             color: 'rgba(0,0,0,0.15)',
@@ -158,22 +175,17 @@
                 },
             },
             plugins: [{
-                id: 'staticTooltipPositioner',
-                afterDraw(chart) {
-                    const point = chart.getDatasetMeta(0).data[highlightIndex];
-                    const tooltip = document.getElementById('salesTooltip');
-                    if (point && tooltip) {
-                        tooltip.style.left = point.x + 'px';
-                        tooltip.style.top = (point.y - 10) + 'px';
-                        tooltip.classList.remove('hidden');
-                    }
-                },
-            }],
+                id: 'hoverTooltip',
+            }]
         });
 
         // ── Payment Donut Chart ────────────────────────────────────────
         const paymentCtx = document.getElementById('paymentChart').getContext('2d');
-        const paymentData = [55, 30, 15];
+        const paymentData = [
+            {{ $paymentBreakdown['cash'] }},
+            {{ $paymentBreakdown['card'] }},
+            {{ $paymentBreakdown['khqr'] }}
+        ];
         const paymentColors = ['#a262e0', '#c9a3ec', '#e9d9f8'];
 
         new Chart(paymentCtx, {

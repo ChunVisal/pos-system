@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InventoryController;
@@ -25,7 +26,8 @@ Route::get('/', function () {
 // Admin Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-
+    Route::get('/admin/dashboard/export', [DashboardController::class, 'exportDashboard'])->name('admin.dashboard.export');
+    
     Route::get('/products', [ProductController::class, 'index'])->name('admin.products');
     Route::post('/products', [ProductController::class, 'store'])->name('admin.products.store');
     Route::get('/products/by-category', [ProductController::class, 'byCategory'])

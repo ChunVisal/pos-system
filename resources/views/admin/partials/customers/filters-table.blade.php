@@ -87,7 +87,7 @@
                                 :class="(customer.total_orders >= 6 || customer.total_spent >= 5000) ?
                                 'bg-yellow-100 text-yellow-700 dark:text-yellow-300 dark:bg-yellow-500/30' :
                                 (customer.total_orders >= 3 || customer.total_spent >= 2000) ?
-                                'bg-blue-100 text-blue-700' :
+                                'bg-blue-100 dark:bg-blue-300/50 text-blue-700 dark:text-blue-900' :
                                 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400'"
                                 x-text="(customer.total_orders >= 6 || customer.total_spent >= 5000) ? 'VIP' : 
                            (customer.total_orders >= 3 || customer.total_spent >= 2000) ? 'REGULAR' : 'NEW'"></span>
@@ -97,7 +97,7 @@
                         <td class="py-3 px-4 font-semibold text-gray-700 dark:text-zinc-300">$<span
                                 x-text="parseFloat(customer.total_spent || 0).toFixed(2)"></span></td>
                         <td class="py-3 px-2 text-xs text-gray-500 dark:text-zinc-400"
-                            x-text="customer.last_order_at ? new Date(customer.last_order_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '-'">
+                            x-text="customer.last_order_at ? new Date(customer.last_order_at).toLocaleDateString('en-US', {hour: 'numeric', minute: 'numeric', month:'short', day:'numeric', year:'numeric'}) : '-'">
                         </td>
                         <td class="py-3 pr-4 pl-2 text-right">
                             <button @click="openCustomerDetail(customer.id)"

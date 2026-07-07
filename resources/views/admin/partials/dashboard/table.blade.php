@@ -1,199 +1,213 @@
-{{-- ============================================================
-     Dashboard › Top Products / Top Categories (tabbed table)
-     Expects: $topProducts   — from DashboardData::getTopProducts()
-              $topCategories — from DashboardData::getTopCategories()
-     ============================================================ --}}
-<div class="bg-white dark:bg-zinc-900 p-4 mt-4 rounded-md shadow-sm border border-gray-200 dark:border-zinc-800">
-
-    {{-- ── Tab Header ── --}}
-    <div class="flex flex-wrap items-center gap-3 mb-4 border-b border-gray-200 dark:border-zinc-800 pb-2">
-        <div class="flex items-center gap-6">
-            <button class="text-sm font-semibold text-[#0F6E8C] transition" id="tabProducts">
-                Top Products
+{{-- resources/views/admin/partials/dashboard/top-tables.blade.php --}}
+<div class="mt-4 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm p-5 border border-gray-200 dark:border-zinc-800/60">
+    {{-- Tab Header --}}
+    <div class="flex flex-wrap items-center justify-between pb-3 border-b border-gray-200 dark:border-zinc-800">
+        <div class="flex items-center gap-1">
+            <button id="tabProducts" class="px-4 py-1.5 text-xs font-semibold text-[#0F6E8C] ">
+                Best Selling Products
             </button>
-            <button
-                class="text-sm font-medium text-gray-500 dark:text-zinc-400 hover:text-gray-600 dark:hover:text-zinc-300 transition"
-                id="tabCategories">
+            <button id="tabCategories" class="px-4 py-1.5 text-xs font-medium text-gray-500 dark:text-zinc-400 ">
                 Top Categories
             </button>
+            <button id="tabCashier" class="px-4 py-1.5 text-xs font-medium text-gray-500 dark:text-zinc-400 ">
+                Top Cashier
+            </button>
         </div>
-
-        <div class="flex items-center gap-3 ml-auto">
-            <div class="relative">
-                <i
-                    class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-xs"></i>
-                <input type="text" id="searchInput" placeholder="Search..."
-                    class="pl-8 pr-3 py-1 text-xs bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200">
-            </div>
-            <a href="#" class="text-xs text-[#0F6E8C] hover:underline font-medium whitespace-nowrap"
-                id="viewAllLink">View All Products →</a>
-        </div>
+        <a href="{{ route('admin.products') }}" id="viewAllLink"
+            class="text-xs text-[#0F6E8C] hover:underline font-medium whitespace-nowrap">View All Products →</a>
     </div>
 
-    {{-- ── Products Table ── --}}
-    <div id="productsTable">
+    {{-- Products Table --}}
+    <div id="productsTable" class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr
-                    class="text-left text-xs text-gray-500 dark:text-zinc-400 border-b border-gray-200 dark:border-zinc-800">
-                    <th class="pb-2 font-medium w-10">
-                        <span class="bg-gray-200/70 dark:bg-zinc-800 px-3 py-1 mr-2 rounded">No</span>
+                    class="text-left text-xs text-gray-500 dark:text-zinc-400 border-b border-gray-100 dark:border-zinc-800">
+                    <th class="py-3 pl-4 pr-2 font-medium w-10">
+                        <span
+                            class="bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 px-2 py-0.5 rounded text-[11px]">No</span>
                     </th>
-                    <th class="pb-2 font-medium">Product</th>
-                    <th class="pb-2 font-medium w-20 text-right">Price</th>
-                    <th class="pb-2 font-medium w-16 text-center">Sold</th>
-                    <th class="pb-2 font-medium w-24 text-right">Revenue</th>
-                    <th class="pb-2 font-medium w-36">Rank</th>
+                    <th class="py-3 px-2 font-medium">Product</th>
+                    <th class="py-3 px-2 font-medium text-center">Price</th>
+                    <th class="py-3 px-2 font-medium text-center">Average Sale</th>
+                    <th class="py-3 px-2 font-medium text-left">Sold</th>
+                    <th class="py-3 font-medium text-right">Performance</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-zinc-800/50">
-                @forelse($topProducts as $product)
+            <tbody class="divide-y divide-gray-50 dark:divide-zinc-800/50">
+                @foreach ($topProducts as $product)
                     <tr class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition">
-                        <td class="py-3">
+                        <td class="py-3 pl-4 pr-2">
                             <span
-                                class="text-sm font-bold {{ $product['rank'] === 1 ? 'text-yellow-500' : ($product['rank'] === 2 ? 'text-p' : ($product['rank'] === 3 ? 'text-brown-200 dark:text-gray-300' : 'text-gray-500 dark:text-zinc-500')) }}">
+                                class="text-xs font-bold {{ $product['rank'] == 1 ? 'text-yellow-500' : ($product['rank'] == 2 ? 'text-blue-500' : ($product['rank'] == 3 ? 'text-amber-600' : 'text-gray-600 dark:text-zinc-500')) }}">
                                 #{{ $product['rank'] }}
                             </span>
                         </td>
-                        <td class="py-3">
+                        <td class="py-3 px-2">
                             <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-gray-200 dark:bg-zinc-800 rounded overflow-hidden shrink-0">
-                                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxolXBpybqOuVoJXLQE2SB0buq-Gq48WnKnB0h9AD5hKYyruRDcNa0ZNXJ&s=10"
-                                        alt="{{ $product['name'] }}" class="w-full h-full object-cover">
+                                <img src="{{ $product['image'] ?? 'https://res.cloudinary.com/dexr27qho/image/upload/v1782723706/8fc9e618-ca35-4366-a173-ae4d15ec0aef_vyjksv.png' }}"
+                                    class="w-12 h-12 rounded-sm object-cover bg-gray-100 dark:bg-zinc-800 shrink-0">
+                                <div class="flex flex-col">
+                                    <span
+                                        class="font-medium text-gray-800 dark:text-zinc-200 truncate max-w-[250px]">{{ $product['name'] }}</span>
+                                    <span
+                                        class="text-xs text-gray-600 dark:text-zinc-400">{{ $product['category'] }}</span>
                                 </div>
-                                <span class="font-medium text-gray-800 dark:text-zinc-200">{{ $product['name'] }}</span>
                             </div>
                         </td>
-                        <td class="py-3 text-right text-gray-600 dark:text-zinc-400">
+                        <td class="py-3 px-2 text-center text-gray-700 font-medium dark:text-zinc-200">
                             ${{ number_format($product['price'], 2) }}</td>
-                        <td class="py-3 text-center text-gray-600 dark:text-zinc-400">{{ $product['sold'] }}</td>
-                        <td class="py-3 text-right font-medium text-gray-800 dark:text-zinc-200 pr-2">
-                            ${{ number_format($product['revenue']) }}</td>
-                        <td class="py-3 w-48">
+                        <td class="py-3 px-2 text-center font-medium text-gray-700 dark:text-zinc-200">
+                            ${{ number_format($product['avg_sale_price'], 2) }}</td>
+                        <td class="py-3 px-2 text-left font-medium text-gray-700 dark:text-zinc-200">
+                            {{ $product['sold'] }}</td>
+                        <td class="py-3">
                             <div class="flex items-center gap-2">
-                                <div class="w-48 h-2 bg-gray-200 dark:bg-zinc-800 rounded-l-full">
-                                    <div class="h-2 bg-[#0F6E8C] rounded-l-full"
-                                        style="width: {{ $product['percent'] }}%;"></div>
+                                <p class="text-gray-700 dark:text-zinc-200 font-semibold">
+                                    ${{ number_format($product['revenue'], 2) }}</p>
+                                <div class="flex-1 h-2 bg-gray-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#0F6E8C] rounded-l-full"
+                                        style="width: {{ $product['percent'] }}%"></div>
                                 </div>
-                                <span
-                                    class="text-xs text-gray-400 dark:text-zinc-500 w-8 text-right">{{ $product['percent'] }}%</span>
+                                <span class="text-[10px] text-gray-400 shrink-0">{{ $product['percent'] }}%</span>
                             </div>
                         </td>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="text-center py-4 text-gray-400 dark:text-zinc-500 text-sm">No products
-                            found</td>
-                    </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
     </div>
 
-    {{-- ── Categories Table (hidden by default) ── --}}
-    <div id="categoriesTable" class="hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr
-                        class="text-left text-xs text-gray-500 dark:text-zinc-400 border-b border-gray-200 dark:border-zinc-800">
-                        <th class="pb-2 font-medium w-10">
-                            <span class="bg-gray-200/70 dark:bg-zinc-800 px-3 py-1 mr-2 rounded">No</span>
-                        </th>
-                        <th class="pb-2 font-medium">Category</th>
-                        <th class="pb-2 font-medium w-20 text-right">Products</th>
-                        <th class="pb-2 font-medium w-24 text-right">Revenue</th>
-                        <th class="pb-2 font-medium w-36">Rank</th>
+    {{-- Categories Table (Redesigned) --}}
+    <div id="categoriesTable" class="overflow-x-auto hidden">
+        <table class="w-full text-sm">
+            <thead>
+                <tr
+                    class="text-left text-xs text-gray-500 dark:text-zinc-400 border-b border-gray-100 dark:border-zinc-800">
+                    <th class="py-3 pl-4 pr-2 font-medium w-10">
+                        <span
+                            class="bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 px-2 py-0.5 rounded text-[11px]">No</span>
+                    </th>
+                    <th class="py-3 px-2 font-medium">Category</th>
+                    <th class="py-3 px-2 font-medium text-center">Products Count</th>
+                    <th class="py-3 px-2 font-medium text-center">Sold Items</th>
+                    <th class="py-3 px-2 font-medium text-center">Average Sale</th>
+                    <th class="py-3 px-2 font-medium text-center">Avg Order Value</th>
+                    <th class="py-3 font-medium text-right">Performance</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50 dark:divide-zinc-800/50">
+                @foreach ($topCategories as $category)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition">
+                        {{-- Clean Rank System Matching Product Grid --}}
+                        <td class="py-3 pl-4 pr-2">
+                            <span
+                                class="text-xs font-bold {{ $category['rank'] == 1 ? 'text-yellow-500' : ($category['rank'] == 2 ? 'text-blue-500' : ($category['rank'] == 3 ? 'text-amber-600' : 'text-gray-600 dark:text-zinc-500')) }}">
+                                #{{ $category['rank'] }}
+                            </span>
+                        </td>
+                        {{-- Category Name and Visual Wrapper --}}
+                        <td class="py-3 px-2">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-12 h-12 rounded-sm bg-[#0F6E8C]/5 dark:bg-[#0F6E8C]/5 flex items-center justify-center shrink-0">
+                                    {!! $category['svg'] !!}
+                                </div>
+                                <div class="flex flex-col">
+                                    <span
+                                        class="font-medium text-gray-800 dark:text-zinc-200 truncate max-w-[250px]">{{ $category['name'] }}</span>
+                                    <span
+                                        class="text-[12px] text-gray-600 dark:text-zinc-400">{{ $category['code'] }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        {{-- Product Count --}}
+                        <td class="py-3 px-2 text-center font-medium text-gray-700 dark:text-zinc-200">
+                            {{ $category['products_count'] ?? $category['products'] }}
+                        </td>
+                        {{-- Sold items --}}
+                        <td class="py-3 px-2 text-center font-medium text-gray-700 dark:text-zinc-200">
+                            {{ $category['sold'] }}
+                        </td>
+
+                        <td class="py-3 px-2 text-center text-gray-700 font-medium dark:text-zinc-200">
+                            ${{ number_format($category['avg_sale_price'] ?? 0, 2) }}
+                        </td>
+                        {{-- Average Order --}}
+                        <td class="py-3 px-2 text-center text-gray-700 font-medium dark:text-zinc-200">
+                            ${{ number_format($category['avg_order_value'] ?? 0, 2) }}
+                        </td>
+                        {{-- Dynamic Performance Bar --}}
+                        <td class="py-3">
+                            <div class="flex items-center gap-2">
+                                <p class="text-gray-700 dark:text-zinc-200 font-semibold">
+                                    ${{ number_format($category['revenue'], 2) }}
+                                </p>
+                                <div class="flex-1 h-2 bg-gray-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#0F6E8C] rounded-l-full"
+                                        style="width: {{ $category['percent'] }}%"></div>
+                                </div>
+                                <span class="text-[10px] text-gray-400 shrink-0">{{ $category['percent'] }}%</span>
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-zinc-800/50">
-                    @forelse($topCategories as $category)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition">
-                            <td class="py-3">
-                                <span
-                                    class="text-sm font-bold {{ $category['rank'] === 1 ? 'text-yellow-500' : ($category['rank'] === 2 ? 'text-p' : ($category['rank'] === 3 ? 'text-brown-200' : 'text-gray-500 dark:text-zinc-500')) }}">
-                                    #{{ $category['rank'] }}
-                                </span>
-                            </td>
-                            <td class="py-3">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-12 h-12 bg-[#0F6E8C]/10 dark:bg-[#0F6E8C]/20 rounded flex items-center justify-center shrink-0">
-                                        <i class="fa-solid {{ $category['icon'] }} text-[#0F6E8C]"></i>
-                                    </div>
-                                    <span
-                                        class="font-medium text-gray-800 dark:text-zinc-200">{{ $category['name'] }}</span>
-                                </div>
-                            </td>
-                            <td class="py-3 text-right text-gray-600 dark:text-zinc-400">{{ $category['products'] }}
-                            </td>
-                            <td class="py-3 text-right font-medium text-gray-800 dark:text-zinc-200">
-                                ${{ number_format($category['revenue']) }}</td>
-                            <td class="py-3 w-48 ml-2">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-48 flex-1 h-2 bg-gray-200 dark:bg-zinc-800 rounded-l-full">
-                                        <div class="h-2 bg-[#0F6E8C] rounded-l-full"
-                                            style="width: {{ $category['percent'] }}%;"></div>
-                                    </div>
-                                    <span
-                                        class="text-xs text-gray-400 dark:text-zinc-500 w-8 text-right">{{ $category['percent'] }}%</span>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center py-4 text-gray-400 dark:text-zinc-500 text-sm">No
-                                categories found</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                @endforeach
+            </tbody>
+        </table>
     </div>
-
+    {{-- Cashiers Table --}}
+    <div id="cashierTable" class="overflow-x-auto hidden">
+        <table class="w-full text-sm">
+            <thead>
+                <tr
+                    class="text-left text-xs text-gray-500 dark:text-zinc-400 border-b border-gray-100 dark:border-zinc-800">
+                    <th class="py-3 pl-4 pr-2 font-medium w-10">
+                        <span
+                            class="bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 px-2 py-0.5 rounded text-[11px]">No</span>
+                    </th>
+                    <th class="py-3 px-2 font-medium">Cashier</th>
+                    <th class="py-3 px-2 font-medium text-center">Orders</th>
+                    <th class="py-3 px-2 font-medium text-right">Revenue</th>
+                    <th class="py-3 font-medium text-right">Performance</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50 dark:divide-zinc-800/50">
+                @foreach ($topCashiers as $index => $cashier)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition">
+                        <td class="py-3 pl-4 pr-2">
+                            <span
+                                class="text-xs font-bold {{ $index == 0 ? 'text-yellow-500' : ($index == 1 ? 'text-blue-500' : ($index == 2 ? 'text-amber-600' : 'text-gray-600')) }}">
+                                #{{ $index + 1 }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-2">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-[#0F6E8C]/10 flex items-center justify-center text-xs font-bold text-[#0F6E8C]">
+                                    {{ strtoupper(substr($cashier->name, 0, 1)) }}
+                                </div>
+                                <span class="font-medium text-gray-800 dark:text-zinc-200">{{ $cashier->name }}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-2 text-center font-medium text-gray-700 dark:text-zinc-200">
+                            {{ $cashier->total_orders }}</td>
+                        <td class="py-3 px-2 text-right font-semibold text-[#0F6E8C]">
+                            ${{ number_format($cashier->total_revenue, 2) }}</td>
+                        <td class="py-3">
+                            @php $maxRevenue = $topCashiers->max('total_revenue') ?: 1; @endphp
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1 h-2 bg-gray-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#0F6E8C] rounded-l-full"
+                                        style="width: {{ round(($cashier->total_revenue / $maxRevenue) * 100) }}%">
+                                    </div>
+                                </div>
+                                <span
+                                    class="text-[10px] text-gray-400 shrink-0">{{ round(($cashier->total_revenue / $maxRevenue) * 100) }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 </div>
-
-{{-- ── Tab switching + search JS ── --}}
-<script>
-    const tabProducts = document.getElementById('tabProducts');
-    const tabCategories = document.getElementById('tabCategories');
-    const productsTable = document.getElementById('productsTable');
-    const categoriesTable = document.getElementById('categoriesTable');
-    const viewAllLink = document.getElementById('viewAllLink');
-
-    function switchTab(tab) {
-        const isProducts = tab === 'products';
-
-        tabProducts.classList.toggle('text-[#0F6E8C]', isProducts);
-        tabProducts.classList.toggle('font-semibold', isProducts);
-        tabProducts.classList.toggle('text-gray-500', !isProducts);
-        tabProducts.classList.toggle('dark:text-zinc-400', !isProducts);
-        tabProducts.classList.toggle('font-medium', !isProducts);
-
-        tabCategories.classList.toggle('text-[#0F6E8C]', !isProducts);
-        tabCategories.classList.toggle('font-semibold', !isProducts);
-        tabCategories.classList.toggle('text-gray-500', isProducts);
-        tabCategories.classList.toggle('dark:text-zinc-400', isProducts);
-        tabCategories.classList.toggle('font-medium', isProducts);
-
-        productsTable.classList.toggle('hidden', !isProducts);
-        categoriesTable.classList.toggle('hidden', isProducts);
-
-        viewAllLink.textContent = isProducts ? 'View All Products →' : 'View All Categories →';
-        viewAllLink.href = isProducts ? '#products' : '#categories';
-    }
-
-    tabProducts.addEventListener('click', () => switchTab('products'));
-    tabCategories.addEventListener('click', () => switchTab('categories'));
-
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-        const search = this.value.toLowerCase();
-        const activeTab = productsTable.classList.contains('hidden') ? 'categories' : 'products';
-        const rows = document.querySelectorAll(
-            activeTab === 'products' ? '#productsTable tbody tr' : '#categoriesTable tbody tr'
-        );
-        rows.forEach(row => {
-            row.style.display = row.textContent.toLowerCase().includes(search) ? '' : 'none';
-        });
-    });
-</script>

@@ -104,9 +104,9 @@
                                         x-text="parseFloat(order.total).toFixed(2)"></span></span>
                             </div>
                             <div class="flex justify-between text-[11px] text-gray-500 mb-2">
-                                <span
+                                {{-- <span
                                     x-text="new Date(order.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'})"></span>
-                                <span class="capitalize px-2 py-0.5 rounded-full text-[10px]"
+                                <span class="capitalize px-2 py-0.5 rounded-full text-[10px]" --}}
                                     :class="order.payment?.method === 'cash' ? 'bg-green-100 text-green-700' : order.payment
                                         ?.method === 'card' ? 'bg-blue-100 text-blue-700' :
                                         'bg-purple-100 text-purple-700'"

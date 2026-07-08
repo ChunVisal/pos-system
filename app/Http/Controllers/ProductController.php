@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashierStock;
 use App\Models\Categories;
 use App\Models\Product;
 use App\Models\ProductCatalog;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -28,6 +30,8 @@ class ProductController extends Controller
             ->get();
 
         $categories = Categories::all();
+        $cashiers = User::where('role', 'cashier')->get();
+        $cashierStocks = CashierStock::with('cashier')->get();
 
         if ($request->ajax === '1') {
             return response()->json([
@@ -36,7 +40,31 @@ class ProductController extends Controller
             ]);
         }
 
-        return view('admin.products', compact('products', 'categories'));
+        return view('admin.products', compact('products', 'categories', 'cashiers', 'cashierStocks'));
+    }
+
+    public function stockDrop(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'cashier_id' => 'required|exists:users,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $product = Product::findOrFail($request->product_id);
+
+        if ($product->stock_quantity < $request->quantity) {
+            return response()->json(['success' => false, 'message' => 'Not enough stock']);
+        }
+
+        CashierStock::create([
+            'product_id' => $request->product_id,
+            'cashier_id' => $request->cashier_id,
+            'allocated_quantity' => $request->quantity,
+            'allocated_by' => Auth::id(),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Stock transferred']);
     }
 
     public function update(Request $request, $id)

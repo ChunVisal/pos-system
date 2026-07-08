@@ -25,7 +25,7 @@
                 </div>
 
                 {{-- Label --}}
-                <h2 class="text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider mt-2">
+                <h2 class=" font-bold tracking-wider text-gray-600 dark:text-zinc-400 uppercase tracking-wider mt-2">
                     {{ $card['title'] }}</h2>
 
             </div>

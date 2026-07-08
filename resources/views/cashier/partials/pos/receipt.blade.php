@@ -88,8 +88,13 @@
 
             {{-- Footer --}}
             <div class="text-center text-[10px] text-gray-400 space-y-1">
+                <div class="flex items-center justify-center gap-1.5 mb-1">
+                    <span class="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                        <i class="fa-solid fa-check text-[10px] text-white"></i>
+                    </span>
+                    <span class="text-green-600 dark:text-green-400 font-medium">Payment Completed</span>
+                </div>
                 <p>Thank you for your purchase!</p>
-                <p>Goods sold are non-refundable</p>
                 <p class="mt-2">***</p>
             </div>
         </div>

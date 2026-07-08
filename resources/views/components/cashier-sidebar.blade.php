@@ -54,8 +54,8 @@
             <span x-show="open" class="text-sm font-medium whitespace-nowrap">POS</span>
         </a>
 
-        <a href="{{ route('admin.products') }}"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {{ request()->routeIs('admin.products') ? 'bg-blue-50 dark:bg-zinc-900 text-p dark:text-zinc-100' : 'text-gray-700 dark:text-zinc-400 hover:bg-gray-200/30 dark:hover:bg-zinc-900/50' }}"
+        <a href="{{ route('cashier.orders') }}"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {{ request()->routeIs('cashier.orders') ? 'bg-blue-50 dark:bg-zinc-900 text-p dark:text-zinc-100' : 'text-gray-700 dark:text-zinc-400 hover:bg-gray-200/30 dark:hover:bg-zinc-900/50' }}"
             :class="open ? '' : 'justify-center'">
             <x-heroicon-o-document-duplicate class="w-5 h-5 shrink-0" />
             <span x-show="open" class="text-sm font-medium whitespace-nowrap">Orders & history</span>

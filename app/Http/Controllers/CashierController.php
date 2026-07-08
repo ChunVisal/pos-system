@@ -11,6 +11,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CashierController extends Controller
 {
@@ -173,7 +174,7 @@ class CashierController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Checkout error: '.$e->getMessage());
+            Log::error('Checkout error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,

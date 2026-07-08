@@ -12,7 +12,7 @@
         @include('cashier.partials.customer.customer-detail')
     </div>
     @push('head-scripts')
-        @include('cashier.partials.customer.script')
+        @include('cashier.partials.customer.scripts')
         @include('cashier.partials.pos.customer-slideover')
     @endpush
 @endsection

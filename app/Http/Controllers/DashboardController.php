@@ -152,10 +152,19 @@ class DashboardController extends Controller
     public static function getTopCashiers($limit = 5)
     {
         return Order::join('users', 'orders.cashier_id', '=', 'users.id')
-            ->select('users.name',
-                DB::raw('COUNT(orders.id) as total_orders'),
-                DB::raw('SUM(orders.total) as total_revenue'))
-            ->groupBy('users.id', 'users.name')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')  // ← Add this
+            ->select(
+                'users.id',
+                'users.name',
+                'users.employee_id',
+                'users.shift',
+                DB::raw('COUNT(DISTINCT orders.id) as total_orders'),
+                DB::raw('SUM(order_items.quantity) as total_items_sold'),
+                DB::raw('SUM(orders.total) as total_revenue'),
+                DB::raw('ROUND(AVG(orders.total), 2) as avg_order_value'),
+                DB::raw('MAX(orders.created_at) as last_sale_at')
+            )
+            ->groupBy('users.id', 'users.name', 'users.employee_id', 'users.shift')
             ->orderByDesc('total_revenue')
             ->limit($limit)
             ->get();

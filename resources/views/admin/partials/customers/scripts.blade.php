@@ -134,6 +134,10 @@
             goToPage(page) {
                 if (typeof page === 'number') {
                     this.currentPage = page;
+                    this.$nextTick(() => {
+                        const el = this.$refs.tableBody;
+                        if (el) el.scrollTop = 0;
+                    });
                 }
             },
 

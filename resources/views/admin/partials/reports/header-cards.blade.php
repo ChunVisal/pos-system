@@ -38,7 +38,7 @@
                 <div class="rounded-md p-2 px-3" style="background-color: {{ $card['iconBg'] }}20;">
                     <i class="{{ $card['icon'] }} text-[18px]" style="color: {{ $card['iconColor'] }};"></i>
                 </div>
-                <p class="text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase">{{ $card['title'] }}</p>
+                <p class="font-bold tracking-wider text-gray-600 dark:text-zinc-400 uppercase">{{ $card['title'] }}</p>
             </div>
             <div class="flex flex-col items-start">
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-zinc-100">{{ $card['value'] }}</h2>

@@ -11,9 +11,10 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('employee_id')->nullable()->unique();
             $table->string('phone')->nullable();
+            $table->string('avatar')->nullable();
             $table->text('address')->nullable();
             $table->string('shift')->nullable();
-            $table->string('pin')->nullable(); 
+            $table->string('pin')->nullable();
             $table->date('hire_date')->nullable();
             $table->decimal('salary', 10, 2)->nullable();
             $table->string('avatar')->nullable();

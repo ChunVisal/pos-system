@@ -84,7 +84,8 @@
                         style="background-color: {{ $card['iconBg'] === 'transparent' ? 'transparent' : $card['iconBg'] . '20' }};">
                         <i class="{{ $card['icon'] }} text-[18px]" style="color: {{ $card['iconColor'] }};"></i>
                     </div>
-                    <p class="text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase">{{ $card['title'] }}
+                    <p class="text-xs font-bold tracking-wider text-gray-600 dark:text-zinc-400 uppercase">
+                        {{ $card['title'] }}
                     </p>
                 </div>
                 <button class="text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-200">
@@ -102,7 +103,6 @@
                     <span class="text-gray-600 dark:text-zinc-400">{{ $card['period'] }}</span>
                 </div>
             </div>
-
         </div>
     @endforeach
 </div>

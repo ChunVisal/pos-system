@@ -59,7 +59,7 @@
     </div>
 </div>
 
-<!-- Stock Movement Chart + Summary Cards -->
+<!-- Stock Movement Chart + Summary Cards-->
 <div class="flex gap-2 w-full min-w-0 mb-4">
     <!-- Stock Movement Overview (chart) -->
     <div
@@ -83,7 +83,7 @@
         </div>
     </div>
 
-    <!-- Summary Cards (2 col x 2 row) -->
+    <!-- Summary Cards (2 col x 2 row)  inventory -->
     <div class="w-[35%] min-w-0 grid grid-cols-2 grid-rows-2 gap-2">
         @foreach ($summaryCards as $card)
             <div
@@ -93,7 +93,8 @@
                         style="background-color: {{ $card['iconBg'] === 'transparent' ? 'transparent' : $card['iconBg'] . '20' }};">
                         <i class="{{ $card['icon'] }} text-[16px]" style="color: {{ $card['iconColor'] }};"></i>
                     </div>
-                    <p class="text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase leading-tight">
+                    <p
+                        class="text-[11px] font-bold tracking-wider text-gray-600 dark:text-zinc-400 uppercase leading-tight">
                         {{ $card['title'] }}</p>
                 </div>
                 <div class="flex flex-col items-start gap-1">

@@ -31,7 +31,7 @@
                     <th class="py-3 px-2 font-medium text-center">Price</th>
                     <th class="py-3 px-2 font-medium text-center">Average Sale</th>
                     <th class="py-3 px-2 font-medium text-left">Sold</th>
-                    <th class="py-3 font-medium text-right">Performance</th>
+                    <th class="py-3 font-medium text-right">Revenue & Performance</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-50 dark:divide-zinc-800/50">
@@ -93,7 +93,7 @@
                     <th class="py-3 px-2 font-medium text-center">Sold Items</th>
                     <th class="py-3 px-2 font-medium text-center">Average Sale</th>
                     <th class="py-3 px-2 font-medium text-center">Avg Order Value</th>
-                    <th class="py-3 font-medium text-right">Performance</th>
+                    <th class="py-3 font-medium text-right">Revenue & Performance</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-50 dark:divide-zinc-800/50">
@@ -137,7 +137,7 @@
                         <td class="py-3 px-2 text-center text-gray-700 font-medium dark:text-zinc-200">
                             ${{ number_format($category['avg_order_value'] ?? 0, 2) }}
                         </td>
-                        {{-- Dynamic Performance Bar --}}
+                        {{-- Dynamic Revenue Bar --}}
                         <td class="py-3">
                             <div class="flex items-center gap-2">
                                 <p class="text-gray-700 dark:text-zinc-200 font-semibold">
@@ -167,42 +167,64 @@
                     </th>
                     <th class="py-3 px-2 font-medium">Cashier</th>
                     <th class="py-3 px-2 font-medium text-center">Orders</th>
-                    <th class="py-3 px-2 font-medium text-right">Revenue</th>
-                    <th class="py-3 font-medium text-right">Performance</th>
+                    <th class="py-3 px-2 font-medium text-center">Items Sold</th>
+                    <th class="py-3 font-medium text-right">Revenue & Performance</th>
                 </tr>
-            </thead>
+            </thead>    
             <tbody class="divide-y divide-gray-50 dark:divide-zinc-800/50">
+                @php $maxRevenue = $topCashiers->max('total_revenue') ?: 1; @endphp
                 @foreach ($topCashiers as $index => $cashier)
+                    @php
+                        $rank = $index + 1;
+                        $percent = round(($cashier->total_revenue / $maxRevenue) * 100);
+                    @endphp
                     <tr class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition">
+                        {{-- Clean Rank System Matching Product Grid --}}
                         <td class="py-3 pl-4 pr-2">
                             <span
-                                class="text-xs font-bold {{ $index == 0 ? 'text-yellow-500' : ($index == 1 ? 'text-blue-500' : ($index == 2 ? 'text-amber-600' : 'text-gray-600')) }}">
-                                #{{ $index + 1 }}
+                                class="text-xs font-bold {{ $rank == 1 ? 'text-yellow-500' : ($rank == 2 ? 'text-blue-500' : ($rank == 3 ? 'text-amber-600' : 'text-gray-600 dark:text-zinc-500')) }}">
+                                #{{ $rank }}
                             </span>
                         </td>
+
+                        {{-- Cashier Meta Block --}}
                         <td class="py-3 px-2">
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="w-10 h-10 rounded-full bg-[#0F6E8C]/10 flex items-center justify-center text-xs font-bold text-[#0F6E8C]">
+                                    class="w-12 h-12 rounded-sm bg-[#0F6E8C]/5 dark:bg-[#0F6E8C]/10 flex items-center justify-center font-bold text-sm text-[#0F6E8C] shrink-0 border border-gray-100 dark:border-zinc-800">
                                     {{ strtoupper(substr($cashier->name, 0, 1)) }}
                                 </div>
-                                <span class="font-medium text-gray-800 dark:text-zinc-200">{{ $cashier->name }}</span>
+                                <div class="flex flex-col">
+                                    <span
+                                        class="font-medium text-gray-800 dark:text-zinc-200 truncate max-w-[250px]">{{ $cashier->name }}</span>
+                                    <span class="text-xs text-gray-600 dark:text-zinc-400">
+                                        {{ $cashier->employee_id ?? 'No ID' }} · {{ $cashier->shift ?? 'No shift' }}
+                                    </span>
+                                </div>
                             </div>
                         </td>
+
+                        {{-- Orders Count --}}
                         <td class="py-3 px-2 text-center font-medium text-gray-700 dark:text-zinc-200">
-                            {{ $cashier->total_orders }}</td>
-                        <td class="py-3 px-2 text-right font-semibold text-[#0F6E8C]">
-                            ${{ number_format($cashier->total_revenue, 2) }}</td>
+                            {{ $cashier->total_orders }}
+                        </td>
+
+                        {{-- Items Sold --}}
+                        <td class="py-3 px-2 text-center font-medium text-gray-700 dark:text-zinc-200">
+                            {{ $cashier->total_items_sold ?? 0 }}
+                        </td>
+
+                        {{-- Revenue & Dynamic Performance Progress Bar Layout --}}
                         <td class="py-3">
-                            @php $maxRevenue = $topCashiers->max('total_revenue') ?: 1; @endphp
                             <div class="flex items-center gap-2">
+                                <p class="text-gray-700 dark:text-zinc-200 font-semibold">
+                                    ${{ number_format($cashier->total_revenue, 2) }}
+                                </p>
                                 <div class="flex-1 h-2 bg-gray-200 dark:bg-zinc-700 rounded-full overflow-hidden">
                                     <div class="h-full bg-[#0F6E8C] rounded-l-full"
-                                        style="width: {{ round(($cashier->total_revenue / $maxRevenue) * 100) }}%">
-                                    </div>
+                                        style="width: {{ $percent }}%"></div>
                                 </div>
-                                <span
-                                    class="text-[10px] text-gray-400 shrink-0">{{ round(($cashier->total_revenue / $maxRevenue) * 100) }}%</span>
+                                <span class="text-[10px] text-gray-400 shrink-0">{{ $percent }}%</span>
                             </div>
                         </td>
                     </tr>

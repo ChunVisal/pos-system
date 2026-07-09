@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashierStock;
 use App\Models\Categories;
 use App\Models\Customer;
 use App\Models\Order;
@@ -18,15 +19,42 @@ class CashierController extends Controller
     public function pos(Request $request)
     {
 
-        $categories = Categories::withCount(['products as products_count'])->get();
+        $cashierId = Auth::id();
+
+        $categories = Categories::whereHas('products', function ($q) use ($cashierId) {
+            $q->where('status', 'active')
+                ->whereHas('cashierStocks', function ($sq) use ($cashierId) {
+                    $sq->where('cashier_id', $cashierId)
+                        ->whereRaw('allocated_quantity > sold_quantity');
+                });
+        })->withCount(['products as products_count' => function ($q) use ($cashierId) {
+            $q->where('status', 'active')
+                ->whereHas('cashierStocks', function ($sq) use ($cashierId) {
+                    $sq->where('cashier_id', $cashierId)
+                        ->whereRaw('allocated_quantity > sold_quantity');
+                });
+        }])->get();
+
         $products = Product::with('category')
             ->where('status', 'active')
+            ->whereHas('cashierStocks', function ($q) use ($cashierId) {
+                $q->where('cashier_id', $cashierId)
+                    ->whereRaw('allocated_quantity > sold_quantity');
+            })
             ->when($request->search, function ($q) use ($request) {
                 $q->where('name', 'like', '%'.$request->search.'%')
                     ->orWhere('code', 'like', '%'.$request->search.'%')
                     ->orWhereHas('category', fn ($cat) => $cat->where('name', 'like', '%'.$request->search.'%'));
             })
-            ->get();
+            ->get()
+            ->map(function ($product) use ($cashierId) {
+                $stock = $product->cashierStocks()
+                    ->where('cashier_id', $cashierId)
+                    ->first();
+                $product->available_stock = $stock ? $stock->allocated_quantity - $stock->sold_quantity : 0;
+
+                return $product;
+            });
 
         if ($request->ajax == '1') {
             if ($products->isEmpty()) {
@@ -47,12 +75,13 @@ class CashierController extends Controller
             return $html;
         }
 
+        $totalAllocated = $products->sum('available_stock');
         $categoryCounts = [];
         foreach ($categories as $cat) {
             $categoryCounts[$cat->id] = $cat->products_count;
         }
 
-        return view('cashier.pos', compact('categories', 'products', 'categoryCounts'));
+        return view('cashier.pos', compact('categories', 'products', 'categoryCounts', 'totalAllocated'));
     }
 
     public function checkout(Request $request)
@@ -108,6 +137,14 @@ class CashierController extends Controller
                 'total' => $total,
                 'status' => 'completed',
             ]);
+
+            $cashierStock = CashierStock::where('cashier_id', Auth::id())
+                ->where('product_id', $item['id'])
+                ->first();
+
+            if ($cashierStock) {
+                $cashierStock->increment('sold_quantity', $item['qty']);
+            }
 
             // 4. Create order items + Update stock
             foreach ($request->items as $item) {

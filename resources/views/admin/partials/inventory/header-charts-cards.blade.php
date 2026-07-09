@@ -7,10 +7,10 @@
     <div class="flex items-center gap-2 mt-3 sm:mt-0">
         <div class="relative" x-data="{ open: false }">
             <div @click="open = !open"
-                class="bg-white dark:bg-zinc-900 flex items-center text-xs gap-2 px-3 py-2 border border-gray-300 dark:border-zinc-800 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 transition cursor-pointer">
+                class="bg-white dark:bg-zinc-900 flex items-center text-xs gap-2 px-3 py-2 border border-gray-300 dark:border-zinc-800 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800/60 transition cursor-pointer">
                 <i class="fa-regular fa-calendar text-gray-800 dark:text-zinc-200"></i>
                 <span class="text-xs text-gray-700 dark:text-zinc-300">
-                    {{ \Carbon\Carbon::parse(request('start_date', now()->subDays(6)))->format('M d, Y') }}
+                    {{ \Carbon\Carbon::parse(request('start_date', now()->subDays(14)))->format('M d, Y') }}
                     -
                     {{ \Carbon\Carbon::parse(request('end_date', now()))->format('M d, Y') }}
                 </span>
@@ -18,33 +18,37 @@
             </div>
 
             <div x-show="open" @click.outside="open = false" x-cloak
-                class="absolute right-0 mt-2 w-72 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-lg z-30 p-3">
+                class="absolute right-0 mt-2 w-72 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-lg dark:shadow-zinc-950/50 z-30 p-3">
 
                 {{-- Presets --}}
                 <div class="space-y-1 mb-3">
-                    <a href="{{ route('admin.inventory', ['range' => '7']) }}"
-                        class="block px-2 py-1.5 text-xs rounded hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300">
+                    <a href="{{ route('admin.inventory', ['start_date' => now()->subDays(14)->format('Y-m-d'), 'end_date' => now()->format('Y-m-d')]) }}"
+                        class="block px-2 py-1.5 text-xs rounded text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800/60 transition-colors">
+                        Last 15 days
+                    </a>
+                    <a href="{{ route('admin.inventory', ['start_date' => now()->subDays(6)->format('Y-m-d'), 'end_date' => now()->format('Y-m-d')]) }}"
+                        class="block px-2 py-1.5 text-xs rounded text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800/60 transition-colors">
                         Last 7 days
                     </a>
-                    <a href="{{ route('admin.inventory', ['range' => '30']) }}"
-                        class="block px-2 py-1.5 text-xs rounded hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300">
+                    <a href="{{ route('admin.inventory', ['start_date' => now()->subDays(29)->format('Y-m-d'), 'end_date' => now()->format('Y-m-d')]) }}"
+                        class="block px-2 py-1.5 text-xs rounded text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800/60 transition-colors">
                         Last 30 days
                     </a>
-                    <a href="{{ route('admin.inventory', ['range' => '90']) }}"
-                        class="block px-2 py-1.5 text-xs rounded hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300">
+                    <a href="{{ route('admin.inventory', ['start_date' => now()->subDays(89)->format('Y-m-d'), 'end_date' => now()->format('Y-m-d')]) }}"
+                        class="block px-2 py-1.5 text-xs rounded text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800/60 transition-colors">
                         Last 90 days
                     </a>
                 </div>
 
-                <div class="border-t border-gray-200 dark:border-zinc-700 pt-3">
+                <div class="border-t border-gray-200 dark:border-zinc-800 pt-3">
                     <p class="text-[11px] font-semibold text-gray-500 dark:text-zinc-400 mb-2">Custom range</p>
                     <form action="{{ route('admin.inventory') }}" method="GET" class="space-y-2">
                         <input type="date" name="start_date" value="{{ request('start_date') }}"
-                            class="w-full text-xs border border-gray-300 dark:border-zinc-700 rounded-md px-2 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300">
+                            class="w-full text-xs border border-gray-300 dark:border-zinc-800 rounded-md px-2 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:border-[#0F6E8C]">
                         <input type="date" name="end_date" value="{{ request('end_date') }}"
-                            class="w-full text-xs border border-gray-300 dark:border-zinc-700 rounded-md px-2 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300">
+                            class="w-full text-xs border border-gray-300 dark:border-zinc-800 rounded-md px-2 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:border-[#0F6E8C]">
                         <button type="submit"
-                            class="w-full px-3 py-1.5 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972]">
+                            class="w-full px-3 py-1.5 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition-colors">
                             Apply
                         </button>
                     </form>
@@ -118,3 +122,178 @@
         @endforeach
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // ---------- AJAX search ----------
+        $(document).ready(function() {
+            let searchTimer;
+            $('#search').on('input', function() {
+                clearTimeout(searchTimer);
+                const query = $(this).val();
+                $('#clearSearch').toggle(query.length > 0);
+                searchTimer = setTimeout(function() {
+                    $.get('{{ route('admin.inventory') }}', {
+                        search: query,
+                        ajax: 1
+                    }, function(data) {
+                        $('#InventoryTable').html(data.table);
+                    });
+                }, 400);
+            });
+            $('#clearSearch').on('click', function() {
+                $('#search').val('').trigger('input');
+            });
+        });
+
+        // ---------- Filters ----------
+        var categoryFilter = document.getElementById('categoryFilter');
+        var stockFilter = document.getElementById('stockFilter');
+        var emptyRow = document.getElementById('noCategoryRow');
+
+        function filterTable() {
+            var categoryVal = categoryFilter ? categoryFilter.value : '';
+            var stockVal = stockFilter ? stockFilter.value : 'all';
+            var anyVisible = false;
+
+            document.querySelectorAll('tbody tr').forEach(function(row) {
+                if (row === emptyRow) return;
+                var cells = row.getElementsByTagName('td');
+                if (cells.length < 6) return;
+
+                var catText = cells[1].textContent.trim();
+                var stockText = cells[4].textContent.trim();
+
+                var categoryMatch = (categoryVal === '' || catText === categoryVal);
+                var stockMatch = true;
+                if (stockVal === 'out') stockMatch = stockText.includes('Out');
+                else if (stockVal === 'low') stockMatch = stockText.includes('Low');
+                else if (stockVal === 'normal') stockMatch = !stockText.includes('Out') && !stockText
+                    .includes('Low');
+
+                if (categoryMatch && stockMatch) {
+                    row.style.display = '';
+                    anyVisible = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (emptyRow) emptyRow.style.display = anyVisible ? 'none' : '';
+        }
+
+        if (categoryFilter) categoryFilter.addEventListener('change', filterTable);
+        if (stockFilter) stockFilter.addEventListener('change', filterTable);
+
+        // ---------- Chart ----------
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        const trendCanvas = document.getElementById('movementTrendChart');
+        if (!trendCanvas) return;
+
+        const existingTrend = Chart.getChart(trendCanvas);
+        if (existingTrend) existingTrend.destroy();
+
+        const trendDetails = @json($trend['details']);
+        const trendLabels = @json($trend['labels']);
+        const trendStockIn = @json($trend['stock_in']);
+        const trendStockOut = @json($trend['stock_out']);
+
+        new Chart(trendCanvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: trendLabels,
+                datasets: [{
+                    label: 'Stock In',
+                    data: trendStockIn,
+                    backgroundColor: '#10B981',
+                    borderRadius: 4,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.6,
+                    minBarLength: 3,
+                }, {
+                    label: 'Stock Out',
+                    data: trendStockOut,
+                    backgroundColor: '#EF4444',
+                    borderRadius: 4,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.6,
+                    minBarLength: 3,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                resizeDelay: 100,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        yAlign: 'bottom',
+                        callbacks: {
+                            footer: function(context) {
+                                const idx = context[0].dataIndex;
+                                const detail = trendDetails[idx];
+                                if (detail && detail.length > 0) {
+                                    return detail.split(', '); // each on its own line
+                                }
+                                return '';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#787878',
+                            font: {
+                                size: 11
+                            }
+                        },
+                        border: {
+                            display: false
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#787878',
+                            font: {
+                                size: 11
+                            },
+                            stepSize: 5
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.15)',
+                            borderDash: [4, 4]
+                        },
+                        border: {
+                            display: false
+                        },
+                    }
+                },
+            },
+        });
+
+        // ---------- Scroll to search ----------
+        @if (request('search'))
+            const searchEl = document.getElementById('searchSection');
+            if (searchEl) {
+                setTimeout(() => {
+                    searchEl.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    document.getElementById('search').focus();
+                }, 100);
+            }
+        @endif
+
+    }); // end DOMContentLoaded
+</script>

@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Helpers\CashierProductData;
+use App\Models\Categories;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class CashierProductController extends Controller
+{
+    public function index(Request $request)
+    {
+        $cashierId = Auth::id();
+
+        $products = Product::with(['category', 'cashierStocks' => function ($q) use ($cashierId) {
+            $q->where('cashier_id', $cashierId);
+        }])
+            ->where('status', 'active')
+            ->whereHas('cashierStocks', function ($q) use ($cashierId) {
+                $q->where('cashier_id', $cashierId);
+            })
+            ->when($request->search, function ($q) use ($request) {
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('code', 'like', '%'.$request->search.'%');
+            })
+            ->get()
+            ->map(function ($product) {
+                $stock = $product->cashierStocks->first();
+                $product->allocated = $product->cashierStocks->sum('allocated_quantity');
+                $product->sold = $product->cashierStocks->sum('sold_quantity');
+                $product->remaining = $product->allocated - $product->sold;
+                $product->revenue = $product->sold * $product->selling_price;
+                $product->last_drop = $product->cashierStocks->max('created_at');
+                $product->category_name = $product->category->name ?? '-';
+
+                return $product;
+            });
+
+        if ($request->ajax) {
+            return response()->json(['products' => $products]);
+        }
+        $categories = Categories::whereHas('products', function ($q) use ($cashierId) {
+            $q->whereHas('cashierStocks', fn ($sq) => $sq->where('cashier_id', $cashierId));
+        })->get();
+
+        $summaryCards = CashierProductData::getSummaryCards();
+
+        return view('cashier.products', compact('products', 'summaryCards', 'categories'));
+    }
+}

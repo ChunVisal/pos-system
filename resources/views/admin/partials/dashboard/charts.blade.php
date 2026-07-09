@@ -191,7 +191,7 @@
         new Chart(paymentCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Cash', 'Credit/Debit', 'QRIS'],
+                labels: ['Cash', 'Credit/Debit', 'KHQR'],
                 datasets: [{
                     data: paymentData,
                     backgroundColor: paymentColors,

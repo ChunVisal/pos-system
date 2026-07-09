@@ -80,7 +80,7 @@
             addToCart(product) {
                 const existing = this.cartItems.find(i => i.id === product.id);
                 const currentQty = existing ? existing.qty : 0;
-                const maxStock = product.stock; // ← Already passed in the object
+                const maxStock = product.stock;
 
                 if (currentQty >= maxStock) {
 

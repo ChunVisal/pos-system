@@ -5,7 +5,7 @@
         {{-- Title - Left --}}
         <div class="flex items-center gap-1 shrink-0">
             <h2 class="text-lg font-semibold text-gray-800 dark:text-zinc-100">Products</h2>
-            <span class="text-sm text-gray-500 dark:text-zinc-500 pt-0.5">({{ count($products) }} total)</span>
+            <span class="text-sm text-gray-500 dark:text-zinc-500 pt-0.5">({{ $totalAllocated }} items available)</span>
         </div>
 
         {{-- Search + Barcode --}}

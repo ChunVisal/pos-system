@@ -39,6 +39,10 @@
         </td>
         <td class="py-3">
             <div class="flex items-center justify-end gap-3">
+                <button @click="openStockDrop({{ $product }})" class="text-p hover:text-blue-600" 17
+                    title="Drop to Cashier">
+                    <i class="fa-solid fa-truck"></i>
+                </button>
                 <button @click='openAdjust(@json($product))'
                     class="text-gray-400 dark:text-zinc-500 hover:text-[#0F6E8C] dark:hover:text-[#0F6E8C]"
                     title="Adjust Stock">

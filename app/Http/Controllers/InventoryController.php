@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\InventoryData;
+use App\Models\CashierStock;
 use App\Models\Categories;
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Models\User;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class InventoryController extends Controller
 {
@@ -36,6 +38,7 @@ class InventoryController extends Controller
                 $q->select(\DB::raw('COALESCE(sum(stock_quantity), 0)'));
             },
         ])->get();
+        $cashiers = User::where('role', 'cashier')->get();
 
         // Mock data not yet migrated
         $summary = InventoryData::getSummary();
@@ -44,85 +47,98 @@ class InventoryController extends Controller
 
         if ($request->ajax === '1') {
 
-            $html = view('admin.partials.products.table-rows', compact('products'))->render();
+            $html = view('admin.partials.inventory.table-rows', compact('products'))->render();
 
             return response()->json(['table' => $html]);
         }
 
-        return view('admin.inventory', compact('products', 'categories', 'summary', 'summaryCards', 'trend'));
+        return view('admin.inventory', compact('products', 'categories', 'summary', 'summaryCards', 'trend', 'cashiers'));
     }
 
     private function getMovementTrend(Request $request)
     {
+        $start = $request->start_date
+            ? Carbon::parse($request->start_date)
+            : now()->subDays(14);
+        $end = $request->end_date
+            ? Carbon::parse($request->end_date)
+            : now();
 
-        $startDate = now()->subDays(6)->startOfDay();
-        $endDate = now()->endOfDay();
-
-        if ($request->start_date && $request->end_date) {
-            $startDate = Carbon::parse($request->start_date)->startOfDay();
-            $endDate = Carbon::parse($request->end_date)->endOfDay();
-        } else {
-            $days = (int) $request->get('range', 7); // default 7
-            $startDate = now()->subDays($days - 1)->startOfDay();
-            $endDate = now()->endOfDay();
-        }
-
-        $movements = StockMovement::orderBy('created_at')->get();
-
-        if ($movements->isEmpty()) {
-            return [
-                'labels' => [],
-                'stock_in' => [],
-                'stock_out' => [],
-            ];
-        }
-
-        $grouped = $movements->groupBy(function ($item) {
-            return $item->created_at->format('M d');
-        });
+        $movements = StockMovement::whereBetween('created_at', [$start->startOfDay(), $end->endOfDay()])
+            ->get()
+            ->groupBy(fn ($m) => $m->created_at->format('M d'));
 
         $labels = [];
         $stockIn = [];
         $stockOut = [];
+        $details = [];
 
-        $period = CarbonPeriod::create($startDate, $endDate);
+        $current = $start->copy();
+        while ($current <= $end) {
+            $key = $current->format('M d');
+            $labels[] = $key;
 
-        foreach ($period as $date) {
-            $dayKey = $date->format('Y-m-d');
-            $labels[] = $date->format('M d');
-
-            $dayMovements = $movements->filter(function ($item) use ($dayKey) {
-                return $item->created_at->format('Y-m-d') === $dayKey;
-            });
+            $dayMovements = isset($movements[$key]) ? collect($movements[$key])->flatten() : collect([]);
 
             $stockIn[] = $dayMovements->where('type', 'in')->sum('quantity');
             $stockOut[] = $dayMovements->where('type', 'out')->sum('quantity');
+
+            $dayDetails = $dayMovements->where('type', 'out')->map(function ($m) {
+                return "{$m->quantity}x {$m->product->name} → {$m->reason}";
+            })->join(', ');
+
+            Log::info("Day: $key, Out count: ".$dayMovements->where('type', 'out')->count().", Details: $dayDetails");
+            $details[] = $dayDetails ?: '';
+            $current->addDay();
         }
-
-        foreach ($grouped as $time => $items) {
-            $labels[] = $time;
-            $stockIn[] = $items->where('type', 'in')->sum('quantity');
-            $stockOut[] = $items->where('type', 'out')->sum('quantity');
-        }
-
-        for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i);
-            $dayKey = $date->format('Y-m-d');
-            $labels[] = $date->format('M d');
-
-            $dayMovements = $movements->filter(function ($item) use ($dayKey) {
-                return $item->created_at->format('Y-m-d') === $dayKey;
-            });
-
-            $stockIn[] = $dayMovements->where('type', 'in')->sum('quantity');
-            $stockOut[] = $dayMovements->where('type', 'out')->sum('quantity');
-        }
+        Log::info('Day movements sample:', [
+            'keys' => $movements->keys(),
+            'sample' => $movements->first() ? $movements->first()->toArray() : 'empty',
+        ]);
 
         return [
             'labels' => $labels,
             'stock_in' => $stockIn,
             'stock_out' => $stockOut,
+            'details' => $details,
         ];
+    }
+
+    public function stockDrop(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'cashier_id' => 'required|exists:users,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $product = Product::findOrFail($request->product_id);
+
+        if ($product->stock_quantity < $request->quantity) {
+            return response()->json(['success' => false, 'message' => 'Not enough stock']);
+        }
+
+        CashierStock::create([
+            'product_id' => $request->product_id,
+            'cashier_id' => $request->cashier_id,
+            'allocated_quantity' => $request->quantity,
+            'allocated_by' => Auth::id(),
+        ]);
+
+        // Deduct from main stock
+        $product->decrement('stock_quantity', $request->quantity);
+
+        // Log as stock movement
+        StockMovement::create([
+            'product_id' => $request->product_id,
+            'type' => 'out',
+            'quantity' => $request->quantity,
+            'reason' => 'Transfer to '.User::find($request->cashier_id)->name,
+            'user_id' => Auth::id(),
+            'notes' => 'Received by: '.User::find($request->cashier_id)->name,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Stock transferred']);
     }
 
     public function adjustStock(Request $request)
@@ -155,9 +171,9 @@ class InventoryController extends Controller
             'product_id' => $product->id,
             'type' => $request->type,
             'quantity' => $request->quantity,
-            'reason' => $request->reason,
+            'reason' => 'Transfer to '.User::find($request->cashier_id)->name,
             'notes' => $request->notes,
-            'user_id' => Auth::id(),
+            'user_id' => $request->cashier_id,
         ]);
 
         // Always update threshold if provided

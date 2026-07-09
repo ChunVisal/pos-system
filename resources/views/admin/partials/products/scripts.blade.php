@@ -249,8 +249,7 @@
                 cancelBulkMode();
             })
             .catch(error => {
-                console.error('Bulk delete error:', error);
-                alert('Error deleting products. Check console for details.');
+                alert('Error: ' + error.message);
             });
     }
 
@@ -270,16 +269,6 @@
             submitting: false,
             selectedCategoryId: null,
             pendingName: '',
-
-            stockDropOpen: false,
-            dropForm: {
-                product_id: null,
-                product_name: '',
-                current_stock: 0,
-                cashier_id: '',
-                quantity: 1
-            },
-            cashierStocks: @json($cashierStocks ?? []),
 
             form: {
                 id: null,
@@ -488,41 +477,6 @@
                 this.open = false;
             },
 
-            openStockDrop(product) {
-                this.dropForm = {
-                    product_id: product.id,
-                    product_name: product.name,
-                    current_stock: product.stock_quantity,
-                    cashier_id: '',
-                    quantity: 1,
-                };
-                this.stockDropOpen = true;
-            },
-
-            getCashierStock() {
-                const stock = this.cashierStocks.find(s => s.product_id === this.dropForm.product_id && s.cashier_id ===
-                    this.dropForm.cashier_id);
-                return stock ? stock.allocated_quantity - stock.sold_quantity : 0;
-            },
-
-            submitDrop() {
-                fetch('/admin/products/stock-drop', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        },
-                        body: JSON.stringify(this.dropForm)
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            window.location.reload();
-                        } else {
-                            alert(data.message);
-                        }
-                    });
-            },
 
             loadProducts() {
                 this.form.name = '';

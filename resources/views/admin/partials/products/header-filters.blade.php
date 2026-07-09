@@ -123,7 +123,7 @@
 <div class="bg-white dark:bg-zinc-900 p-4 rounded-md shadow-xs border border-gray-200 dark:border-zinc-800/60">
     <div class="overflow-x-auto">
         <div x-show="viewMode === 'table'">
-            <table class="w-full text-sm    ">
+            <table class="w-full text-sm">
                 <thead>
                     <tr
                         class="text-left text-xs text-gray-500 dark:text-zinc-400 border-b border-gray-200 dark:border-zinc-800">

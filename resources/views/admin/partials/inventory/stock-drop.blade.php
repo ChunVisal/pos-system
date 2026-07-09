@@ -1,6 +1,9 @@
 <div x-show="stockDropOpen" x-cloak class="fixed inset-0 z-50" style="display: none;">
-    <div @click="stockDropOpen = false" class="absolute inset-0 bg-black/50"></div>
-    <div @click.stop x-transition:enter="transition ease-out duration-200"
+
+    <div @click.stop @click.outside="stockDropOpen = false" x-show="stockDropOpen"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="translate-x-full"
+        x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
         class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-zinc-900 shadow-xl flex flex-col">
 
         <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-zinc-800">
@@ -29,7 +32,8 @@
                     class="w-full text-sm border border-gray-300 dark:border-zinc-700 rounded-lg px-3 py-2 bg-white dark:bg-zinc-800 text-gray-800 dark:text-zinc-200">
                     <option value="">Choose cashier...</option>
                     @foreach ($cashiers as $cashier)
-                        <option value="{{ $cashier->id }}">{{ $cashier->name }} ({{ $cashier->employee_id ?? 'N/A' }})
+                        <option value="{{ $cashier->id }}">{{ $cashier->name }}
+                            ({{ $cashier->employee_id ?? 'N/A' }})
                         </option>
                     @endforeach
                 </select>
@@ -55,4 +59,5 @@
             </button>
         </div>
     </div>
+    s
 </div>

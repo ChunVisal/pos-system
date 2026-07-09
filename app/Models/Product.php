@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Product extends Model
 {
-
     protected $table = 'products';
 
     protected $fillable = [
@@ -28,5 +27,10 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Categories::class, 'category_id');
+    }
+
+    public function cashierStocks()
+    {
+        return $this->hasMany(CashierStock::class);
     }
 }

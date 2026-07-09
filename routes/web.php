@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\CashierProductController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
@@ -36,11 +37,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::put('/products/{id}', [ProductController::class, 'update'])->name('admin.products.update');
     Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
     Route::post('/products/bulk-delete', [ProductController::class, 'bulkDestroy'])->name('products.bulk-delete');
-    Route::post('/admin/products/stock-drop', [ProductController::class, 'stockDrop'])->name('admin.products.stock-drop');
 
     Route::get('/inventory', [InventoryController::class, 'index'])->name('admin.inventory');
     Route::post('/inventory/adjust', [InventoryController::class, 'adjustStock'])->name('admin.inventory.adjust');
     Route::get('/inventory/export', [InventoryController::class, 'export'])->name('admin.inventory.export');
+    Route::post('/inventory/stock-drop', [InventoryController::class, 'stockDrop'])->name('admin.products.stock-drop');
 
     Route::get('/users', [UserController::class, 'index'])->name('admin.users');
     Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
@@ -72,6 +73,8 @@ Route::middleware(['auth', 'role:cashier'])->group(function () {
     Route::get('/cashier/customers/export', [CustomerController::class, 'export'])->name('cashier.customers.export');
     Route::put('/cashier/customers/{id}', [CustomerController::class, 'update']);
     Route::get('/cashier/customers/{id}', [CustomerController::class, 'show'])->name('cashier.customers.show');
+
+    Route::get('/cashier/products', [CashierProductController::class, 'index'])->name('cashier.products');
 
     Route::get('/cashier/orders/export', [OrderController::class, 'export'])->name('cashier.orders.export');
     Route::get('/cashier/orders', [OrderController::class, 'index'])->name('cashier.orders');

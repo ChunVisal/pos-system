@@ -75,10 +75,6 @@
                     title="Edit">
                     <x-heroicon-m-pencil-square class="w-5 h-5" />
                 </button>
-                <button @click="openStockDrop({{ $product }})" class="text-green-500 hover:text-green-600" 17
-                    title="Drop to Cashier">
-                    <i class="fa-solid fa-truck"></i>
-                </button>
                 <button onclick="deleteProduct({{ $product->id }}, this)"
                     class="trash-btn text-red-500 hover:text-red-600" title="Delete">
                     <x-heroicon-m-trash class="w-5 h-5" />

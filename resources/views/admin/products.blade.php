@@ -29,7 +29,6 @@
 
             @include('admin.partials.products.header-filters')
             @include('admin.partials.products.slide-over')
-            @include('admin.partials.products.stock-drop')
 
         </x-skeleton.product>
     </div>

@@ -17,13 +17,13 @@
             <span
                 class="text-sm font-bold text-green-600 dark:text-green-400">${{ number_format($product->selling_price, 2) }}</span>
             <span class="text-xs text-gray-500">Qty: <label
-                    class="font-semibold">{{ $product->stock_quantity }}</label></span>
+                    class="font-semibold">{{ $product->available_stock  }}</label></span>
         </div>
 
         {{-- Add to Cart --}}
         <div class="mt-2 pt-1.5 border-t border-gray-100 dark:border-zinc-800">
             <button
-                @click="addToCart({ id: {{ $product->id }}, name: '{{ addslashes($product->name) }}', price: {{ $product->selling_price }}, image: '{{ $product->image }}',  stock: {{ $product->stock_quantity }} })"
+                @click="addToCart({ id: {{ $product->id }}, name: '{{ addslashes($product->name) }}', price: {{ $product->selling_price }}, image: '{{ $product->image }}',  stock: {{ $product->available_stock }} })"
                 x-show="!cartItems.find(i => i.id === {{ $product->id }})"
                 class="w-full py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-plus text-[10px]"></i> Add to Cart
@@ -35,10 +35,9 @@
                 <span x-text="cartItems.find(i => i.id === {{ $product->id }})?.qty || 0"
                     class="text-base text-gray-800 dark:text-gray-200 font-bold min-w-[24px] text-center"></span>
                 <button
-                    @click="addToCart({ id: {{ $product->id }}, name: '{{ addslashes($product->name) }}', price: {{ $product->selling_price }}, image: '{{ $product->image }}',  stock: {{ $product->stock_quantity }} })"
+                    @click="addToCart({ id: {{ $product->id }}, name: '{{ addslashes($product->name) }}', price: {{ $product->selling_price }}, image: '{{ $product->image }}',  stock: {{ $product->available_stock  }} })"
                     class="flex-1 py-2 bg-green-200 dark:bg-green-700/50 text-green-600 dark:text-green-100 rounded-md text-sm font-bold">+</button>
             </div>
         </div>
     </div>
 </div>
-{{-- @endforeach --}}

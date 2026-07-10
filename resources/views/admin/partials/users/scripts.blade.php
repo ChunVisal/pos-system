@@ -80,7 +80,6 @@
                     'Accept': 'application/json',
                 }
             })
-            .then(res => res.json())
             .then(() => button.closest('tr').remove())
             .catch(err => alert('Error: ' + err.message));
     }

@@ -150,38 +150,44 @@ class InventoryController extends Controller
             'reason' => 'required|string',
             'notes' => 'nullable|string',
             'low_stock_threshold' => 'nullable|integer|min:0',
+            'status' => 'nullable|in:active,inactive',
         ]);
 
         $product = Product::where('code', $request->product_code)->firstOrFail();
-
-        if ($request->type === 'in') {
-            $product->increment('stock_quantity', $request->quantity);
-        } else {
-            if ($product->stock_quantity < $request->quantity) {
-                return response()->json(['error' => 'Not enough stock to remove that quantity'], 422);
+        if ($request->quantity > 0) {
+            if ($request->type === 'in') {
+                $product->increment('stock_quantity', $request->quantity);
+            } else {
+                if ($product->stock_quantity < $request->quantity) {
+                    return response()->json(['error' => 'Not enough stock to remove that quantity'], 422);
+                }
+                $product->decrement('stock_quantity', $request->quantity);
             }
-            $product->decrement('stock_quantity', $request->quantity);
+
+            StockMovement::create([
+                'product_id' => $product->id,
+                'type' => $request->type,
+                'quantity' => $request->quantity,
+                'reason' => $request->reason,
+                'notes' => $request->notes,
+                'user_id' => Auth::id(),
+            ]);
         }
 
         if ($request->low_stock_threshold !== null) {
             $product->update(['low_stock_threshold' => $request->low_stock_threshold]);
         }
 
-        StockMovement::create([
-            'product_id' => $product->id,
-            'type' => $request->type,
-            'quantity' => $request->quantity,
-            'reason' => 'Transfer to '.User::find($request->cashier_id)->name,
-            'notes' => $request->notes,
-            'user_id' => $request->cashier_id,
+        // Always update status and threshold
+        if ($request->status) {
+            $product->update(['status' => $request->status]);
+        }
+
+        return response()->json([
+            'message' => 'Stock adjusted',
+            'new_stock' => $product->stock_quantity,
+            'low_stock_threshold' => $product->low_stock_threshold,
         ]);
-
-        // Always update threshold if provided
-        if ($request->low_stock_threshold !== null) {
-            $product->update(['low_stock_threshold' => $request->low_stock_threshold]);
-        }
-
-        return response()->json(['message' => 'Stock adjusted', 'new_stock' => $product->stock_quantity, 'low_stock_threshold' => $product->low_stock_threshold]);
     }
 
     public function export(Request $request)

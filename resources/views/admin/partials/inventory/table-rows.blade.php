@@ -14,12 +14,6 @@
         <td class="py-3 pl-4 text-gray-600 dark:text-zinc-400 whitespace-nowrap">
             {{ $product->category->name ?? 'Unassigned' }}
         </td>
-        <td class="py-3 text-center font-semibold text-gray-800 dark:text-zinc-100">
-            {{ $product->stock_quantity }}
-        </td>
-        <td class="py-3 text-center text-gray-500 dark:text-zinc-400">
-            {{ $product->low_stock_threshold }}
-        </td>
         <td class="py-3 px-3 text-center whitespace-nowrap">
             @if ($product->stock_quantity <= 0)
                 <span
@@ -34,15 +28,35 @@
                     class="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400">{{ $product->stock_quantity }}</span>
             @endif
         </td>
+        <td class="py-3 text-center text-gray-500 dark:text-zinc-400">
+            {{ $product->low_stock_threshold }}
+        </td>
+        <td class="py-3 text-center whitespace-nowrap">
+            <span
+                class="px-2 py-0.5 text-[11px] font-semibold rounded-full 
+        {{ $product->status === 'active' ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-zinc-700 dark:text-zinc-400' }}">
+                {{ ucfirst($product->status) }}
+            </span>
+        </td>
         <td class="py-3 pl-4 text-gray-500 dark:text-zinc-500 text-xs whitespace-nowrap">
             {{ $product->updated_at->format('H:i, M d, Y') }}
         </td>
         <td class="py-3">
             <div class="flex items-center justify-end gap-3">
-                <button @click="openStockDrop({{ $product }})" class="text-p hover:text-blue-600" 17
-                    title="Drop to Cashier">
-                    <i class="fa-solid fa-truck"></i>
-                </button>
+                {{-- Stock Drop - only for active --}}
+                @if ($product->status === 'active')
+                    <button @click="openStockDrop({{ $product->id }})" class="text-p hover:text-blue-600"
+                        title="Drop to Cashier">
+                        <i class="fa-solid fa-truck"></i>
+                    </button>
+                @else
+                    <button onclick="alert('Product is inactive')"
+                        class="text-gray-300 dark:text-zinc-600 cursor-not-allowed" title="Inactive">
+                        <i class="fa-solid fa-truck"></i>
+                    </button>
+                @endif
+
+                {{-- Stock Adjustment - always available --}}
                 <button @click='openAdjust(@json($product))'
                     class="text-gray-400 dark:text-zinc-500 hover:text-[#0F6E8C] dark:hover:text-[#0F6E8C]"
                     title="Adjust Stock">

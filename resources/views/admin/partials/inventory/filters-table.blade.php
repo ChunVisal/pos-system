@@ -54,7 +54,7 @@
                     <th class="pb-2 px-4 font-medium">Category</th>
                     <th class="pb-2 px-4 font-medium text-center">Current Stock</th>
                     <th class="pb-2 px-4 font-medium text-center">Reorder Level</th>
-                    <th class="pb-2 px-4 font-medium text-center">Stock</th>
+                    <th class="pb-2 px-4 font-medium text-center">Status</th>
                     <th class="pb-2 px-4 font-medium">Last Updated</th>
                     <th class="pb-2 pl-4 font-medium text-right">Actions</th>
                 </tr>

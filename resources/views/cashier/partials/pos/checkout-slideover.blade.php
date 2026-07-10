@@ -86,6 +86,14 @@
                         <p class="text-xs text-gray-500 dark:text-z">Scan to pay</p>
                     </div>
                 </button>
+
+                <div x-show="requiresCustomer && !selectedCustomer"
+                    class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-3">
+                    <p class="text-xs text-amber-700 dark:text-amber-400">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                        Orders over $700 require customer information.
+                    </p>
+                </div>
             </div>
         </div>
 
@@ -255,7 +263,8 @@
                     :disabled="submitting || (paymentMethod === 'cash' && (!amountReceived || parseFloat(amountReceived) <
                         total))"
                     class="flex-[2] py-2.5 text-sm font-bold text-white bg-[#0F6E8C] rounded-lg hover:bg-[#0c5972] disabled:opacity-50 transition">
-                    <span x-text="submitting ? 'Processing...' : 'Complete Payment'"></span>
+                    <span
+                        x-text="submitting ? 'Processing...' : requiresCustomer && !selectedCustomer ? 'Customer Info Required' : 'Complete Payment'"></span>
                 </button>
             </div>
         </div>

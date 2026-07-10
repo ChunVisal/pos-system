@@ -24,6 +24,17 @@
                 {{-- Dropdown List --}}
                 <div x-show="customerResults.length > 0"
                     class="absolute left-0 right-0 top-[66px] bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg z-10 max-h-[200px] overflow-y-auto">
+
+                    {{-- Header with close --}}
+                    <div
+                        class="flex items-center justify-between px-3 py-2 border-b border-gray-100 dark:border-zinc-700 sticky top-0 bg-white dark:bg-zinc-800">
+                        <span class="text-[10px] text-gray-500">Search Results</span>
+                        <button @click="customerResults = []; customerSearch = ''"
+                            class="text-gray-400 hover:text-gray-600">
+                            <i class="fa-solid fa-xmark text-[10px]"></i>
+                        </button>
+                    </div>
+
                     <template x-for="cust in customerResults" :key="cust.id">
                         <div @click="selectCustomer(cust)"
                             class="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700 transition border-b border-gray-100 dark:border-zinc-700 last:border-0">

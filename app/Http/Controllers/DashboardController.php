@@ -12,14 +12,23 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public static function getSummaryCards()
+    public static function getSummaryCards($start = null, $end = null)
     {
-        $today = Carbon::today();
-        $yesterday = Carbon::yesterday();
+        if ($start && $end) {
+            $periodStart = Carbon::parse($start)->startOfDay();
+            $periodEnd = Carbon::parse($end)->endOfDay();
 
-        $todaySales = Order::whereDate('created_at', $today)->sum('total');
-        $yesterdaySales = Order::whereDate('created_at', $yesterday)->sum('total');
-        $todayOrders = Order::whereDate('created_at', $today)->count();
+            $todaySales = Order::whereBetween('created_at', [$periodStart, $periodEnd])->sum('total');
+            $yesterdaySales = Order::whereBetween('created_at', [Carbon::parse($start)->subDay()->startOfDay(), Carbon::parse($end)->subDay()->endOfDay()])->sum('total');
+            $todayOrders = Order::whereBetween('created_at', [$periodStart, $periodEnd])->count();
+        } else {
+            $today = Carbon::today();
+            $yesterday = Carbon::yesterday();
+
+            $todaySales = Order::whereDate('created_at', $today)->sum('total');
+            $yesterdaySales = Order::whereDate('created_at', $yesterday)->sum('total');
+            $todayOrders = Order::whereDate('created_at', $today)->count();
+        }
 
         // Percentage change from yesterday
         $salesChange = $yesterdaySales > 0
@@ -51,7 +60,7 @@ class DashboardController extends Controller
                 'iconColor' => '#0F6E8C',
                 'trend' => $salesChange >= 0 ? 'up' : 'down',
                 'percentage' => abs($salesChange).'%',
-                'period' => 'vs yesterday',
+                'period' => 'Yesterday: $'.number_format($yesterdaySales, 2),
             ],
             [
                 'title' => 'Total Products',
@@ -152,14 +161,12 @@ class DashboardController extends Controller
     public static function getTopCashiers($limit = 5)
     {
         return Order::join('users', 'orders.cashier_id', '=', 'users.id')
-            ->join('order_items', 'orders.id', '=', 'order_items.order_id')  // ← Add this
             ->select(
                 'users.id',
                 'users.name',
                 'users.employee_id',
                 'users.shift',
-                DB::raw('COUNT(DISTINCT orders.id) as total_orders'),
-                DB::raw('SUM(order_items.quantity) as total_items_sold'),
+                DB::raw('COUNT(orders.id) as total_orders'),
                 DB::raw('SUM(orders.total) as total_revenue'),
                 DB::raw('ROUND(AVG(orders.total), 2) as avg_order_value'),
                 DB::raw('MAX(orders.created_at) as last_sale_at')
@@ -167,7 +174,14 @@ class DashboardController extends Controller
             ->groupBy('users.id', 'users.name', 'users.employee_id', 'users.shift')
             ->orderByDesc('total_revenue')
             ->limit($limit)
-            ->get();
+            ->get()
+            ->map(function ($cashier) {
+                $cashier->total_items_sold = OrderItem::whereHas('order', function ($q) use ($cashier) {
+                    $q->where('cashier_id', $cashier->id);
+                })->sum('quantity');
+
+                return $cashier;
+            });
     }
 
     public static function getSalesChart($start = null, $end = null)
@@ -242,6 +256,19 @@ class DashboardController extends Controller
             fputcsv($file, ['Rank', 'Category', 'Products', 'Sold', 'Revenue', 'Avg Order', 'Performance %']);
             foreach (DashboardController::getTopCategories(20) as $c) {
                 fputcsv($file, [$c['rank'], $c['name'], $c['products'], $c['sold'], $c['revenue'], $c['avg_order_value'], $c['percent'].'%']);
+            }
+            fputcsv($file, []);
+
+            // Top Cashiers
+            fputcsv($file, ['TOP CASHIERS']);
+            fputcsv($file, ['Rank', 'Name', 'Orders', 'Revenue']);
+            foreach (self::getTopCashiers(20) as $index => $cashier) {
+                fputcsv($file, [
+                    $index + 1,
+                    $cashier->name,
+                    $cashier->total_orders,
+                    number_format($cashier->total_revenue, 2),
+                ]);
             }
             fputcsv($file, []);
 

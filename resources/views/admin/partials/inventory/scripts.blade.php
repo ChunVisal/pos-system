@@ -18,14 +18,16 @@
                 quantity: 1
             },
             cashierStocks: @json($cashierStocks ?? []),
+            products: @json($products),
 
             form: {
-                product_code: '',
+            product_code: '',
                 type: 'in',
                 quantity: null,
                 low_stock_threshold: null,
                 reason: '',
                 notes: '',
+                status: 'active',
             },
 
             get currentStock() {
@@ -44,6 +46,7 @@
                     low_stock_threshold: item ? item.low_stock_threshold : null,
                     reason: '',
                     notes: '',
+                    status: item ? item.status : 'active',
                 };
                 this.open = true;
             },
@@ -52,7 +55,10 @@
                 this.open = false;
             },
 
-            openStockDrop(product) {
+            openStockDrop(productId) {
+                const product = this.products.find(p => p.id == productId);
+                if (!product) return;
+
                 this.dropForm = {
                     product_id: product.id,
                     product_name: product.name,
@@ -62,7 +68,6 @@
                 };
                 this.stockDropOpen = true;
             },
-
             getCashierStock() {
                 const stock = this.cashierStocks.find(s => s.product_id === this.dropForm.product_id && s.cashier_id ===
                     this.dropForm.cashier_id);
@@ -98,6 +103,11 @@
                 if (!this.form.reason) {
                     alert('Please select a reason!');
                     return;
+                }
+
+                // Default quantity to 0 if empty
+                if (!this.form.quantity || this.form.quantity === '') {
+                    this.form.quantity = 0;
                 }
 
                 this.submitting = true;

@@ -20,7 +20,6 @@
         rel="stylesheet">
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <script>
         // Runs immediately — before Alpine, before CSS, no flicker
         if (localStorage.getItem('sidebar') === 'closed') {

@@ -128,8 +128,16 @@
         if (stockFilter) stockFilter.addEventListener('change', filterTable);
     });
 
-    // ── Delete product ────────────────────────────────────────────
     function deleteProduct(id, button) {
+        if (button.dataset.hasOrders === '1') {
+            alert('Cannot delete: This product has existing orders');
+            return;
+        }
+        if (button.dataset.hasStock === '1') {
+            alert('Cannot delete: This product has stock movement history');
+            return;
+        }
+
         if (!confirm('Are you sure you want to delete this product?')) return;
 
         fetch('/admin/products/' + id, {
@@ -139,13 +147,15 @@
                     'Accept': 'application/json'
                 }
             })
-            .then(function(response) {
-                if (response.ok) {
-                    button.closest('tr, [data-product-card]')?.remove();
+            .then(res => res.json())
+            .then(data => {
+                if (data.message === 'Deleted') {
                     window.location.reload();
+                } else {
+                    alert(data.message);
                 }
             })
-            .catch(console.error);
+            .catch(err => alert('Error: ' + err.message));
     }
 
     // Toggle all checkboxes - NOW shows/hides checkboxes and trash
@@ -206,7 +216,6 @@
         updateBulkBar();
     }
 
-    // Bulk delete function - FIXED
     function bulkDelete() {
         const checkedBoxes = document.querySelectorAll('.bulk-checkbox:checked');
         const ids = Array.from(checkedBoxes).map(cb => cb.dataset.id);
@@ -216,12 +225,20 @@
             return;
         }
 
+        // Check if any selected products have relationships
+        for (let cb of checkedBoxes) {
+            if (cb.dataset.hasOrders === '1' || cb.dataset.hasStock === '1') {
+                alert('Some selected products have existing orders or stock history and cannot be deleted.');
+                return;
+            }
+        }
+
         if (!confirm(`Delete ${ids.length} products?`)) return;
 
         fetch('/admin/products/bulk-delete', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
@@ -229,28 +246,12 @@
                     ids: ids
                 })
             })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return res.json();
-            })
+            .then(res => res.json())
             .then(data => {
-                // Remove deleted rows from table
-                ids.forEach(id => {
-                    const checkbox = document.querySelector(`.bulk-checkbox[data-id="${id}"]`);
-                    if (checkbox) {
-                        const row = checkbox.closest('tr');
-                        if (row) row.remove();
-                        window.location.reload();
-                    }
-                });
-                // Reset bulk mode
-                cancelBulkMode();
+                alert(data.message);
+                window.location.reload();
             })
-            .catch(error => {
-                alert('Error: ' + error.message);
-            });
+            .catch(err => alert('Error: ' + err.message));
     }
 
     function productPage() {

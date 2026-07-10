@@ -124,13 +124,24 @@
                     <div>
                         <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Shift</label>
                         <select x-model="form.shift"
-                            class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200">
-                            <option value="">Select</option>
-                            <option value="morning-afternoon">Morning → Afternoon</option>
-                            <option value="afternoon-night">Afternoon → Night</option>
-                            <option value="night-morning">Night → Morning</option>
-                            <option value="full-morning">Full (Morning-Afternoon)</option>
-                            <option value="full-night">Full (Night-Morning)</option>
+                            class="w-full text-sm bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-800 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] focus:border-[#0F6E8C] text-gray-800 dark:text-zinc-200">
+                            <option value="" class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">
+                                Select</option>
+                            <option value="morning-afternoon"
+                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">Morning → Afternoon
+                            </option>
+                            <option value="afternoon-night"
+                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">Afternoon → Night
+                            </option>
+                            <option value="night-morning"
+                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">Night → Morning
+                            </option>
+                            <option value="full-morning"
+                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">Full
+                                (Morning-Afternoon)</option>
+                            <option value="full-night"
+                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">Full (Night-Morning)
+                            </option>
                         </select>
                     </div>
                     <div>

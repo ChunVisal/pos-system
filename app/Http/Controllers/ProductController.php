@@ -118,14 +118,42 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
-        Product::findOrFail($id)->delete(); // hard delete, no soft delete
+        $product = Product::findOrFail($id);
+
+        // Check if product has orders
+        if ($product->orderItems()->exists()) {
+            return response()->json([
+                'message' => 'Cannot delete this product. It has existing orders/transactions.',
+            ], 422);
+        }
+
+        // Check if product has stock movements
+        if ($product->stockMovements()->exists()) {
+            return response()->json([
+                'message' => 'Cannot delete this product. It has stock movement history.',
+            ], 422);
+        }
 
         return response()->json(['message' => 'Deleted']);
     }
 
     public function bulkDestroy(Request $request)
     {
-        Product::whereIn('id', $request->ids)->delete();
+        $ids = $request->ids;
+
+        // Check if any products have relationships
+        $withOrders = Product::whereIn('id', $ids)
+            ->whereHas('orderItems')
+            ->orWhereHas('stockMovements')
+            ->exists();
+
+        if ($withOrders) {
+            return response()->json([
+                'message' => 'Some products cannot be deleted. They have existing orders or stock history.',
+            ], 422);
+        }
+
+        Product::whereIn('id', $ids)->delete();
 
         return response()->json(['message' => 'Deleted']);
     }

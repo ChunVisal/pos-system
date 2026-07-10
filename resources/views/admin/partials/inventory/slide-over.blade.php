@@ -103,6 +103,26 @@
                 </div>
             </div>
 
+            {{-- Status --}}
+            <div>
+                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-2">Status</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" @click="form.status = 'active'"
+                        class="py-2 rounded-md text-xs font-semibold border transition"
+                        :class="form.status === 'active' ?
+                            'bg-green-50 dark:bg-green-950/40 border-green-300 dark:border-green-800 text-green-700 dark:text-green-400' :
+                            'border-gray-300 dark:border-zinc-700 text-gray-500 dark:text-zinc-400'">
+                        Active
+                    </button>
+                    <button type="button" @click="form.status = 'inactive'"
+                        class="py-2 rounded-md text-xs font-semibold border transition"
+                        :class="form.status === 'inactive' ?
+                            'bg-red-50 dark:bg-red-950/40 border-red-300 dark:border-red-800 text-red-700 dark:text-red-400' :
+                            'border-gray-300 dark:border-zinc-700 text-gray-500 dark:text-zinc-400'">
+                        Inactive
+                    </button>
+                </div>
+            </div>
             <div>
                 <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Notes (optional)</label>
                 <textarea x-model="form.notes" rows="3" placeholder="Add any additional notes..."

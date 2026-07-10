@@ -100,7 +100,7 @@
                         </div>
                     </td>
                     <td class="py-3 px-2 text-xs text-gray-500 dark:text-zinc-400">{{ $product->category_name }}</td>
-                    <td class="py-3 px-2 text-center font-medium">{{ $product->allocated }}</td>
+                    <td class="py-3 px-2 text-center text-gray-700 dark:text-zinc-300 font-medium">{{ $product->allocated }}</td>
                     <td class="py-3 px-2 text-center text-red-500 font-medium">{{ $product->sold }}</td>
                     <td class="py-3 px-2 text-center font-bold text-green-600">{{ $product->remaining }}</td>
                     <td class="py-3 px-2 text-right font-semibold text-[#0F6E8C]">

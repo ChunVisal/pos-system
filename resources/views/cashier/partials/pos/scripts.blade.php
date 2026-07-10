@@ -180,6 +180,10 @@
                 this.customerOpen = false;
             },
 
+            get requiresCustomer() {
+                return this.total >= 700;
+            },
+
             processPayment() {
 
                 if (this.paymentMethod === 'cash' && (!this.amountReceived || parseFloat(this.amountReceived) < this
@@ -187,7 +191,11 @@
                     alert('Insufficient amount');
                     return;
                 }
-                console.log('selectedCustomer:', this.selectedCustomer);
+                if (this.requiresCustomer && !this.selectedCustomer) {
+                    alert('Orders over $700 require customer information. Please add customer details.');
+                    this.customerOpen = true;
+                    return;
+                }
                 this.submitting = true;
 
                 fetch('{{ route('cashier.checkout') }}', {

@@ -33,4 +33,14 @@ class Product extends Model
     {
         return $this->hasMany(CashierStock::class);
     }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class);
+    }
 }

@@ -23,7 +23,6 @@
                 class="w-32 text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200">
             <span class="text-xs text-gray-400 dark:text-zinc-500 ml-2">units remaining triggers an alert</span>
         </div>
-
         <div class="flex items-center justify-between border border-gray-200 dark:border-zinc-700 rounded-md px-4 py-3">
             <div>
                 <p class="text-sm font-medium text-gray-800 dark:text-zinc-200">Email Alerts</p>

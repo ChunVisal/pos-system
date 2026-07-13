@@ -25,6 +25,11 @@ class AdminController extends Controller
         ]);
     }
 
+    public function products()
+    {
+        return view('admin.products');
+    }
+
     public function inventory()
     {
         // Fetch raw collections directly from your database tables

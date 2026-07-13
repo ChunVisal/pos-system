@@ -30,7 +30,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/dashboard/export', [DashboardController::class, 'exportDashboard'])->name('admin.dashboard.export');
 
-    Route::get('/products', [ProductController::class, 'index'])->name('admin.products');
+    Route::get('/products', [AdminController::class, 'products'])->name('admin.products');
     Route::post('/products', [ProductController::class, 'store'])->name('admin.products.store');
     Route::get('/products/by-category', [ProductController::class, 'byCategory'])
         ->name('admin.products.byCategory');
@@ -42,6 +42,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/inventory/adjust', [InventoryController::class, 'adjustStock'])->name('admin.inventory.adjust');
     Route::get('/inventory/export', [InventoryController::class, 'export'])->name('admin.inventory.export');
     Route::post('/inventory/stock-drop', [InventoryController::class, 'stockDrop'])->name('admin.products.stock-drop');
+    Route::get('/admin/inventory/movements', [InventoryController::class, 'movements'])->name('admin.inventory.movements');
 
     Route::get('/users', [UserController::class, 'index'])->name('admin.users');
     Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
@@ -61,7 +62,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
     Route::get('/activitylog', [AdminController::class, 'activitylog'])->name('admin.activitylog');
 });
-
 // Cashier Routes
 Route::middleware(['auth', 'role:cashier'])->group(function () {
     Route::get('/cashier/pos', [CashierController::class, 'pos'])->name('cashier.pos');
@@ -82,4 +82,4 @@ Route::middleware(['auth', 'role:cashier'])->group(function () {
 });
 
 // Auth routes (already there)
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

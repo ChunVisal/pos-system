@@ -3,12 +3,14 @@
         <h1 class="text-xl font-bold text-gray-800 dark:text-zinc-100">My Products</h1>
         <p class="text-xs text-gray-500 dark:text-zinc-400">Stock allocated to you</p>
     </div>
+    {{-- <button onclick="requestStock({{ $product->id }})">Request Stock</button> --}}
 </div>
 
 {{-- Summary Cards --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-5">
     @foreach ($summaryCards as $card)
-        <div class="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-800/80 shadow-sm relative overflow-hidden flex flex-col justify-between group">
+        <div
+            class="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-800/80 shadow-sm relative overflow-hidden flex flex-col justify-between group">
 
             <div class="flex items-center gap-2.5">
                 {{-- Minimal Square Inventory Icon Badge --}}

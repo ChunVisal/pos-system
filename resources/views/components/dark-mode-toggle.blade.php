@@ -18,6 +18,8 @@
         function updateUI(isDark) {
             if (isDark) {
                 html.classList.add('dark');
+
+
                 sunIcon.style.display = 'block';
                 moonIcon.style.display = 'none';
             } else {

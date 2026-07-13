@@ -44,22 +44,26 @@
 
             {{-- Basic Info --}}
             <div class="space-y-3">
-                <p class="text-xs font-semibold text-gray-400 dark:text-zinc-500 uppercase">Basic Info</p>
+                <p class="text-xs font-semibold text-gray-400 dark:text-zinc-500 uppercase">
+                    Basic Info</p>
 
                 <div>
-                    <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Full Name *</label>
+                    <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Full Name
+                        *</label>
                     <input type="text" x-model="form.name" required placeholder="e.g. Sokha Chan"
                         class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200 placeholder-gray-400">
                 </div>
 
                 <div>
-                    <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Email Address *</label>
+                    <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Email
+                        Address *</label>
                     <input type="email" x-model="form.email" required placeholder="name@bluetech.com"
                         class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200 placeholder-gray-400">
                 </div>
 
                 <div>
-                    <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Phone Number</label>
+                    <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Phone
+                        Number</label>
                     <input type="text" x-model="form.phone" placeholder="e.g. 012 345 678"
                         class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200 placeholder-gray-400">
                 </div>
@@ -73,7 +77,8 @@
 
             {{-- Security --}}
             <div class="space-y-3">
-                <p class="text-xs font-semibold text-gray-400 dark:text-zinc-500 uppercase">Security</p>
+                <p class="text-xs font-semibold text-gray-400 dark:text-zinc-500 uppercase">
+                    Security</p>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">
@@ -82,8 +87,11 @@
                         <input type="password" x-model="form.password" :required="!editMode" placeholder="••••••••"
                             class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200 placeholder-gray-400">
                     </div>
-                    <div>
-                        <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Confirm Password</label>
+                    <div>Terminals are not available in the web editor. Continue in an
+                        environment that can run code,
+                        like a codespace or VS Code Desktop.
+                        <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Confirm
+                            Password</label>
                         <input type="password" x-model="form.password_confirmation" :required="!editMode"
                             placeholder="••••••••"
                             class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200 placeholder-gray-400">
@@ -111,10 +119,12 @@
 
             {{-- CASHIER ONLY --}}
             <div x-show="form.role === 'cashier'" class="space-y-3">
-                <p class="text-xs font-semibold text-blue-500 dark:text-blue-400 uppercase">Cashier Details</p>
+                <p class="text-xs font-semibold text-blue-500 dark:text-blue-400 uppercase">
+                    Cashier Details</p>
 
                 <div>
-                    <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Employee ID</label>
+                    <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Employee
+                        ID</label>
                     <input type="text" x-model="form.employee_id" placeholder="Auto-generated"
                         class="w-full text-sm bg-gray-50 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 text-gray-800 dark:text-zinc-200"
                         readonly>
@@ -128,24 +138,30 @@
                             <option value="" class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">
                                 Select</option>
                             <option value="morning-afternoon"
-                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">Morning → Afternoon
+                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">
+                                Morning → Afternoon
                             </option>
                             <option value="afternoon-night"
-                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">Afternoon → Night
+                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">
+                                Afternoon → Night
                             </option>
                             <option value="night-morning"
-                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">Night → Morning
+                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">
+                                Night → Morning
                             </option>
                             <option value="full-morning"
-                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">Full
+                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">
+                                Full
                                 (Morning-Afternoon)</option>
                             <option value="full-night"
-                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">Full (Night-Morning)
+                                class="bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200">
+                                Full (Night-Morning)
                             </option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Hire Date</label>
+                        <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Hire
+                            Date</label>
                         <div class="relative">
                             <div class="relative">
                                 <input type="date" x-model="form.hire_date"
@@ -154,30 +170,34 @@
 
                         </div>
                     </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Salary
+                                ($)</label>
+                            <input type="number" x-model="form.salary" step="0.01" placeholder="0.00"
+                                class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200 placeholder-gray-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Quick
+                                Login PIN</label>
+                            <input type="password" x-model="form.pin" maxlength="4" placeholder="4 digits"
+                                class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200 placeholder-gray-400">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Salary ($)</label>
-                        <input type="number" x-model="form.salary" step="0.01" placeholder="0.00"
-                            class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200 placeholder-gray-400">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Quick Login PIN</label>
-                        <input type="password" x-model="form.pin" maxlength="4" placeholder="4 digits"
-                            class="w-full text-sm bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200 placeholder-gray-400">
-                    </div>
-                </div>
-            </div>
-
-            {{-- ADMIN ONLY --}}
-            <div x-show="form.role === 'admin'" class="space-y-3">
-                <p class="text-xs font-semibold text-purple-500 dark:text-purple-400 uppercase">Admin Privileges</p>
+                {{-- ADMIN ONLY --}}
+                <div x-show="form.role === 'admin'" class="space-y-3">
+                <p class="text-xs font-semibold text-purple-500 dark:text-purple-400 uppercase">
+                    Admin Privileges</p>
                 <div
                     class="bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-md p-3">
                     <p class="text-xs text-purple-700 dark:text-purple-400">
                         <i class="fa-solid fa-shield-halved mr-1"></i>
-                        Admin has full access to all features: products, inventory, users, reports, and settings.
+                        Admin has full access to all features: products, inventory, users,
+                        reports, and settings.
                     </p>
                 </div>
             </div>

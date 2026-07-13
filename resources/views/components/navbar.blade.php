@@ -10,7 +10,7 @@
             // Listen for dark mode changes
             const observer = new MutationObserver(() => {
                 this.isDark = document.documentElement.classList.contains('dark');
-            }); 
+            });
             observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
         }
     }"
@@ -46,11 +46,11 @@
     </div>
 </nav>
 
-<script>
-    document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
-        const sidebar = document.querySelector('aside');
-        if (sidebar && sidebar.__x) {
-            sidebar.__x.$data.open = !sidebar.__x.$data.open;
-        }
-    });
-</script>
+        <script>
+            document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+                const sidebar = document.querySelector('aside');
+                if (sidebar && sidebar.__x) {
+                    sidebar.__x.$data.open = !sidebar.__x.$data.open;
+                }
+            });
+        </script>

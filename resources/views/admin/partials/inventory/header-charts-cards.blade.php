@@ -80,6 +80,10 @@
                     In</span>
                 <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#EF4444]"></span>Stock
                     Out</span>
+                <a href="{{ route('admin.inventory.movements', ['start_date' => request('start_date', now()->subDays(14)->format('Y-m-d')), 'end_date' => request('end_date', now()->format('Y-m-d'))]) }}"
+                    class="text-[11px] text-[#0F6E8C] hover:underline">
+                    View All Movements →
+                </a>
             </div>
         </div>
         <div class="relative min-w-0" style="height: 260px;">

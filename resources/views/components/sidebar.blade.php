@@ -11,7 +11,7 @@
         open ? 'w-[200px]' : 'w-14',
         ready ? 'transition-all duration-300' : ''
     ]"
-    class="sticky top-[60px] h-[calc(100vh-60px)] flex flex-col bg-white dark:bg-black overflow-hidden z-40">
+    class="sticky top-[60px] h-[calc(100vh-60px)] flex flex-col bg-white dark:bg-zinc-950 overflow-hidden z-40">
 
     <div class="absolute right-0 top-0 bottom-0 w-[1px] cursor-ew-resize hover:bg-blue-400 bg-gray-200 dark:bg-zinc-800 transition-all z-50"
         @mousedown.stop="
@@ -30,9 +30,9 @@
         ">
     </div>
 
-    <div x-show="open" class="absolute top-1/3 -translate-y-1/2 right-0 z-50 flex items-center justify-center">
+    <div x-show="open" class="absolute top-2/3 -translate-y-1/2 right-0 z-50 flex items-center justify-center">
         <button @click="toggle(false)"
-            class="w-6 h-12 bg-gray-100 dark:bg-zinc-800 border-t border-r border-gray-300 dark:border-zinc-800 rounded-l-lg shadow-sm flex items-center justify-center hover:bg-gray-200/30 dark:hover:bg-zinc-800/50 transition">
+            class="w-6 h-12 bg-gray-100 dark:bg-zinc-800 border-t border-r border-gray-300 dark:border-zinc-900 rounded-l-lg shadow-sm flex items-center justify-center hover:bg-gray-200/30 dark:hover:bg-zinc-800/50 transition">
             <x-heroicon-o-chevron-left class="w-10 text-gray-600 dark:text-zinc-400" />
         </button>
     </div>
@@ -61,12 +61,42 @@
             <span x-show="open" class="text-sm font-medium whitespace-nowrap">Products</span>
         </a>
 
-        <a href="{{ route('admin.inventory') }}"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {{ request()->routeIs('admin.inventory') ? 'bg-blue-50 dark:bg-zinc-900 text-p dark:text-zinc-100' : 'text-gray-700 dark:text-zinc-400 hover:bg-gray-200/30 dark:hover:bg-zinc-900/50' }}"
-            :class="open ? '' : 'justify-center'">
-            <x-heroicon-o-archive-box class="w-5 h-5 shrink-0" />
-            <span x-show="open" class="text-sm font-medium whitespace-nowrap">Inventory</span>
-        </a>
+        {{-- Inventory with Submenu --}}
+        <div x-data="{
+            inventoryOpen: localStorage.getItem('submenu-inventory') === 'open',
+            toggleSubmenu() {
+                this.inventoryOpen = !this.inventoryOpen;
+                localStorage.setItem('submenu-inventory', this.inventoryOpen ? 'open' : 'closed');
+            }
+        }">
+            <button @click="toggleSubmenu()"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {{ request()->routeIs('admin.inventory*') ? 'bg-blue-50 dark:bg-zinc-900 text-p dark:text-zinc-100' : 'text-gray-700 dark:text-zinc-400 hover:bg-gray-200/30 dark:hover:bg-zinc-900/50' }}"
+                :class="open ? '' : 'justify-center'">
+                <x-heroicon-o-archive-box class="w-5 h-5 shrink-0" />
+                <span x-show="open" class="text-sm font-medium whitespace-nowrap flex-1 text-left">Inventory</span>
+                <svg x-show="open" :class="inventoryOpen ? 'rotate-180' : ''" class="w-4 h-4 transition-transform"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+
+            {{-- Submenu --}}
+            <div x-show="open && inventoryOpen" x-transition:enter="transition-all ease-out duration-300"
+                x-transition:enter-start="opacity-0 max-h-0 overflow-hidden"
+                x-transition:enter-end="opacity-100 max-h-40 overflow-hidden"
+                x-transition:leave="transition-all ease-in duration-200"
+                x-transition:leave-start="opacity-100 max-h-40 overflow-hidden"
+                x-transition:leave-end="opacity-0 max-h-0 overflow-hidden" class="ml-4 space-y-2 mt-2">
+                <a href="{{ route('admin.inventory') }}"
+                    class="block px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap transition-colors {{ request()->routeIs('admin.inventory') && !request()->routeIs('admin.inventory.movements') ? 'bg-blue-50 dark:bg-zinc-800/70 text-p dark:text-zinc-100' : 'text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800/50' }}">
+                    Stock Overview
+                </a>
+                <a href="{{ route('admin.inventory.movements') }}"
+                    class="block px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap transition-colors {{ request()->routeIs('admin.inventory.movements') ? 'bg-blue-50 dark:bg-zinc-800/70 text-p dark:text-zinc-100' : 'text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800/50' }}">
+                    Stock Movements
+                </a>
+            </div>
+        </div>
 
         <a href="{{ route('admin.users') }}"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {{ request()->routeIs('admin.users') ? 'bg-blue-50 dark:bg-zinc-900 text-p dark:text-zinc-100' : 'text-gray-700 dark:text-zinc-400 hover:bg-gray-200/30 dark:hover:bg-zinc-900/50' }}"

@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Categories;
 use App\Models\Product;
 use App\Models\ProductCatalog;
+use App\Models\StockMovement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -67,7 +69,6 @@ class ProductController extends Controller
             ]);
 
             return response()->json($product->fresh());
-
         } catch (\Exception $e) {
             Log::error('Update error: '.$e->getMessage());
 
@@ -231,10 +232,21 @@ class ProductController extends Controller
                 'low_stock_threshold' => $request->low_stock_threshold ?? 5,
             ]);
 
+            // Log initial stock as stock movement
+            if ($product->stock_quantity > 0) {
+                StockMovement::create([
+                    'product_id' => $product->id,
+                    'type' => 'in',
+                    'quantity' => $product->stock_quantity,
+                    'reason' => 'Initial stock',
+                    'notes' => 'Product created with initial stock',
+                    'user_id' => Auth::id(),
+                ]);
+            }
+
             Cache::put($cacheKey, $product, 5);
 
             return response()->json($product);
-
         } catch (\Exception $e) {
             Log::error('Store error: '.$e->getMessage());
 

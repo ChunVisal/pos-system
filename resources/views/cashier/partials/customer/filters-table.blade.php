@@ -121,7 +121,7 @@
                         <div class="flex flex-col items-center justify-center">
                             <div
                                 class="w-16 h-16 mb-4 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center">
-                                <i class="fa-solid fa-users text-2xl text-gray-400 dark:text-zinc-500"></i>
+                            <i class="fa-solid fa-users text-2xl text-gray-400 dark:text-zinc-500"></i>
                             </div>
                             <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-1">No customers
                                 found</h3>

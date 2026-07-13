@@ -201,7 +201,7 @@
             },
 
             closeView() {
-                this.viewOpen = false;
+            this.viewOpen = false;
             },
 
             deleteCustomer(customer) {

@@ -22,11 +22,11 @@ class InventoryController extends Controller
                 $search = $request->search;
 
                 return $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%'.$search.'%')
-                        ->orWhere('code', 'like', '%'.$search.'%')
-                        ->orWhere('barcode', 'like', '%'.$search.'%')
+                    $q->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('code', 'like', '%' . $search . '%')
+                        ->orWhere('barcode', 'like', '%' . $search . '%')
                         ->orWhereHas('category', function ($cat) use ($search) {
-                            $cat->where('name', 'like', '%'.$search.'%');
+                            $cat->where('name', 'like', '%' . $search . '%');
                         });
                 });
             })
@@ -66,7 +66,7 @@ class InventoryController extends Controller
 
         $movements = StockMovement::whereBetween('created_at', [$start->startOfDay(), $end->endOfDay()])
             ->get()
-            ->groupBy(fn ($m) => $m->created_at->format('M d'));
+            ->groupBy(fn($m) => $m->created_at->format('M d'));
 
         $labels = [];
         $stockIn = [];
@@ -87,7 +87,7 @@ class InventoryController extends Controller
                 return "{$m->quantity}x {$m->product->name} → {$m->reason}";
             })->join(', ');
 
-            Log::info("Day: $key, Out count: ".$dayMovements->where('type', 'out')->count().", Details: $dayDetails");
+            Log::info("Day: $key, Out count: " . $dayMovements->where('type', 'out')->count() . ", Details: $dayDetails");
             $details[] = $dayDetails ?: '';
             $current->addDay();
         }
@@ -133,12 +133,37 @@ class InventoryController extends Controller
             'product_id' => $request->product_id,
             'type' => 'out',
             'quantity' => $request->quantity,
-            'reason' => 'Transfer to '.User::find($request->cashier_id)->name,
+            'reason' => 'Transfer to ' . User::find($request->cashier_id)->name,
             'user_id' => Auth::id(),
-            'notes' => 'Received by: '.User::find($request->cashier_id)->name,
+            'notes' => 'Received by: ' . User::find($request->cashier_id)->name,
         ]);
 
         return response()->json(['success' => true, 'message' => 'Stock transferred']);
+    }
+
+    public function movements(Request $request)
+    {
+        $start = $request->start_date
+            ? Carbon::parse($request->start_date)
+            : now()->subDays(14);
+        $end = $request->end_date
+            ? Carbon::parse($request->end_date)
+            : now();
+
+        $movements = StockMovement::with(['product.category', 'user'])
+            ->whereBetween('created_at', [$start->startOfDay(), $end->endOfDay()])
+            ->latest()
+            ->get();
+
+        if ($request->ajax) {
+            return response()->json([
+                'movements' => $movements->items(),
+                'pagination' => (string) $movements->links(),
+            ]);
+        }
+
+        $categories = Categories::orderBy('name')->get();
+        return view('admin.stockmovements', compact('movements', 'start', 'end', 'categories'));
     }
 
     public function adjustStock(Request $request)
@@ -198,7 +223,7 @@ class InventoryController extends Controller
             now()->endOfDay(),
         ])->get();
 
-        $filename = 'inventory_'.now()->format('Y_m_d').'.csv';
+        $filename = 'inventory_' . now()->format('Y_m_d') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
@@ -212,9 +237,9 @@ class InventoryController extends Controller
             fputcsv($file, ['INVENTORY SUMMARY']);
             fputcsv($file, ['Metric', 'Value']);
             fputcsv($file, ['Total Products', $products->count()]);
-            fputcsv($file, ['Low Stock', $products->filter(fn ($p) => $p->stock_quantity > 0 && $p->stock_quantity <= $p->low_stock_threshold)->count()]);
+            fputcsv($file, ['Low Stock', $products->filter(fn($p) => $p->stock_quantity > 0 && $p->stock_quantity <= $p->low_stock_threshold)->count()]);
             fputcsv($file, ['Out of Stock', $products->where('stock_quantity', 0)->count()]);
-            fputcsv($file, ['Stock Value ($)', number_format($products->sum(fn ($p) => $p->stock_quantity * $p->selling_price), 2)]);
+            fputcsv($file, ['Stock Value ($)', number_format($products->sum(fn($p) => $p->stock_quantity * $p->selling_price), 2)]);
             fputcsv($file, []); // empty row spacer
 
             // ── Section 2: Products ──
@@ -228,7 +253,7 @@ class InventoryController extends Controller
                     $product->stock_quantity,
                     $product->low_stock_threshold,
                     ucfirst($product->status),
-                    '$'.number_format($product->selling_price, 2),
+                    '$' . number_format($product->selling_price, 2),
                     $product->updated_at->format('M d, Y H:i'),
                 ]);
             }
@@ -243,7 +268,7 @@ class InventoryController extends Controller
             for ($i = 6; $i >= 0; $i--) {
                 $date = now()->subDays($i)->format('Y-m-d');
                 $label = now()->subDays($i)->format('M d, Y');
-                $dayMovements = $movements->filter(fn ($m) => $m->created_at->format('Y-m-d') === $date);
+                $dayMovements = $movements->filter(fn($m) => $m->created_at->format('Y-m-d') === $date);
                 fputcsv($file, [
                     $label,
                     $dayMovements->where('type', 'in')->sum('quantity'),

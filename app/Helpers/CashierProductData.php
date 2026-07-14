@@ -20,7 +20,13 @@ class CashierProductData
         $totalRemaining = $totalAllocated - $totalSold;
         $totalProducts = CashierStock::where('cashier_id', $cashierId)
             ->distinct('product_id')
-            ->count('product_id'); // 4
+            ->count('product_id');
+
+        $totalValue = CashierStock::where('cashier_id', $cashierId)
+            ->join('products', 'cashier_stocks.product_id', '=', 'products.id')
+            ->selectRaw('SUM((allocated_quantity - sold_quantity) * selling_price) as total_value')
+            ->value('total_value') ?? 0;
+
         $lowStock = CashierStock::where('cashier_id', $cashierId)
             ->selectRaw('product_id, SUM(allocated_quantity) as total_allocated, SUM(sold_quantity) as total_sold')
             ->groupBy('product_id')
@@ -28,7 +34,7 @@ class CashierProductData
             ->havingRaw('(total_allocated - total_sold) <= 5')
             ->count();
 
-            $outOfStock = CashierStock::where('cashier_id', $cashierId)
+        $outOfStock = CashierStock::where('cashier_id', $cashierId)
             ->whereRaw('allocated_quantity <= sold_quantity')
             ->distinct('product_id')
             ->count('product_id');
@@ -41,7 +47,7 @@ class CashierProductData
                 'iconBg' => '#0F6E8C',
                 'iconColor' => '#0F6E8C',
                 'dot' => '#0F6E8C',
-                'subtitle' => 'Available items',
+                'subtitle' => '$' . number_format($totalValue) . ' total value',
             ],
             [
                 'title' => 'Allocated',
@@ -59,7 +65,7 @@ class CashierProductData
                 'iconBg' => '#10B981',
                 'iconColor' => '#10B981',
                 'dot' => '#10B981',
-                'subtitle' => $totalSold.' sold',
+                'subtitle' => $totalSold . ' sold',
             ],
             [
                 'title' => 'Low Stock',
@@ -68,7 +74,7 @@ class CashierProductData
                 'iconBg' => $lowStock > 0 ? '#EF4444' : '#F59E0B',
                 'iconColor' => $lowStock > 0 ? '#EF4444' : '#F59E0B',
                 'dot' => $lowStock > 0 ? '#EF4444' : '#F59E0B',
-                'subtitle' => $outOfStock.' out of stock',
+                'subtitle' => $outOfStock . ' out of stock',
             ],
         ];
     }

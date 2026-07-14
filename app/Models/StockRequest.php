@@ -13,8 +13,6 @@ class StockRequest extends Model
         'quantity_approved',
         'status',
         'approved_by',
-        'admin_notes',
-        'cashier_notes',
         'dispute_reason',
         'eta',
         'confirmed_at'

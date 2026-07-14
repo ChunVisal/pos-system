@@ -3,7 +3,11 @@
         <h1 class="text-xl font-bold text-gray-800 dark:text-zinc-100">My Products</h1>
         <p class="text-xs text-gray-500 dark:text-zinc-400">Stock allocated to you</p>
     </div>
-    {{-- <button onclick="requestStock({{ $product->id }})">Request Stock</button> --}}
+    <button @click="requestOpen = true"
+        class="px-3 py-1.5 text-sm font-semibold rounded-md bg-p text-gray-100 flex items-center gap-2">
+        <x-heroicon-o-arrow-up-tray class="w-4 h-4" />
+        Request Restock
+    </button>
 </div>
 
 {{-- Summary Cards --}}
@@ -45,3 +49,6 @@
         </div>
     @endforeach
 </div>
+
+
+<script></script>

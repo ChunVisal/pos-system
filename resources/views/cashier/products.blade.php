@@ -7,3 +7,7 @@
         @include('cashier.partials.products.request-stock')
     </div>
 @endsection
+
+@push('head-scripts')
+    @include('cashier.partials.products.scripts')
+@endpush

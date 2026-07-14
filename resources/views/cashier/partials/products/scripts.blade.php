@@ -1,15 +1,23 @@
 <script>
     function productPage() {
         return {
+
+            searchQuery: '',
             requestOpen: false,
+            requestSearch: '',
             requestForm: {
                 product_id: '',
-                quantity: 1,
-                notes: ''
+                product_name: '',
+                quantity: 1
             },
+            products: @json($products),
 
-            openRequest() {
-                this.requestOpen = true;
+            get filteredRequestProducts() {
+                const q = (this.requestSearch || '').toLowerCase();
+                return this.products.filter(p =>
+                    (p.remaining || 0) <= 5 &&
+                    (!q || (p.name || '').toLowerCase().includes(q))
+                );
             },
 
             submitRequest() {
@@ -17,7 +25,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
                         body: JSON.stringify(this.requestForm)
                     })
@@ -25,43 +33,20 @@
                     .then(data => {
                         alert(data.message);
                         this.requestOpen = false;
+                        this.requestForm = {
+                            product_id: '',
+                            product_name: '',
+                            quantity: 1
+                        };
                     });
             },
 
-            confirmReceipt(id) {
-                fetch(`/cashier/stock-request/${id}/confirm`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        }
-                    })
+            searchProducts() {
+                fetch(`/cashier/products?search=${encodeURIComponent(this.searchQuery)}&ajax=1`)
                     .then(res => res.json())
-                    .then(data => {
-                        alert(data.message);
-                        window.location.reload();
-                    });
+                    .then(data => this.products = data.products);
             },
 
-            disputeDrop(id) {
-                const reason = prompt('Reason:');
-                if (!reason) return;
-                fetch(`/cashier/stock-request/${id}/dispute`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        },
-                        body: JSON.stringify({
-                            reason
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        alert(data.message);
-                        window.location.reload();
-                    });
-            },
         }
     }
 </script>

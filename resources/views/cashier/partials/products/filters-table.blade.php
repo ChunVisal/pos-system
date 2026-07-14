@@ -1,6 +1,4 @@
 {{-- resources/views/cashier/partials/products/filters-table.blade.php --}}
-
-
 {{-- Filter Bar --}}
 <div class="flex flex-wrap items-center gap-3 mb-4">
 
@@ -16,7 +14,7 @@
             ✕
         </button>
     </div>
-
+    
     {{-- Category --}}
     <div class="relative">
         <select id="categoryFilter"
@@ -100,7 +98,8 @@
                         </div>
                     </td>
                     <td class="py-3 px-2 text-xs text-gray-500 dark:text-zinc-400">{{ $product->category_name }}</td>
-                    <td class="py-3 px-2 text-center text-gray-700 dark:text-zinc-300 font-medium">{{ $product->allocated }}</td>
+                    <td class="py-3 px-2 text-center text-gray-700 dark:text-zinc-300 font-medium">
+                        {{ $product->allocated }}</td>
                     <td class="py-3 px-2 text-center text-red-500 font-medium">{{ $product->sold }}</td>
                     <td class="py-3 px-2 text-center font-bold text-green-600">{{ $product->remaining }}</td>
                     <td class="py-3 px-2 text-right font-semibold text-[#0F6E8C]">
@@ -129,18 +128,3 @@
         </tbody>
     </table>
 </div>
-
-<script>
-    function productSearch() {
-        return {
-            searchQuery: '',
-            products: @json($products),
-
-            searchProducts() {
-                fetch(`/cashier/products?search=${encodeURIComponent(this.searchQuery)}&ajax=1`)
-                    .then(res => res.json())
-                    .then(data => this.products = data.products);
-            },
-        };
-    }
-</script>

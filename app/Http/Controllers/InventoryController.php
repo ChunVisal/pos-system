@@ -8,6 +8,7 @@ use App\Models\Categories;
 use App\Models\Product;
 use App\Models\StockMovement;
 use App\Models\User;
+use App\Models\StockRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -106,6 +107,7 @@ class InventoryController extends Controller
 
     public function stockDrop(Request $request)
     {
+
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'cashier_id' => 'required|exists:users,id',
@@ -114,28 +116,52 @@ class InventoryController extends Controller
 
         $product = Product::findOrFail($request->product_id);
 
+        // Check warehouse has enough stock
         if ($product->stock_quantity < $request->quantity) {
-            return response()->json(['success' => false, 'message' => 'Not enough stock']);
+            return response()->json([
+                'success' => false,
+                'message' => 'Not enough stock! Warehouse has ' . $product->stock_quantity . ' left.'
+            ]);
         }
 
-        CashierStock::create([
-            'product_id' => $request->product_id,
-            'cashier_id' => $request->cashier_id,
-            'allocated_quantity' => $request->quantity,
-            'allocated_by' => Auth::id(),
-        ]);
-
-        // Deduct from main stock
+        // Deduct from warehouse FIRST
         $product->decrement('stock_quantity', $request->quantity);
 
-        // Log as stock movement
+        // Add to cashier (find existing or create new)
+        $cashierStock = CashierStock::where('cashier_id', $request->cashier_id)
+            ->where('product_id', $request->product_id)
+            ->first();
+
+        if ($cashierStock) {
+            $cashierStock->increment('allocated_quantity', $request->quantity);
+        } else {
+            CashierStock::create([
+                'product_id' => $request->product_id,
+                'cashier_id' => $request->cashier_id,
+                'allocated_quantity' => $request->quantity,
+                'sold_quantity' => 0,
+                'allocated_by' => Auth::id(),
+            ]);
+        }
+
+        // Create notification for cashier
+        StockRequest::create([
+            'cashier_id' => $request->cashier_id,
+            'product_id' => $request->product_id,
+            'quantity_requested' => $request->quantity,
+            'quantity_approved' => $request->quantity,
+            'status' => 'approved',
+            'approved_by' => Auth::id(),
+        ]);
+
+
+        // Log stock movement
         StockMovement::create([
             'product_id' => $request->product_id,
             'type' => 'out',
             'quantity' => $request->quantity,
             'reason' => 'Transfer to ' . User::find($request->cashier_id)->name,
             'user_id' => Auth::id(),
-            'notes' => 'Received by: ' . User::find($request->cashier_id)->name,
         ]);
 
         return response()->json(['success' => true, 'message' => 'Stock transferred']);

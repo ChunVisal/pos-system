@@ -18,7 +18,7 @@
 
         <form class="flex-1 overflow-y-auto px-5 py-4 space-y-5">
             <div>
-                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Product</label>
+                <label class="block text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400 mb-1">Product</label>
                 <div class="relative">
                     <select x-model="form.product_code" required
                         class="appearance-none w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md pl-3 pr-8 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C]">
@@ -33,7 +33,7 @@
             </div>
 
             <div>
-                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-2">Movement Type</label>
+                <label class="block text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400 mb-2">Movement Type</label>
                 <div class="grid grid-cols-2 gap-2">
                     <button type="button" @click="form.type = 'in'"
                         class="flex items-center justify-center gap-2 py-2 rounded-md text-xs font-semibold border transition"
@@ -63,7 +63,7 @@
             </div>
 
             <div>
-                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Quantity</label>
+                <label class="block text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400 mb-1">Quantity</label>
                 <input type="number" min="1" x-model.number="form.quantity" placeholder="0"
                     class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] placeholder-gray-400 dark:placeholder-zinc-500">
                 <p class="text-[11px] text-gray-400 dark:text-zinc-500 mt-1" x-show="currentStock !== null">
@@ -73,7 +73,7 @@
 
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">
+                <label class="block text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400 mb-1">
                     Warning Number
                     <span class="text-gray-400 dark:text-zinc-500 font-normal">(show warning when stock drops to
                         this)</span>
@@ -87,7 +87,7 @@
             </div>
 
             <div>
-                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Reason</label>
+                <label class="block text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400 mb-1">Reason</label>
                 <div class="relative">
                     <select x-model="form.reason" required
                         class="appearance-none w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md pl-3 pr-8 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C]">
@@ -105,7 +105,7 @@
 
             {{-- Status --}}
             <div>
-                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-2">Status</label>
+                <label class="block text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400 mb-2">Status</label>
                 <div class="grid grid-cols-2 gap-2">
                     <button type="button" @click="form.status = 'active'"
                         class="py-2 rounded-md text-xs font-semibold border transition"
@@ -124,7 +124,7 @@
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Notes (optional)</label>
+                <label class="block text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400 mb-1">Notes (optional)</label>
                 <textarea x-model="form.notes" rows="3" placeholder="Add any additional notes..."
                     class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] placeholder-gray-400 dark:placeholder-zinc-500"></textarea>
             </div>

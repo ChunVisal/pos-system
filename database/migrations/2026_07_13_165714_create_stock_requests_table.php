@@ -20,8 +20,6 @@ return new class extends Migration
             $table->string('status')->default('pending');
             // pending, approved, on_hold, rejected, in_transit, received, disputed
             $table->foreignId('approved_by')->nullable()->constrained('users');
-            $table->text('admin_notes')->nullable();
-            $table->text('cashier_notes')->nullable();
             $table->text('dispute_reason')->nullable();
             $table->string('eta')->nullable();
             $table->timestamp('confirmed_at')->nullable();

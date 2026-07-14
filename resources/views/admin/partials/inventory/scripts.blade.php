@@ -21,7 +21,7 @@
             products: @json($products),
 
             form: {
-            product_code: '',
+                product_code: '',
                 type: 'in',
                 quantity: null,
                 low_stock_threshold: null,
@@ -74,18 +74,43 @@
                 return stock ? stock.allocated_quantity - stock.sold_quantity : 0;
             },
 
+            openStockDropFromRequest(requestId, productId, cashierId, quantity) {
+                const product = this.products.find(p => p.id == productId);
+                if (!product) return;
+
+                this.dropForm = {
+                    request_id: requestId,
+                    product_id: productId,
+                    product_name: product.name,
+                    current_stock: product.stock_quantity,
+                    cashier_id: cashierId,
+                    quantity: quantity,
+                };
+                this.stockDropOpen = true;
+            },
+
             submitDrop() {
                 fetch('/admin/inventory/stock-drop', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
                         body: JSON.stringify(this.dropForm)
                     })
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
+                            // Also approve the request
+                            if (this.dropForm.request_id) {
+                                fetch('/admin/notifications/' + this.dropForm.request_id + '/approve', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    }
+                                }); 	
+                            }
                             window.location.reload();
                         } else {
                             alert(data.message);

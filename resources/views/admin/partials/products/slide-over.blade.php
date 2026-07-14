@@ -27,7 +27,7 @@
 
                 {{-- Category --}}
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Category *</label>
+                    <label class="block text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400 mb-1">Category *</label>
                     <select x-model="form.category_code" @change.one="loadProducts()" required
                         class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C]">
                         <option value="">Select category</option>
@@ -40,7 +40,7 @@
 
                 {{-- Product Name --}}
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Product Name
+                    <label class="block text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400 mb-1">Product Name
                         *</label>
                     <select x-model="form.name" @change.one="autoFillDetails()"
                         :required="!editMode ? draftList.length === 0 : true" :disabled="!form.category_code"
@@ -55,7 +55,7 @@
 
                 {{-- Image --}}
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Product Image</label>
+                    <label class="block text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400 mb-1">Product Image</label>
                     <div x-show="form.image_preview || form.image_url" class="mb-2 relative inline-block">
                         <img :src="form.image_preview || form.image_url"
                             class="h-24 w-24 object-cover rounded-md border border-gray-200 dark:border-zinc-700">
@@ -85,13 +85,13 @@
                 {{-- Price + Stock --}}
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Price ($)
+                        <label class="block text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400 mb-1">Price ($)
                             *</label>
                         <input type="number" step="0.01" x-model.number="form.price" placeholder="0.00"
                             class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C]">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Stock *</label>
+                        <label class="block text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400 mb-1">Stock *</label>
                         <input type="number" x-model.number="form.stock" placeholder="0"
                             class="w-full text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C]">
                     </div>
@@ -99,7 +99,7 @@
 
                 {{-- Status --}}
                 <div class="flex items-center justify-between">
-                    <label class="text-xs font-medium text-gray-600 dark:text-zinc-400">Status</label>
+                    <label class="text-[12px] font-bold tracking-wider uppercase text-gray-600 dark:text-zinc-400">Status</label>
                     <div class="flex gap-1">
                         <button type="button" @click="form.status = 'active'"
                             class="px-3 py-1 text-[11px] font-medium rounded-l-md transition"
@@ -147,7 +147,7 @@
 
                             {{-- Info --}}
                             <div class="flex-1 min-w-0">
-                                <p class="text-xs font-medium text-gray-800 dark:text-zinc-100 truncate"
+                                <p class="text-[12px] font-bold tracking-wider uppercase text-gray-800 dark:text-zinc-100 truncate"
                                     x-text="item.name"></p>
                                 <p class="text-[10px] text-gray-400 dark:text-zinc-500">
                                     $<span x-text="item.price"></span> · Stock: <span x-text="item.stock"></span>

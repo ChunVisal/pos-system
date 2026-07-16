@@ -5,6 +5,7 @@
         @include('cashier.partials.products.header-cards')
         @include('cashier.partials.products.filters-table')
         @include('cashier.partials.products.request-stock')
+        @include('cashier.partials.products.request-new-product')
     </div>
 @endsection
 

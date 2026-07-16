@@ -26,9 +26,9 @@ class UserController extends Controller
                 $search = $request->search;
 
                 return $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%'.$search.'%')
-                    ->orWhere('email', 'like', '%'.$search.'%')
-                        ->orWhere('role', 'like', '%'.$search.'%');
+                    $q->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%')
+                        ->orWhere('role', 'like', '%' . $search . '%');
                 });
             })
             ->orderByRaw("FIELD(role, 'admin', 'cashier')")
@@ -43,31 +43,68 @@ class UserController extends Controller
         return view('admin.users', compact('users', 'summaryCards'));
     }
 
+
+    private function uploadToCloudinary($file): string
+    {
+        $cloudName = config('cloudinary.cloud_name');
+        $apiKey = config('cloudinary.api_key');
+        $apiSecret = config('cloudinary.api_secret');
+        $timestamp = time();
+        $signature = sha1("folder=pos/products&timestamp={$timestamp}{$apiSecret}");
+
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => "https://api.cloudinary.com/v1_1/{$cloudName}/image/upload",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_SSL_VERIFYPEER => false,   // ← bypass SSL for Laragon
+            CURLOPT_SSL_VERIFYHOST => false,   // ← bypass SSL for Laragon
+            CURLOPT_POSTFIELDS => [
+                'file' => new \CURLFile($file->getRealPath(), $file->getMimeType(), $file->getClientOriginalName()),
+                'api_key' => $apiKey,
+                'timestamp' => $timestamp,
+                'signature' => $signature,
+                'folder' => 'pos/products',
+            ],
+        ]);
+
+        $response = curl_exec($ch);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            throw new \Exception("Cloudinary upload failed: {$error}");
+        }
+
+        $data = json_decode($response, true);
+
+        if (! isset($data['secure_url'])) {
+            throw new \Exception('Cloudinary error: ' . ($data['error']['message'] ?? 'Unknown error'));
+        }
+
+        return $data['secure_url'];
+    }
+
     public function store(Request $request)
     {
 
         Log::info('Store called', $request->all());
+        Log::info('Has avatar_file: ' . ($request->hasFile('avatar_file') ? 'YES' : 'NO'));
 
-        try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users',
-                'password' => 'required|min:6',
-                'role' => 'required|in:admin,cashier',
-                'status' => 'required|in:active,inactive',
-                'employee_id' => 'nullable|unique:users',
-                'phone' => 'nullable|string',
-                'address' => 'nullable|string',
-                'shift' => 'nullable|string',
-                'pin' => 'nullable|digits:4',
-                'hire_date' => 'nullable|date',
-                'salary' => 'nullable|numeric',
-            ]);
-        } catch (ValidationException $e) {
-            Log::error('Validation failed', $e->errors());
-
-            return response()->json(['errors' => $e->errors()], 422);
-        }
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
+            'role' => 'required|in:admin,cashier',
+            'status' => 'required|in:active,inactive',
+            'employee_id' => 'nullable|unique:users',
+            'phone' => 'nullable|string',
+            'address' => 'nullable|string',
+            'shift' => 'nullable|string',
+            'pin' => 'nullable|digits:4',
+            'hire_date' => 'nullable|date',
+            'salary' => 'nullable|numeric',
+        ]);
 
         $employeeId = null;
         if ($request->role === 'cashier') {
@@ -79,7 +116,16 @@ class UserController extends Controller
                 ? (intval(substr($lastEmp->employee_id, 4)) + 1)
                 : 1;
 
-            $employeeId = 'EMP-'.str_pad($nextNum, 3, '0', STR_PAD_LEFT);
+            $employeeId = 'EMP-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
+        }
+
+
+        $imageUrl = null;
+
+        if ($request->hasFile('avatar_file')) {
+            $imageUrl = $this->uploadToCloudinary($request->file('avatar_file'), 'pos/avatars');
+        } elseif ($request->avatar_url) {
+            $imageUrl = $request->avatar_url;
         }
 
         User::create([
@@ -88,13 +134,14 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'status' => $request->status ?? 'active',
-            'employee_id' => $employeeId,
+            'avatar' => $imageUrl,
+            'employee_id' => $request->role === 'cashier' ? $employeeId : null,
             'phone' => $request->phone,
             'address' => $request->address,
-            'shift' => $request->shift,
-            'pin' => $request->pin,
-            'hire_date' => $request->hire_date,
-            'salary' => $request->salary,
+            'shift' => $request->role === 'cashier' ? $request->shift : null,
+            'pin' => $request->role === 'cashier' ? $request->pin : null,
+            'hire_date' => $request->role === 'cashier' ? $request->hire_date : null,
+            'salary' => $request->role === 'cashier' ? $request->salary : null,
         ]);
 
         return response()->json(['success' => true, 'message' => 'User created']);
@@ -102,32 +149,54 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        try {
+            $user = User::findOrFail($id);
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.$id,
-            'role' => 'required|in:admin,cashier',
-            'phone' => 'nullable|string',
-            'address' => 'nullable|string',
-            'shift' => 'nullable|string',
-            'pin' => 'nullable|digits:4',
-            'hire_date' => 'nullable|date',
-            'salary' => 'nullable|numeric',
-        ]);
+            $imageUrl = $user->avatar;
 
-        $data = $request->only([
-            'name', 'email', 'role', 'status', 'phone',
-            'address', 'shift', 'pin', 'hire_date', 'salary',
-        ]);
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $id,
+                'role' => 'required|in:admin,cashier',
+                'phone' => 'nullable|string',
+                'address' => 'nullable|string',
+                'shift' => 'nullable|string',
+                'pin' => 'nullable|digits:4',
+                'hire_date' => 'nullable|date',
+                'salary' => 'nullable|numeric',
+            ]);
 
-        if ($request->password) {
-            $data['password'] = Hash::make($request->password);
+            // update()
+            if ($request->hasFile('avatar_file')) {
+                $imageUrl = $this->uploadToCloudinary($request->file('avatar_file'), 'pos/avatars');
+            } elseif ($request->avatar_url) {
+                $imageUrl = $request->avatar_url;
+            }
+
+            $data = $request->only([
+                'name',
+                'email',
+                'role',
+                'status',
+                'phone',
+                'address',
+                'shift',
+                'pin',
+                'hire_date',
+                'salary'
+            ]);
+            $data['avatar'] = $imageUrl;
+
+            if ($request->password) {
+                $data['password'] = Hash::make($request->password);
+            }
+
+            $user->update($data);
+
+            return response()->json(['success' => true, 'message' => 'User updated']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        $user->update($data);
-
-        return response()->json(['success' => true, 'message' => 'User updated']); // ← JSON not redirect
     }
 
     public function toggleStatus($id)

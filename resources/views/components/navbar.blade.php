@@ -91,7 +91,7 @@
                                 {{-- Pending Status Badge Dynamic Overlay Ring Element --}}
                                 <div
                                     class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-900 bg-amber-500">
-                                    <x-heroicon-s-circle-stack class="w-2.5 h-2.5 text-white" />
+                                    <x-heroicon-s-clock class="w-2.5 h-2.5 text-white" />
                                 </div>
                             </div>
 
@@ -130,8 +130,13 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <div class="w-9 h-9 bg-[#0F6E8C] text-white rounded-full flex items-center justify-center font-semibold">
-                {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+            <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold overflow-hidden"
+                style="background-color: {{ auth()->user()->role === 'admin' ? '#8B5CF6' : '#0F6E8C' }};">
+                @if (auth()->user()->avatar)
+                    <img src="{{ auth()->user()->avatar }}" class="w-full h-full object-cover">
+                @else
+                    <span class="text-white">{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</span>
+                @endif
             </div>
             <div class="hidden sm:block leading-none">
                 <p class="font-semibold text-sm text-gray-800 dark:text-zinc-200">{{ auth()->user()->name ?? 'Guest' }}

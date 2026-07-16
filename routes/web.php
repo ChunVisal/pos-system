@@ -51,6 +51,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/inventory/export', [InventoryController::class, 'export'])->name('admin.inventory.export');
     Route::post('/inventory/stock-drop', [InventoryController::class, 'stockDrop'])->name('admin.products.stock-drop');
     Route::get('/inventory/movements', [InventoryController::class, 'movements'])->name('admin.inventory.movements');
+    Route::get('/stockmovements/export', [InventoryController::class, 'exportMovements'])->name('admin.stockmovement.export');
 
     Route::get('/users', [UserController::class, 'index'])->name('admin.users');
     Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
@@ -76,6 +77,8 @@ Route::middleware(['auth', 'role:cashier'])->group(function () {
     Route::post('/cashier/checkout', [CashierController::class, 'checkout'])->name('cashier.checkout');
 
     Route::get('/cashier/notifications', [NotificationController::class, 'cashierIndex'])->name('cashier.notifications');
+    Route::post('/cashier/notifications/mark-read', [NotificationController::class, 'markRead'])->name('cashier.notifications.markRead');
+    Route::post('/cashier/notifications/{id}/mark-read', [NotificationController::class, 'markSingleRead'])->name('cashier.notifications.markSingleRead');
     Route::post('/cashier/stock-return', [NotificationController::class, 'returnStock']);
 
     Route::get('/cashier/customers/search', [CustomerController::class, 'search']);
@@ -87,6 +90,7 @@ Route::middleware(['auth', 'role:cashier'])->group(function () {
 
     Route::get('/cashier/products', [CashierProductController::class, 'index'])->name('cashier.products');
     Route::post('/cashier/stock-request', [StockRequestController::class, 'store']);
+    Route::post('/cashier/stock-request/bulk', [StockRequestController::class, 'bulkProductRequest']);
 
     Route::get('/cashier/orders/export', [OrderController::class, 'export'])->name('cashier.orders.export');
     Route::get('/cashier/orders', [OrderController::class, 'index'])->name('cashier.orders');

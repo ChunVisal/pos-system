@@ -70,7 +70,7 @@
                                     {{-- Stack Icon Badge overlay --}}
                                     <div
                                         class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#0F6E8C] flex items-center justify-center border-2 border-white dark:border-zinc-900">
-                                        <x-heroicon-s-circle-stack class="w-2.5 h-2.5 text-white" />
+                                        <x-heroicon-s-clock class="w-2.5 h-2.5 text-white" />
                                     </div>
                                 </div>
 
@@ -96,7 +96,7 @@
                                     </p>
 
                                     </p>
-                                    <div class="flex items-center gap-2 mt-1">
+                                    <div class="flex items-center gap-2 mt-2">
                                         <span
                                             class="text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider bg-gray-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">
                                             Req #{{ $req->id }}
@@ -105,6 +105,14 @@
                                             {{ $req->created_at->diffForHumans() }}
                                         </span>
                                     </div>
+                                    @if ($req->cashier_notes)
+                                        <p class="text-[12px] text-gray-600 dark:text-zinc-300 mt-0.5 flex items-center gap-1">
+                                            <x-heroicon-o-chat-bubble-bottom-center-text
+                                                class="inline w-3 h-3 text-gray-400 mr-1" />
+                                            "{{ $req->cashier_notes }}"
+                                        </p>
+                                    @endif
+
                                 </div>
                             </div>
 
@@ -118,11 +126,11 @@
                                     @csrf
                                     <input type="number" name="quantity" value="{{ $req->quantity_requested }}"
                                         min="1" max="{{ $req->product->stock_quantity }}"
-                                        class="w-16 text-xs text-center border rounded px-2 py-1 bg-white dark:bg-zinc-800">
+                                        class="w-16 text-xs text-center border rounded px-2 py-1 dark:text-gray-200 bg-white dark:bg-zinc-800">
 
                                     @if ($req->product->stock_quantity <= 0)
                                         <button type="button" disabled
-                                            class="px-3 py-1.5 text-xs font-medium text-white bg-gray-400 rounded-md cursor-not-allowed">
+                                            class="px-3 py-1.5 text-xs font-medium text-white dark:text-zinc-900 bg-gray-400 rounded-md cursor-not-allowed">
                                             Out of Stock
                                         </button>
                                     @elseif($req->product->stock_quantity < $req->quantity_requested)

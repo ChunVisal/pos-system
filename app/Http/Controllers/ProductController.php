@@ -20,11 +20,11 @@ class ProductController extends Controller
                 $search = $request->search;
 
                 return $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%'.$search.'%')
-                        ->orWhere('code', 'like', '%'.$search.'%')
-                        ->orWhere('barcode', 'like', '%'.$search.'%')
+                    $q->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('code', 'like', '%' . $search . '%')
+                        ->orWhere('barcode', 'like', '%' . $search . '%')
                         ->orWhereHas('category', function ($cat) use ($search) {
-                            $cat->where('name', 'like', '%'.$search.'%');
+                            $cat->where('name', 'like', '%' . $search . '%');
                         });
                 });
             })
@@ -70,7 +70,7 @@ class ProductController extends Controller
 
             return response()->json($product->fresh());
         } catch (\Exception $e) {
-            Log::error('Update error: '.$e->getMessage());
+            Log::error('Update error: ' . $e->getMessage());
 
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -111,7 +111,7 @@ class ProductController extends Controller
         $data = json_decode($response, true);
 
         if (! isset($data['secure_url'])) {
-            throw new \Exception('Cloudinary error: '.($data['error']['message'] ?? 'Unknown error'));
+            throw new \Exception('Cloudinary error: ' . ($data['error']['message'] ?? 'Unknown error'));
         }
 
         return $data['secure_url'];
@@ -195,16 +195,16 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $cacheKey = 'store_product_'.md5($request->name.$request->category_id.$request->ip());
+        $cacheKey = 'store_product_' . md5($request->name . $request->category_id . $request->ip());
 
         if (Cache::has($cacheKey)) {
             return response()->json(Cache::get($cacheKey));
         }
 
         try {
-            $prefix = 'PROD-'.strtoupper(substr($request->name, 0, 3));
+            $prefix = 'PROD-' . strtoupper(substr($request->name, 0, 3));
             do {
-                $code = $prefix.'-'.rand(1000, 9999);
+                $code = $prefix . '-' . rand(1000, 9999);
             } while (Product::where('code', $code)->exists());
 
             do {
@@ -248,7 +248,7 @@ class ProductController extends Controller
 
             return response()->json($product);
         } catch (\Exception $e) {
-            Log::error('Store error: '.$e->getMessage());
+            Log::error('Store error: ' . $e->getMessage());
 
             return response()->json(['error' => $e->getMessage()], 500);
         }

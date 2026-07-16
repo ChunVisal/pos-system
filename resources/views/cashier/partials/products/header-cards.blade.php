@@ -3,11 +3,19 @@
         <h1 class="text-xl font-bold text-gray-800 dark:text-zinc-100">My Products</h1>
         <p class="text-xs text-gray-500 dark:text-zinc-400">Stock allocated to you</p>
     </div>
-    <button @click="requestOpen = true"
-        class="px-3 py-1.5 text-sm font-semibold rounded-md bg-p text-gray-100 flex items-center gap-2">
-        <x-heroicon-o-arrow-up-tray class="w-4 h-4" />
-        Request Restock
-    </button>
+    <div class="flex gap-3">
+        <button @click="requestOpen = true"
+            class="px-3 py-1.5 text-sm font-medium rounded-md bg-p text-gray-100 flex items-center gap-2">
+            <x-heroicon-o-arrow-up-tray class="w-4 h-4" />
+            Request Restock
+        </button>
+        <button @click="requestNewProduct = true"
+            class="px-3 py-1.5 text-sm font-medium flex items-center gap-2
+    text-white bg-emerald-500 dark:bg-emerald-600 border border-emerald-600/20 rounded-md transition-colors shadow-sm">
+            <x-heroicon-s-plus-circle class="w-4 h-4 text-white" />
+            <span>Request New Product</span>
+        </button>
+    </div>
 </div>
 
 {{-- Summary Cards --}}

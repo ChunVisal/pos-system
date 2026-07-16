@@ -42,9 +42,9 @@ class CashierController extends Controller
                     ->whereRaw('allocated_quantity > sold_quantity');
             })
             ->when($request->search, function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->search.'%')
-                    ->orWhere('code', 'like', '%'.$request->search.'%')
-                    ->orWhereHas('category', fn ($cat) => $cat->where('name', 'like', '%'.$request->search.'%'));
+                $q->where('name', 'like', '%' . $request->search . '%')
+                    ->orWhere('code', 'like', '%' . $request->search . '%')
+                    ->orWhereHas('category', fn($cat) => $cat->where('name', 'like', '%' . $request->search . '%'));
             })
             ->get()
             ->map(function ($product) use ($cashierId) {
@@ -116,25 +116,26 @@ class CashierController extends Controller
             // 1. Generate order number
             $lastOrder = Order::latest()->first();
             $nextNumber = $lastOrder ? intval(substr($lastOrder->order_number, 4)) + 1 : 1;
-            $orderNumber = 'INV-'.str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+            $orderNumber = 'INV-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
-            // 2. Calculate totals
+            // In CashierController@checkout
+            $discount = $request->discount ?? 0;
             $subtotal = 0;
             foreach ($request->items as $item) {
                 $product = Product::find($item['id']);
                 $subtotal += $product->selling_price * $item['qty'];
             }
-            $tax = $subtotal * 0.10;
-            $total = $subtotal + $tax;
+            $tax = ($subtotal - $discount) * 0.10;
+            $total = $subtotal - $discount + $tax;
 
-            // 3. Create order
             $order = Order::create([
                 'order_number' => $orderNumber,
                 'cashier_id' => Auth::id(),
                 'customer_id' => $customerId,
                 'subtotal' => $subtotal,
+                'discount' => $discount,
                 'tax' => $tax,
-                'total' => $total,
+                'total' => $total,  // Now includes discount
                 'status' => 'completed',
             ]);
 
@@ -153,7 +154,7 @@ class CashierController extends Controller
 
                 // Check stock
                 if ($product->stock_quantity < $item['qty']) {
-                    throw new \Exception('Insufficient stock for: '.$product->name);
+                    throw new \Exception('Insufficient stock for: ' . $product->name);
                 }
 
                 OrderItem::create([
@@ -208,10 +209,9 @@ class CashierController extends Controller
                     'change' => $change,
                 ],
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Checkout error: '.$e->getMessage());
+            Log::error('Checkout error: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,

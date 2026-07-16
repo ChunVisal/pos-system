@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('subtotal', 10, 2);
             $table->decimal('tax', 10, 2)->default(0);
             $table->decimal('total', 10, 2);
+            $table->decimal('discount', 10, 2)->default(0)->after('subtotal');
             $table->string('status')->default('completed');
             $table->text('notes')->nullable();
             $table->timestamps();

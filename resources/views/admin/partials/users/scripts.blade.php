@@ -17,7 +17,7 @@
                 if (firstCell && firstCell.getAttribute('colspan')) return;
 
                 const cells = row.querySelectorAll('td');
-                if (cells.length < 6) return;
+                if (cells.length < 6) retufrn;
 
                 // Role is in cells[1] - get the span text
                 const roleSpan = cells[1]?.querySelector('span');
@@ -142,7 +142,6 @@
             .catch(err => alert('Error: ' + err.message));
     }
 
-
     function userPage() {
         return {
             open: false,
@@ -150,12 +149,15 @@
             showProfile: false,
             viewMode: 'edit',
             submitting: false,
+            avatarPreview: '{{ auth()->user()->avatar }}',
 
             form: {
                 id: null,
                 name: '',
                 email: '',
                 role: '',
+                avatar_url: '{{ auth()->user()->avatar }}',
+                avatar_file: null,
                 password: '',
                 password_confirmation: '',
                 status: 'active',
@@ -180,6 +182,7 @@
                     name: user.name,
                     email: user.email,
                     role: user.role,
+                    avatar: user.avatar,
                     status: user.status,
                     employee_id: user.employee_id,
                     phone: user.phone,
@@ -202,6 +205,9 @@
                     name: '',
                     email: '',
                     role: '',
+                    avatar_file: null,
+                    avatar_url: '',
+                    avatar_preview: '',
                     password: '',
                     password_confirmation: '',
                     status: 'active',
@@ -215,19 +221,31 @@
                 };
             },
 
+            handleAvatarFile(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                this.form.avatar_file = file;
+                this.avatarPreview = URL.createObjectURL(file);
+                this.form.avatar_url = '';
+            },
+
             openAdd() {
                 this.editMode = false;
                 this.form = this.emptyForm();
+                this.avaavatar_urltarPreview = '';
                 this.open = true;
             },
 
             openEdit(user) {
                 this.editMode = true;
+                this.avatarPreview = user.avatar || '';
                 this.form = {
                     id: user.id ?? null,
                     name: user.name ?? '',
                     email: user.email ?? '',
                     role: user.role ?? '',
+                    avatar_url: user.avatar || '',
+                    avatar_file: null,
                     password: '',
                     password_confirmation: '',
                     status: user.status ?? 'active',
@@ -248,76 +266,78 @@
                 this.viewMode = 'edit';
             },
             submitForm() {
+                if (!this.form.name || !this.form.email || !this.form.role) {
+                    alert('Please fill all required fields');
+                    return;
+                }
+
+                if (!this.editMode && !this.form.password) {
+                    alert('Password is required for new users');
+                    return;
+                }
+
+                if (!this.form.email.includes('@')) {
+                    alert('Please enter a valid email address');
+                    return;
+                }
+
                 if (this.submitting) return;
                 this.submitting = true;
 
                 const isEdit = this.editMode;
                 const url = isEdit ? `/admin/users/${this.form.id}` : '/admin/users';
+                
+                console.log('avatar_file:', this.form.avatar_file);
+                console.log('avatar_url:', this.form.avatar_url);
+                // Use FormData for file upload
+                const fd = new FormData();
+                fd.append('name', this.form.name);
+                fd.append('email', this.form.email);
+                fd.append('role', this.form.role);
+                fd.append('password', this.form.password || '');
+                fd.append('password_confirmation', this.form.password_confirmation || '');
+                fd.append('status', this.form.status);
+                fd.append('phone', this.form.phone || '');
+                fd.append('address', this.form.address || '');
 
-                // Validate
-                if (!this.form.name || !this.form.email || !this.form.role) {
-                    alert('Please fill all required fields');
-                    this.submitting = false;
-                    return;
+                // Only append cashier fields if role is cashier
+                if (this.form.role === 'cashier') {
+                    fd.append('employee_id', this.form.employee_id || '');
+                    fd.append('shift', this.form.shift || '');
+                    fd.append('hire_date', this.form.hire_date || '');
+                    fd.append('salary', this.form.salary || '');
+                    fd.append('pin', this.form.pin || '');
                 }
 
-                if (!isEdit && !this.form.password) {
-                    alert('Password is required');
-                    this.submitting = false;
-                    return;
+                if (this.form.avatar_file) {
+                    fd.append('avatar_file', this.form.avatar_file);
+                } else if (this.form.avatar_url) {
+                    fd.append('avatar_url', this.form.avatar_url);
                 }
 
-                if (this.form.password && this.form.password !== this.form.password_confirmation) {
-                    alert('Passwords do not match');
-                    this.submitting = false;
-                    return;
-                }
-
-                // Build data object
-                const data = {
-                    name: this.form.name,
-                    email: this.form.email,
-                    role: this.form.role,
-                    password: this.form.password || undefined,
-                    password_confirmation: this.form.password_confirmation || undefined,
-                    status: this.form.status,
-                    employee_id: this.form.employee_id || null,
-                    phone: this.form.phone || null,
-                    address: this.form.address || null,
-                    shift: this.form.shift || null,
-                    pin: this.form.pin || null,
-                    hire_date: this.form.hire_date || null,
-                    salary: this.form.salary || null,
-                };
-
-                // Remove undefined values
-                Object.keys(data).forEach(key => {
-                    if (data[key] === undefined) delete data[key];
-                    if (data[key] === '') data[key] = null;
-                });
+                if (isEdit) fd.append('_method', 'PUT');
 
                 fetch(url, {
-                        method: isEdit ? 'PUT' : 'POST',
+                        method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Content-Type': 'application/json',
                             'Accept': 'application/json',
                         },
-                        body: JSON.stringify(data),
+                        body: fd,
                     })
-                    .then(res => {
-                        if (!res.ok) return res.json().then(err => {
-                            throw new Error(JSON.stringify(err.errors || err.message || err));
-                        });
-                        return res.json();
-                    })
-                    .then(() => {
-                        this.submitting = false; // ← ADD
-                        window.location.reload();
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.errors) {
+                            const messages = Object.values(data.errors).flat().join('\n');
+                            alert('Error:\n' + messages);
+                            this.submitting = false;
+                        } else {
+                            window.location.reload();
+                        }
                     })
                     .catch(err => {
-                        this.submitting = false; // ← ADD
                         alert('Error: ' + err.message);
+                        this.submitting = false;
                     });
             },
         }

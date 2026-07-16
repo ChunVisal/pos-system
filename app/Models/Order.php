@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['order_number', 'cashier_id', 'customer_id', 'subtotal', 'tax', 'total', 'status', 'notes'];
+    protected $fillable = ['order_number', 'cashier_id', 'customer_id', 'subtotal', 'tax', 'total', 'discount', 'status', 'notes'];
 
     public function items()
     {
@@ -21,7 +21,6 @@ class Order extends Model
     public function cashier()
     {
         return $this->belongsTo(User::class, 'cashier_id');
-
     }
 
     public function customer()

@@ -58,7 +58,8 @@
                                         alt="Placeholder" class="w-full h-full object-cover">
                                 </template>
                             </div>
-                            <div class="space-y-1">
+                            <div class="s
+                            pace-y-1">
                                 <p class="text-xs font-bold text-gray-800 dark:text-zinc-200 leading-tight"
                                     x-text="product.name"></p>
                                 {{-- Precision Context Stock Alert Badges --}}
@@ -119,9 +120,21 @@
 
             {{-- Empty Data Placeholder Block State --}}
             <div x-show="filteredRequestProducts.length === 0"
-                class="text-center py-12 text-xs font-medium text-gray-400 dark:text-zinc-500">
-                <i class="fa-solid fa-box-open block text-lg mb-2 opacity-60"></i>
-                No low stock products identified
+                class="text-center py-16 rounded-md border border-dashed border-gray-200 dark:border-zinc-800 bg-gray-100 dark:bg-zinc-900 flex flex-col items-center justify-center">
+
+                {{-- Dynamic circular icon layout --}}
+                <div
+                    class="w-14 h-14 rounded-full bg-gray-100 dark:bg-zinc-800/40 border border-gray-200/50 dark:border-zinc-800/60 flex items-center justify-center mb-3">
+                    <i class="fa-solid fa-box-open text-gray-400 dark:text-zinc-500 text-md"></i>
+                </div>
+
+                {{-- Typography hierarchy --}}
+                <p class="text-xs font-bold text-gray-900 dark:text-zinc-200 uppercase">
+                    All Stock Levels Stable
+                </p>
+                <p class="text-[11px] text-gray-400 dark:text-zinc-505 mt-1 max-w-[220px] leading-relaxed">
+                    No low stock products require current attention.
+                </p>
             </div>
         </div>
     </div>

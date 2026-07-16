@@ -44,7 +44,7 @@ class DashboardController extends Controller
         return [
             [
                 'title' => 'Total Revenue',
-                'value' => '$'.number_format($totalRevenue, 2),
+                'value' => '$' . number_format($totalRevenue, 2),
                 'icon' => 'fa-solid fa-dollar-sign',
                 'iconBg' => '#10B981',
                 'iconColor' => '#10B981',
@@ -54,13 +54,13 @@ class DashboardController extends Controller
             ],
             [
                 'title' => 'Sales Today',
-                'value' => '$'.number_format($todaySales, 2),
+                'value' => '$' . number_format($todaySales, 2),
                 'icon' => 'fa-solid fa-cart-shopping',
                 'iconBg' => '#0F6E8C',
                 'iconColor' => '#0F6E8C',
                 'trend' => $salesChange >= 0 ? 'up' : 'down',
-                'percentage' => abs($salesChange).'%',
-                'period' => 'Yesterday: $'.number_format($yesterdaySales, 2),
+                'percentage' => abs($salesChange) . '%',
+                'period' => 'Yesterday: $' . number_format($yesterdaySales, 2),
             ],
             [
                 'title' => 'Total Products',
@@ -69,8 +69,8 @@ class DashboardController extends Controller
                 'iconBg' => '#8B5CF6',
                 'iconColor' => '#8B5CF6',
                 'trend' => 'up',
-                'percentage' => $lowStock.' low',
-                'period' => $outOfStock.' out of stock',
+                'percentage' => $lowStock . ' low',
+                'period' => $outOfStock . ' out of stock',
             ],
             [
                 'title' => 'Low Stock Alert',
@@ -79,7 +79,7 @@ class DashboardController extends Controller
                 'iconBg' => '#EF4444',
                 'iconColor' => '#EF4444',
                 'trend' => 'down',
-                'percentage' => $outOfStock.' items',
+                'percentage' => $outOfStock . ' items',
                 'period' => 'Need restock',
             ],
         ];
@@ -87,11 +87,14 @@ class DashboardController extends Controller
 
     public static function getTopProducts($limit = 5)
     {
-        $items = OrderItem::select('name', 'product_id',
+        $items = OrderItem::select(
+            'name',
+            'product_id',
             DB::raw('SUM(quantity) as total_qty'),
             DB::raw('SUM(total) as total_revenue'),
             DB::raw('COUNT(DISTINCT order_id) as order_count'),
-            DB::raw('ROUND(SUM(total) / SUM(quantity), 2) as avg_sale_price'))
+            DB::raw('ROUND(SUM(total) / SUM(quantity), 2) as avg_sale_price')
+        )
             ->groupBy('name', 'product_id')
             ->orderByDesc('total_qty')
             ->limit($limit)
@@ -165,13 +168,14 @@ class DashboardController extends Controller
                 'users.id',
                 'users.name',
                 'users.employee_id',
+                'users.avatar',
                 'users.shift',
                 DB::raw('COUNT(orders.id) as total_orders'),
                 DB::raw('SUM(orders.total) as total_revenue'),
                 DB::raw('ROUND(AVG(orders.total), 2) as avg_order_value'),
                 DB::raw('MAX(orders.created_at) as last_sale_at')
             )
-            ->groupBy('users.id', 'users.name', 'users.employee_id', 'users.shift')
+            ->groupBy('users.id', 'users.name', 'users.employee_id', 'users.avatar', 'users.shift')
             ->orderByDesc('total_revenue')
             ->limit($limit)
             ->get()
@@ -222,7 +226,7 @@ class DashboardController extends Controller
         $start = $request->start_date ?? now()->subDays(14)->format('Y-m-d');
         $end = $request->end_date ?? now()->format('Y-m-d');
 
-        $filename = 'dashboard_report_'.now()->format('Y_m_d').'.csv';
+        $filename = 'dashboard_report_' . now()->format('Y_m_d') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
@@ -235,7 +239,7 @@ class DashboardController extends Controller
             // Summary
             $summary = DashboardController::getSummaryCards($start, $end);
             fputcsv($file, ['DASHBOARD REPORT']);
-            fputcsv($file, ['Period', Carbon::parse($start)->format('M d, Y').' - '.Carbon::parse($end)->format('M d, Y')]);
+            fputcsv($file, ['Period', Carbon::parse($start)->format('M d, Y') . ' - ' . Carbon::parse($end)->format('M d, Y')]);
             fputcsv($file, []);
             fputcsv($file, ['SUMMARY']);
             foreach ($summary as $card) {
@@ -247,7 +251,7 @@ class DashboardController extends Controller
             fputcsv($file, ['TOP PRODUCTS']);
             fputcsv($file, ['Rank', 'Product', 'Category', 'Price', 'Sold', 'Revenue', 'Performance %']);
             foreach (DashboardController::getTopProducts(20) as $p) {
-                fputcsv($file, [$p['rank'], $p['name'], $p['category'], $p['price'], $p['sold'], $p['revenue'], $p['percent'].'%']);
+                fputcsv($file, [$p['rank'], $p['name'], $p['category'], $p['price'], $p['sold'], $p['revenue'], $p['percent'] . '%']);
             }
             fputcsv($file, []);
 
@@ -255,7 +259,7 @@ class DashboardController extends Controller
             fputcsv($file, ['TOP CATEGORIES']);
             fputcsv($file, ['Rank', 'Category', 'Products', 'Sold', 'Revenue', 'Avg Order', 'Performance %']);
             foreach (DashboardController::getTopCategories(20) as $c) {
-                fputcsv($file, [$c['rank'], $c['name'], $c['products'], $c['sold'], $c['revenue'], $c['avg_order_value'], $c['percent'].'%']);
+                fputcsv($file, [$c['rank'], $c['name'], $c['products'], $c['sold'], $c['revenue'], $c['avg_order_value'], $c['percent'] . '%']);
             }
             fputcsv($file, []);
 

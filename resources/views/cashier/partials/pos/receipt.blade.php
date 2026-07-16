@@ -63,8 +63,12 @@
 
             {{-- Totals --}}
             <div class="flex justify-between dark:text-zinc-300">
-                <span class="text-gray-500 dark:text-zinc-300">Subtotal</span>
+            <span class="text-gray-500 dark:text-zinc-300">Subtotal</span>
                 <span>$<span x-text="receiptData.subtotal?.toFixed(2) || '0.00'"></span></span>
+            </div>
+            <div class="flex justify-between dark:text-zinc-300" x-show="receiptData.discount > 0">
+                <span class="text-gray-500 dark:text-zinc-300">Discount</span>
+                <span>-$<span x-text="receiptData.discount.toFixed(2)"></span></span>
             </div>
             <div class="flex justify-between dark:text-zinc-300">
                 <span class="text-gray-500 ">Tax (10%)</span>

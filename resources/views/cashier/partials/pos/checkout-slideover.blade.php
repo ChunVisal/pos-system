@@ -29,12 +29,18 @@
             </div>
 
             {{-- Total - Big Display --}}
-            <div class="bg-gray-100/60 dark:bg-zinc-800/70 rounded-lg p-4 mb-6 text-start">
+            <div class=" bg-gray-100/60 dark:bg-zinc-800/70 rounded-lg p-4 text-start">
                 <p class="text-xs text-gray-500 dark:text-z dark:text-zinc-300 mb-1">Total Amount</p>
                 <p class="text-4xl font-bold text-[#0F6E8C]">$<span x-text="total.toFixed(2)"></span></p>
                 <div class="flex justify-start gap-4 mt-2 text-xs text-gray-500 dark:text-z dark:text-zinc-300">
                     <span>Subtotal: $<span x-text="subtotal.toFixed(2)"></span></span>
                     <span>Tax: $<span x-text="tax.toFixed(2)"></span></span>
+                    {{-- Show discount amount (Only displays if active savings are calculated) --}}
+                    <div class="flex items-center justify-between text-xs font-bold" x-show="discount > 0" x-cloak>
+                        <span class="text-red-600 dark:text-red-400">
+                            -$<span x-text="discount.toFixed(2)"></span>
+                        </span>
+                    </div>
                 </div>
                 {{-- Change --}}
                 <div x-show="paymentMethod === 'cash' && change > 0"
@@ -42,11 +48,40 @@
                     <span class="text-sm text-green-700 dark:text-green-400">Change: $<span
                             x-text="change.toFixed(2)"></span></span>
                 </div>
+
+
+
+            </div>
+
+            {{-- In checkout modal, after subtotal/tax, before total --}}
+            <div class="py-1 my-3 border-t border-b border-gray-100 dark:border-zinc-800/60">
+                {{-- Discount Control Field Block --}}
+                <div class="flex items-center justify-between">
+                    <span
+                        class="text-[11px] font-bold text-gray-500 dark:text-zinc-300 uppercase tracking-wider">Discount</span>
+                    <div class="flex items-center gap-1.5">
+                        {{-- Numerical Discount Input --}}
+                        <input type="number" x-model="discountValue" placeholder="0" min="0"
+                            @input="calculateDiscount()"
+                            class="w-16 text-xs font-semibold text-right border border-gray-250 dark:border-zinc-800/80 rounded-md px-2 py-1 bg-white dark:bg-zinc-950 text-gray-900 dark:text-zinc-100 focus:outline-none focus:border-[#0F6E8C] dark:focus:border-[#1389af] transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+
+                        {{-- Discount Type Toggle Selector --}}
+                        <div class="relative">
+                            <select x-model="discountType" @change="calculateDiscount()"
+                                class="text-xs font-semibold border border-gray-250 dark:border-zinc-800/80 rounded-md pl-2 pr-6 py-1 bg-white dark:bg-zinc-950 text-gray-900 dark:text-zinc-100 focus:outline-none focus:border-[#0F6E8C] dark:focus:border-[#1389af] appearance-none transition-colors">
+                                <option value="fixed">$</option>
+                                <option value="percent">%</option>
+                            </select>
+                            <x-heroicon-o-chevron-down
+                                class="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-gray-450 dark:text-zinc-500 pointer-events-none" />
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {{-- Payment Methods - Vertical List --}}
             <div class="flex-1 space-y-3">
-                <p class="text-xs font-semibold text-gray-400 dark:text-zinc-300 uppercase">Select Payment</p>
+                <p class="text-xs font-semibold text-gray-500 dark:text-zinc-300 uppercase">Select Payment</p>
 
                 <button @click="paymentMethod = 'cash'; amountReceived = ''; change = 0"
                     :class="paymentMethod === 'cash' ? 'border-[#0F6E8C]/60 bg-[#0F6E8C]/5' :
@@ -105,7 +140,7 @@
                     <h3 class="text-md font-semibold text-gray-200 dark:text-zinc-200"
                         x-text="paymentMethod === 'cash' ? 'Cash Payment' : paymentMethod === 'card' ? 'Card Terminal' : 'KHQR Scan'">
                     </h3>
-                    <p class="text-xs text-gray-400 dark:text-zinc-200"
+                    <p class="text-xs text-gray-500 dark:text-zinc-200"
                         x-text="paymentMethod === 'cash' ? 'Enter amount received from customer' : paymentMethod === 'card' ? 'Tap or swipe card to process' : 'Customer scans QR code to pay'">
                     </p>
                 </div>
@@ -201,7 +236,7 @@
 
                                 <div class="flex justify-between items-end mt-5">
                                     <div>
-                                        <p class="text-[10px] uppercase text-gray-400">
+                                        <p class="text-[10px] uppercase text-gray-500">
                                             Card Holder
                                         </p>
                                         <p class="font-medium">
@@ -210,7 +245,7 @@
                                     </div>
 
                                     <div class="text-right">
-                                        <p class="text-[10px] uppercase text-gray-400">
+                                        <p class="text-[10px] uppercase text-gray-500">
                                             Expires
                                         </p>
                                         <p>12/30</p>

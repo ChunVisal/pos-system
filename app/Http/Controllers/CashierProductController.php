@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\CashierProductData;
 use App\Models\Categories;
 use App\Models\Product;
+use App\Models\CashierStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,8 +23,8 @@ class CashierProductController extends Controller
                 $q->where('cashier_id', $cashierId);
             })
             ->when($request->search, function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->search.'%')
-                    ->orWhere('code', 'like', '%'.$request->search.'%');
+                $q->where('name', 'like', '%' . $request->search . '%')
+                    ->orWhere('code', 'like', '%' . $request->search . '%');
             })
             ->get()
             ->map(function ($product) {
@@ -34,16 +35,23 @@ class CashierProductController extends Controller
                 $product->revenue = $product->sold * $product->selling_price;
                 $product->last_drop = $product->cashierStocks->max('created_at');
                 $product->category_name = $product->category->name ?? '-';
-
+                $product->cashier_remaining;
                 return $product;
             });
 
         if ($request->ajax) {
             return response()->json(['products' => $products]);
         }
+
         $categories = Categories::whereHas('products', function ($q) use ($cashierId) {
-            $q->whereHas('cashierStocks', fn ($sq) => $sq->where('cashier_id', $cashierId));
+            $q->whereHas('cashierStocks', fn($sq) => $sq->where('cashier_id', $cashierId));
         })->get();
+
+        foreach ($categories as $category) {
+            $category->cashier_remaining = CashierStock::where('cashier_id', $cashierId)
+                ->whereHas('product', fn($q) => $q->where('category_id', $category->id))
+                ->sum('allocated_quantity');
+        }
 
         $summaryCards = CashierProductData::getSummaryCards();
 

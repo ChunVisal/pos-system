@@ -4,13 +4,13 @@
     {{-- Header --}}
     <div class="px-4 py-3 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
         <h3 class="text-sm font-semibold text-gray-800 dark:text-zinc-100">Current Order</h3>
-        <button @click="cartItems = []" x-show="cartItems.length > 0"
+        <button @click="if(confirm('Clear all items from cart?')) cartItems = []" x-show="cartItems.length > 0"
             class="flex  items-center text-xs font-semibold text-red-500 hover:text-red-600 transition">
             <i class="fa-solid fa-trash-can mr-1"></i>
             Clear All
         </button>
     </div>
-
+    
     {{-- Cart Items - Scrollable --}}
     <div class="flex-1 overflow-y-auto tab-container p-3 space-y-2">
         <template x-for="(item, index) in cartItems" :key="index">

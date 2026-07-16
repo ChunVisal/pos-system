@@ -27,8 +27,14 @@ class NotificationController extends Controller
 
     public function cashierIndex()
     {
+        // Mark all as seen
+        StockRequest::where('cashier_id', Auth::id())
+            ->whereNull('seen_at')
+            ->update(['seen_at' => now()]);
+
+
         $notifications = StockRequest::with(['product', 'approver'])
-            ->where('cashier_id', auth()->id())
+            ->where('cashier_id', Auth::id())
             ->whereIn('status', ['pending', 'approved', 'rejected', 'on_hold'])
             ->latest()
             ->get();
@@ -90,6 +96,7 @@ class NotificationController extends Controller
                 'status' => 'approved',
                 'quantity_approved' => $quantity,
                 'approved_by' => Auth::id(),
+                'seen_at' => null,
             ]);
         });
 
@@ -100,8 +107,9 @@ class NotificationController extends Controller
     {
         StockRequest::findOrFail($id)->update([
             'status' => 'rejected',
-            'approved_by' => auth()->id(),
+            'approved_by' => Auth::id(),
             'dispute_reason' => $request->reason,
+            'seen_at' => null,
         ]);
         return back()->with('success', 'Request rejected');
     }
@@ -127,5 +135,23 @@ class NotificationController extends Controller
         ]);
 
         return response()->json(['message' => 'Broken stock reported.']);
+    }
+
+    public function markSingleRead($id)
+    {
+        StockRequest::where('id', $id)
+            ->where('cashier_id', Auth::id()) // add this
+            ->update(['seen_at' => now()]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function markRead()
+    {
+        StockRequest::where('cashier_id', Auth::id())
+            ->whereNull('seen_at')
+            ->update(['seen_at' => now()]);
+
+        return response()->json(['success' => true]);
     }
 }

@@ -92,6 +92,15 @@
         @forelse($products as $product)
             @include('cashier.partials.pos.table-rows')
         @empty
+            <div class="bg-gray-200/50 dark:bg-zinc-900  col-span-full flex flex-col items-center justify-center py-12">
+                <div class="rounded-full bg-gray-100 dark:bg-zinc-800 p-4 mb-4">
+                    <x-heroicon-o-shopping-bag class="w-10 h-10 text-gray-400 dark:text-zinc-600" />
+                </div>
+                <h4 class="text-base font-semibold text-gray-800 dark:text-zinc-200">Product Not Exist</h4>
+                <p class="text-xs text-center text-gray-500 dark:text-zinc-400 max-w-[200px] mt-1">
+                    There are currently no products registered in this category.
+                </p>
+            </div>
         @endforelse
 
     </div>

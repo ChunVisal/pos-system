@@ -16,15 +16,17 @@
                             items: order.items.map(i => ({
                                 id: i.id,
                                 name: i.name,
-                                price: i.price,
+                                price: parseFloat(i.price) || 0,
                                 qty: i.quantity,
                             })),
-                            subtotal: order.subtotal,
-                            tax: order.tax,
-                            total: order.total,
+                            subtotal: parseFloat(order.subtotal) || 0,
+                            tax: parseFloat(order.tax) || 0,
+                            total: parseFloat(order.total) || 0,
+                            discount: parseFloat(order.discount) || 0,
                             payment_method: order.payment?.method,
-                            amount_received: order.payment?.amount_received || order.total,
-                            change: order.payment?.change || 0,
+                            amount_received: parseFloat(order.payment?.amount_received) || parseFloat(order
+                                .total) || 0,
+                            change: parseFloat(order.payment?.change) || 0,
                             customer: order.customer ? {
                                 name: order.customer.name
                             } : null,

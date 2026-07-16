@@ -22,16 +22,19 @@ return new class extends Migration
             $table->foreignId('approved_by')->nullable()->constrained('users');
             $table->text('dispute_reason')->nullable();
             $table->string('eta')->nullable();
+            $table->text('cashier_notes')->nullable();
             $table->timestamp('confirmed_at')->nullable();
+            $table->timestamp('seen_at')->nullable()->default(null);
             $table->timestamps();
+
+            // request new products
+            $table->string('product_name')->nullable()->after('product_id');
+            $table->foreignId('product_id')->nullable()->change();
         });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down(): void
-    {
-        Schema::dropIfExists('stock_requests');
-    }
+    public function down(): void {}
 };

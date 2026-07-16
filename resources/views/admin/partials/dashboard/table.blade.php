@@ -36,7 +36,7 @@
             </thead>
             <tbody class="divide-y divide-gray-50 dark:divide-zinc-800/50">
                 @foreach ($topProducts as $product)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition">
+                    <tr class=" hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition">
                         <td class="py-3 pl-4 pr-2">
                             <span
                                 class="text-xs font-bold {{ $product['rank'] == 1 ? 'text-yellow-500' : ($product['rank'] == 2 ? 'text-blue-500' : ($product['rank'] == 3 ? 'text-amber-600' : 'text-gray-600 dark:text-zinc-500')) }}">
@@ -170,7 +170,7 @@
                     <th class="py-3 px-2 font-medium text-center">Items Sold</th>
                     <th class="py-3 font-medium text-right">Revenue & Performance</th>
                 </tr>
-            </thead>    
+            </thead>
             <tbody class="divide-y divide-gray-50 dark:divide-zinc-800/50">
                 @php $maxRevenue = $topCashiers->max('total_revenue') ?: 1; @endphp
                 @foreach ($topCashiers as $index => $cashier)
@@ -191,8 +191,13 @@
                         <td class="py-3 px-2">
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="w-12 h-12 rounded-sm bg-[#0F6E8C]/5 dark:bg-[#0F6E8C]/10 flex items-center justify-center font-bold text-sm text-[#0F6E8C] shrink-0 border border-gray-100 dark:border-zinc-800">
-                                    {{ strtoupper(substr($cashier->name, 0, 1)) }}
+                                    class="w-[48px] h-[48px] rounded-full flex items-center justify-center font-bold text-sm text-white shrink-0 overflow-hidden bg-[#0F6E8C]">
+                                    @if ($cashier->avatar)
+                                        <img src="{{ $cashier->avatar }}" class="w-full h-full object-cover"
+                                            alt="{{ $cashier->name }}">
+                                    @else
+                                        {{ strtoupper(substr($cashier->name, 0, 1)) }}
+                                    @endif
                                 </div>
                                 <div class="flex flex-col">
                                     <span

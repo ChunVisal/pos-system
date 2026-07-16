@@ -15,10 +15,14 @@ class StockRequest extends Model
         'approved_by',
         'dispute_reason',
         'eta',
-        'confirmed_at'
+        'confirmed_at',
+        'cashier_notes',
+        'seen_at',
     ];
 
-    protected $casts = ['confirmed_at' => 'datetime'];
+    protected $casts = [
+        'confirmed_at' => 'datetime',
+    ];
 
     public function cashier()
     {

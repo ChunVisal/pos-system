@@ -1,18 +1,15 @@
 @forelse($users as $user)
-    @php
-        $initials = collect(explode(' ', $user->name))
-            ->map(fn($n) => strtoupper($n[0]))
-            ->take(2)
-            ->implode('');
-        $avatarColor = $user->role === 'admin' ? '#8B5CF6' : '#0F6E8C';
-    @endphp
     <tr class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition">
         <td class="py-3 pr-4">
             <button class="flex items-center gap-3 cursor-pointer" @click="openDetail({{ $user->id }})">
                 <div class="relative">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center text-xs font-semibold text-white shrink-0"
-                        style="background-color: {{ $avatarColor }};">
-                        {{ $initials }}
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center text-xs font-semibold text-white shrink-0 overflow-hidden"
+                        style="background-color: {{ $user->role === 'admin' ? '#8B5CF6' : '#0F6E8C' }};">
+                        @if ($user->avatar)
+                            <img src="{{ $user->avatar }}" class="w-full h-full object-cover">
+                        @else
+                            {{ strtoupper(substr($user->name, 0, 1)) }}{{ strtoupper(substr(strrchr($user->name, ' ') ?: $user->name, 1, 1)) }}
+                        @endif
                     </div>
                     @if ($user->is_online)
                         <div
@@ -72,7 +69,8 @@
     <tr>
         <td colspan="6" class="text-center py-16">
             <div class="flex flex-col items-center justify-center">
-             w   <div class="w-16 h-16 mb-4 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center">
+                <div
+                    class="w-16 h-16 mb-4 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center">
                     <svg class="w-8 h-8 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"

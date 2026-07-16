@@ -34,12 +34,18 @@
             paymentMethod: 'cash',
             amountReceived: 0,
             change: 0,
+
+            // discount
+            discountType: 'fixed',
+            discountValue: 0,
+
             // In posPage() data:
             receiptData: {
                 customer: null,
                 items: [],
                 subtotal: 0,
-                tax: 0,
+                tax: this.tax,
+                discount: this.discount,
                 total: 0,
                 payment_method: 'cash',
                 amount_received: 0,
@@ -65,11 +71,21 @@
             get subtotal() {
                 return this.cartItems.reduce((sum, i) => sum + (i.price * i.qty), 0);
             },
+            get discount() {
+                if (!this.discountValue || this.discountValue <= 0) return 0;
+                if (this.discountType === 'percent') {
+                    return this.subtotal * (this.discountValue / 100);
+                }
+                return parseFloat(this.discountValue) || 0;
+            },
+            get discountedSubtotal() {
+                return Math.max(0, this.subtotal - this.discount);
+            },
             get tax() {
-                return this.subtotal * 0.005;
+                return this.discountedSubtotal * 0.10;
             },
             get total() {
-                return this.subtotal + this.tax;
+                return this.discountedSubtotal + this.tax;
             },
 
             hasProducts() {
@@ -83,7 +99,6 @@
                 const maxStock = product.stock;
 
                 if (currentQty >= maxStock) {
-
                     return;
                 }
 
@@ -135,6 +150,7 @@
                 this.change = 0;
                 this.paymentMethod = 'cash';
             },
+
             calculateChange() {
                 this.change = Math.max(0, this.amountReceived - this.total);
             },
@@ -212,6 +228,11 @@
                             })),
                             payment_method: this.paymentMethod,
                             total: this.total,
+                            subtotal: this.subtotal,
+                            tax: this.tax,
+                            discount: this.discount,
+                            discount_type: this.discountType,
+                            discount_value: this.discountValue,
                             amount_received: this.paymentMethod === 'cash' ? parseFloat(this
                                 .amountReceived) : this.total,
                             customer: this.selectedCustomer ? {
@@ -233,7 +254,9 @@
                                 items: [...this.cartItems],
                                 subtotal: this.subtotal,
                                 tax: this.tax,
+                                discount: this.discount,
                                 total: data.order.total,
+
                                 payment_method: this.paymentMethod,
                                 amount_received: this.amountReceived,
                                 change: data.order.change,
@@ -241,7 +264,6 @@
                                     .selectedCustomer)) : null,
                             };
 
-                            console.log('receiptData.customer.name:', this.receiptData.customer?.name);
                             this.lastOrder = data.order;
                             this.checkoutOpen = false;
                             this.receiptOpen = true;

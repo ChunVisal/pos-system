@@ -11,11 +11,13 @@
         {{-- Header --}}
         <div class="px-6 py-5 border-b border-gray-200 dark:border-zinc-800 flex items-center gap-4">
             <div class="relative">
-                <div class="w-14 h-14 rounded-full bg-[#0F6E8C] flex items-center justify-center text-white text-xl font-bold shrink-0"
-                    x-text="form.name ? form.name.charAt(0).toUpperCase() : '?'"></div>
-
+                <div class="w-[65px] h-[65px] rounded-full flex items-center justify-center text-xs font-semibold text-white shrink-0 overflow-hidden"
+                    :style="'background-color: ' + (form.role === 'admin' ? '#8B5CF6' : '#0F6E8C')">
+                    <img x-show="form.avatar" :src="form.avatar" class="w-full h-full rounded-full object-cover">
+                    <span x-show="!form.avatar" x-text="form.name ? form.name.charAt(0).toUpperCase() : '?'"></span>
+                </div>
                 <div x-show="form.is_online"
-                    class="w-3.5 h-3.5 bg-green-500 rounded-full absolute top-0 right-0 border-2 border-white dark:border-zinc-800">
+                    class="w-4 h-4 bg-green-500 rounded-full absolute top-0 right-0 border-2 border-white dark:border-zinc-800">
                 </div>
             </div>
             <div class="flex-1">
@@ -38,34 +40,34 @@
         {{-- Body - 2 Columns --}}
         <div class="p-6 grid grid-cols-2 gap-5">
             {{-- Left Column --}}
-            <div class="space-y-4">
-                <div>
-                    <h4 class="text-xs font-semibold text-gray-400 dark:text-zinc-400 uppercase tracking-wider mb-2">
-                        Employee Info</h4>
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500 dark:text-zinc-400">Shift</span>
-                            <span class="font-medium text-gray-800 dark:text-zinc-200 capitalize"
-                                x-text="form.shift?.replace(/-/g, ' → ') || '-'"></span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500 dark:text-zinc-400">Hire Date</span>
-                            <span class="font-medium text-gray-800 dark:text-zinc-200"
-                                x-text="form.hire_date || '-'"></span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500 dark:text-zinc-400">Salary</span>
-                            <span class="font-medium text-[#0F6E8C]">$<span x-text="form.salary || '0'"></span></span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500 dark:text-zinc-400">Status</span>
-                            <span class="font-medium"
-                                :class="form.status === 'active' ? 'text-green-600' : 'text-red-600'"
-                                x-text="form.status"></span>
-                        </div>
+            <div class="space-y-4" x-show="form.role === 'cashier'">
+
+                <h4 class="text-xs font-semibold text-gray-400 dark:text-zinc-400 uppercase tracking-wider mb-2">
+                    Employee Info</h4>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-zinc-400">Shift</span>
+                        <span class="font-medium text-gray-800 dark:text-zinc-200 capitalize"
+                            x-text="form.shift?.replace(/-/g, ' → ') || '-'"></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-zinc-400">Hire Date</span>
+                        <span class="font-medium text-gray-800 dark:text-zinc-200"
+                            x-text="form.hire_date || '-'"></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-zinc-400">Salary</span>
+                        <span class="font-medium text-[#0F6E8C]">$<span x-text="form.salary || '0'"></span></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-zinc-400">Status</span>
+                        <span class="font-medium"
+                            :class="form.status === 'active' ? 'text-green-600' : 'text-red-600'"
+                            x-text="form.status"></span>
                     </div>
                 </div>
             </div>
+
 
             {{-- Right Column --}}
             <div class="space-y-4">

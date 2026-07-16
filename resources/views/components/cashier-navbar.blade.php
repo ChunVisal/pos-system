@@ -15,7 +15,7 @@
         }
     }"
         :src="isDark ? '{{ asset('images/logodarkmode.png') }}' : '{{ asset('images/logo.png') }}'" alt="Logo"
-        class="w-[90px]">
+        class="w-[100px]">
 
     <div class="flex items-center gap-3">
 
@@ -24,24 +24,26 @@
         {{-- Cashier Bell Icon with Dropdown --}}
         <div class="relative" x-data="{ open: false }">
             <button @click="open = !open"
-                class="relative p-2 text-gray-500 dark:text-zinc-400 hover:text-[#0F6E8C] dark:hover:text-[#138cb3] hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-full transition-colors">
+                class="relative p-2 text-gray-500 dark:text-zinc-400 hover:text-[#0F6E8C] dark:hover:text-[#138cb3] hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-full transition-colors"
+                title="Notifications">
+                {{-- Use correct FontAwesome bell icon (solid style) --}}
                 <i class="fa-solid fa-bell text-xl"></i>
                 @php
                     $cashierNotifCount = \App\Models\StockRequest::where('cashier_id', auth()->id())
-                        ->where('created_at', '>=', now()->subDays(30))
+                        ->where('created_at', '>=', now()->subDays(15))
                         ->whereIn('status', ['pending', 'approved', 'rejected', 'on_hold'])
+                        ->whereNull('seen_at')
                         ->count();
                 @endphp
                 @if ($cashierNotifCount > 0)
                     <span
-                        class="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                        class="bell-badge absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                         {{ $cashierNotifCount }}
                     </span>
                 @endif
             </button>
 
-
-            <div x-show="open" @click.outside="open = false" x-cloak
+            <div x-show="open" @click.outside="open = false" x- cloak
                 x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 scale-95 translate-y-[-10px]"
                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -53,14 +55,30 @@
                 {{-- Premium Minimal Header Segment Layout --}}
                 <div
                     class="px-4 py-3 bg-gray-50/50 dark:bg-zinc-900/40 border-b border-gray-100 dark:border-zinc-800/60 flex items-center justify-between">
-                    <h3 class="text-xs font-semibold tracking-tight text-gray-900 dark:text-zinc-100 uppercase">
+                    {{-- Left Side: Header Title --}}
+                    <h3 class="text-md font-bold text-gray-900 dark:text-zinc-100">
                         Notifications</h3>
-                    <a href="{{ route('cashier.notifications') }}"
-                        class="text-[12px] font-medium text-[#0F6E8C] dark:text-[#1389af] underline tracking-normal">
-                        View All
-                    </a>
-                </div>
 
+                    {{-- Right Side: Action Controllers --}}
+                    <div class="flex items-center gap-3">
+                        {{-- Mark all as read Button UI --}}
+                        <button type="button" @click="markAllRead()"
+                            class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 text-[#0F6E8C] dark:text-[#1389af] hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors"
+                            title="Mark all notifications as read">
+                            <x-heroicon-s-check-circle class="w-3.5 h-3.5" />
+                            <span>Mark read</span>
+                        </button>
+
+                        {{-- Vertical Minimal Divider --}}
+                        <span class="w-[1px] h-3 bg-gray-200 dark:bg-zinc-800"></span>
+
+                        {{-- View All Route Action --}}
+                        <a href="{{ route('cashier.notifications') }}"
+                            class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:underline transition-colors">
+                            View All
+                        </a>
+                    </div>
+                </div>
                 {{-- Notification List Feed Container Block --}}
                 <div
                     class="max-h-[320px] tab-container overflow-y-auto divide-y divide-gray-100 dark:divide-zinc-800/40">
@@ -73,20 +91,26 @@
                             ->limit(6)
                             ->get();
 
-                        // Sort: pending first, then by date
                         $sortedNotifs = $pendingCashierNotifs->sortBy(function ($notif) {
-                            return $notif->status === 'pending' ? 0 : 1;
+                            // pending = 0, recently approved/rejected = 1, older = 2
+                            if ($notif->status === 'pending') {
+                                return 0;
+                            }
+                            if (
+                                in_array($notif->status, ['approved', 'rejected']) &&
+                                $notif->updated_at->diffInMinutes(now()) < 60
+                            ) {
+                                return 1;
+                            }
+                            return 2;
                         });
-
-                        $cashierNotifCount = \App\Models\StockRequest::where('cashier_id', auth()->id())
-                            ->where('created_at', '>=', now()->subDays(30))
-                            ->whereIn('status', ['pending', 'approved', 'rejected', 'on_hold'])
-                            ->count();
                     @endphp
 
                     @forelse($sortedNotifs as $notif)
-                        <div
-                            class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50/60 dark:hover:bg-zinc-800/30 transition-colors">
+                        <div class="notif-card flex items-start gap-3 px-4 py-3 transition-colors
+                    {{ empty($notif->seen_at) ? 'bg-blue-50 dark:bg-blue-950/20 border-l-2 border-blue-500' : 'hover:bg-gray-50/60 dark:hover:bg-zinc-800/30' }}"
+                            data-notif-id="{{ $notif->id }}" style="cursor:pointer"
+                            @click="markSingleRead({{ $notif->id }}, $event.currentTarget)">
                             <div class="relative flex-shrink-0">
                                 <div
                                     class="w-11 h-11 rounded-sm bg-gray-100 dark:bg-zinc-850 border border-gray-200/60 dark:border-zinc-800 overflow-hidden flex items-center justify-center">
@@ -125,6 +149,11 @@
                                     {{ $notif->updated_at->diffForHumans() }}
                                 </p>
                             </div>
+                            <button @click.stop="markSingleRead({{ $notif->id }}, $event.target)"
+                                class="notif-dot ml-2 flex items-center justify-center w-2.5 h-2.5 rounded-full
+                                    {{ $notif->seen_at ? 'bg-gray-300 dark:bg-zinc-700' : 'bg-red-500' }}"
+                                title="Mark as read" aria-label="Mark as read" type="button">
+                            </button>
                         </div>
                     @empty
                         <div class="px-4 py-12 text-center text-xs font-medium text-gray-400 dark:text-zinc-500">
@@ -138,8 +167,13 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <div class="w-9 h-9 bg-[#0F6E8C] text-white rounded-full flex items-center justify-center font-semibold">
-                {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+            <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold overflow-hidden"
+                style="background-color: {{ auth()->user()->role === 'admin' ? '#8B5CF6' : '#0F6E8C' }};">
+                @if (auth()->user()->avatar)
+                    <img src="{{ auth()->user()->avatar }}" class="w-full h-full object-cover">
+                @else
+                    <span class="text-white">{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</span>
+                @endif
             </div>
             <div class="hidden sm:block leading-none">
                 <p class="font-semibold text-sm text-gray-800 dark:text-zinc-200">{{ auth()->user()->name ?? 'Guest' }}
@@ -158,4 +192,77 @@
             sidebar.__x.$data.open = !sidebar.__x.$data.open;
         }
     });
+
+    function markAllRead() {
+        fetch('/cashier/notifications/mark-read', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+
+                // gray out every dot
+                document.querySelectorAll('.notif-dot').forEach(dot => {
+                    dot.classList.remove('bg-red-500');
+                    dot.classList.add('bg-gray-300', 'dark:bg-zinc-700');
+                });
+                // remove unmark background on notif cards
+                document.querySelectorAll('.notif-card').forEach(card => {
+                    card.classList.remove('bg-red-50', 'dark:bg-zinc-900/30');
+                });
+
+                // clear the bell badge count
+                const badge = document.querySelector('.bell-badge');
+                if (badge) badge.remove();
+            });
+    }
+
+    function markSingleRead(id, el) {
+        fetch(`/cashier/notifications/${id}/mark-read`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+
+                let notifCard, notifDot;
+
+                if (el.classList.contains('notif-dot')) {
+                    notifDot = el;
+                    notifCard = el.closest('.notif-card');
+                } else if (el.classList.contains('notif-card')) {
+                    notifCard = el;
+                    notifDot = notifCard.querySelector('.notif-dot');
+                } else {
+                    notifCard = document.querySelector(`.notif-card[data-notif-id="${id}"]`);
+                    notifDot = notifCard ? notifCard.querySelector('.notif-dot') : null;
+                }
+
+                if (notifDot) {
+                    notifDot.classList.remove('bg-blue-500');
+                    notifDot.classList.add('bg-gray-300', 'dark:bg-zinc-700');
+                }
+                if (notifCard) {
+                    notifCard.classList.remove('bg-blue-50', 'dark:bg-blue-950/20', 'border-l-2',
+                        'border-blue-500');
+                }
+
+                const badge = document.querySelector('.bell-badge');
+                if (badge) {
+                    const newCount = parseInt(badge.textContent.trim()) - 1;
+                    if (newCount <= 0) {
+                        badge.remove();
+                    } else {
+                        badge.textContent = newCount;
+                    }
+                }
+            });
+    }
 </script>

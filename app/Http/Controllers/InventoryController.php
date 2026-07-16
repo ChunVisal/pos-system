@@ -152,8 +152,8 @@ class InventoryController extends Controller
             'quantity_approved' => $request->quantity,
             'status' => 'approved',
             'approved_by' => Auth::id(),
+            'seen_at' => null,
         ]);
-
 
         // Log stock movement
         StockMovement::create([
@@ -299,6 +299,51 @@ class InventoryController extends Controller
                     $label,
                     $dayMovements->where('type', 'in')->sum('quantity'),
                     $dayMovements->where('type', 'out')->sum('quantity'),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportMovements(Request $request)
+    {
+        $start = $request->start_date ? Carbon::parse($request->start_date) : now()->subDays(14);
+        $end = $request->end_date ? Carbon::parse($request->end_date) : now();
+
+        $movements = StockMovement::with(['product.category', 'user'])
+            ->whereBetween('created_at', [$start->startOfDay(), $end->endOfDay()])
+            ->when($request->type, fn($q) => $q->where('type', $request->type))
+            ->when($request->search, fn($q) => $q->whereHas('product', fn($p) => $p->where('name', 'like', '%' . $request->search . '%')))
+            ->latest()
+            ->get();
+
+        $filename = 'stock_movements_' . $start->format('Ymd') . '_to_' . $end->format('Ymd') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function () use ($movements, $start, $end) {
+            $file = fopen('php://output', 'w');
+
+            fputcsv($file, ['STOCK MOVEMENTS REPORT']);
+            fputcsv($file, ['Period: ' . $start->format('M d, Y') . ' - ' . $end->format('M d, Y')]);
+            fputcsv($file, []);
+            fputcsv($file, ['Date', 'Product', 'Category', 'Type', 'Quantity', 'Reason', 'User']);
+
+            foreach ($movements as $m) {
+                fputcsv($file, [
+                    $m->created_at->format('Y-m-d H:i'),
+                    $m->product->name ?? '-',
+                    $m->product->category->name ?? '-',
+                    strtoupper($m->type),
+                    $m->quantity,
+                    $m->reason,
+                    $m->user->name ?? '-',
                 ]);
             }
 

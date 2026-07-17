@@ -79,20 +79,21 @@
                                     <p class="text-sm text-gray-800 dark:text-zinc-200 leading-snug">
                                         <span
                                             class="font-bold text-gray-900 dark:text-zinc-100">{{ $req->cashier->name }}</span>
-                                        <span class="text-gray-500 dark:text-zinc-400 font-medium">initiated restock
-                                            of</span>
+                                        @if ($req->product_id)
+                                            requested restock of
+                                            <span
+                                                class="font-bold text-[#0F6E8C] dark:text-[#1389af]">{{ $req->quantity_requested }}x</span>
+                                        @else
+                                            requested new product: {{ $req->product_name }}
+                                        @endif
                                         <span
-                                            class="font-bold text-[#0F6E8C] dark:text-[#1389af]">{{ $req->quantity_requested }}x</span>
-                                        <span
-                                            class="font-bold text-gray-900 dark:text-zinc-100">{{ $req->product->name }}</span>
+                                            class="font-bold text-gray-900 dark:text-zinc-100">{{ $req->product->name ?? ($req->product_name ?? 'Unknown') }}"</span>
                                     </p>
 
                                     <p class="text-[12px] text-gray-500 mt-0.5">
-                                        Warehouse: {{ $req->product->stock_quantity ?? '?' }} |
-                                        Cashier: <span
-                                            class="font-semibold text-gray-700 dark:text-zinc-200">{{ $req->cashier->name }}</span>
-                                        has:
-                                        {{ $cashierRemaining }}
+                                        Warehouse:
+                                        {{ \App\Models\Product::find($req->product_id)->stock_quantity ?? 'N/A' }} |
+                                        Cashier has: {{ $cashierRemaining }}
                                     </p>
 
                                     </p>
@@ -106,7 +107,8 @@
                                         </span>
                                     </div>
                                     @if ($req->cashier_notes)
-                                        <p class="text-[12px] text-gray-600 dark:text-zinc-300 mt-0.5 flex items-center gap-1">
+                                        <p
+                                            class="text-[12px] text-gray-600 dark:text-zinc-300 mt-0.5 flex items-center gap-1">
                                             <x-heroicon-o-chat-bubble-bottom-center-text
                                                 class="inline w-3 h-3 text-gray-400 mr-1" />
                                             "{{ $req->cashier_notes }}"
@@ -125,18 +127,19 @@
                                     class="flex items-center gap-2">
                                     @csrf
                                     <input type="number" name="quantity" value="{{ $req->quantity_requested }}"
-                                        min="1" max="{{ $req->product->stock_quantity }}"
+                                        min="1"
+                                        max="{{ $req->product_id ? $req->product->stock_quantity ?? 0 : $req->quantity_requested }}"
                                         class="w-16 text-xs text-center border rounded px-2 py-1 dark:text-gray-200 bg-white dark:bg-zinc-800">
 
-                                    @if ($req->product->stock_quantity <= 0)
+                                    @if (($req->product->stock_quantity ?? 0) <= 0)
                                         <button type="button" disabled
                                             class="px-3 py-1.5 text-xs font-medium text-white dark:text-zinc-900 bg-gray-400 rounded-md cursor-not-allowed">
                                             Out of Stock
                                         </button>
-                                    @elseif($req->product->stock_quantity < $req->quantity_requested)
+                                    @elseif(($req->product->stock_quantity ?? 0) < $req->quantity_requested)
                                         <button type="submit"
                                             class="px-3 py-1.5 text-xs font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600">
-                                            Partial ({{ $req->product->stock_quantity }} available)
+                                            Partial ({{ $req->product->stock_quantity ?? 0 }} available)
                                         </button>
                                     @else
                                         <button type="submit"

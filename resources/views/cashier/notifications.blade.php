@@ -15,7 +15,7 @@
                 class="bg-white dark:bg-zinc-900 rounded-md border border-gray-100 dark:border-zinc-800/80 p-16 text-center shadow-sm">
                 <div
                     class="w-14 h-14 mx-auto mb-4 bg-gray-50 dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-800 rounded-full flex items-center justify-center">
-                    <x-heroicon-o-bell-slash class="w-6 h-6 text-gray-500 dark:text-zinc-500" />
+                    <x-heroicon-o-bell-slash class="w-6 h-6 text-gray-800 dark:text-zinc-200" />
                 </div>
                 <p class="text-sm font-bold text-gray-800 dark:text-zinc-200 uppercase tracking-wider">No notifications yet
                 </p>
@@ -24,15 +24,15 @@
             </div>
         @else
             {{-- Premium Styled Notifications Feed Container --}}
-            <div
-                class="bg-white dark:bg-zinc-900 rounded-md shadow-sm border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800/40 overflow-hidden">
+            <div class="  overflow-hidden">
                 @foreach ($notifications as $notif)
-                    <div class="flex items-start gap-4 p-5 hover:bg-gray-50/40 dark:hover:bg-zinc-800/20 transition-colors">
+                    <div
+                        class="bg-white dark:bg-zinc-900 rounded-xs shadow-sm border border-gray-100 dark:border-zinc-800/80 divide-y divide-gray-100 dark:divide-zinc-800/40 my-2 flex items-start gap-4 px-5 py-4 transition-colors">
 
                         {{-- Image Thumbnail Box with Embedded Indicator Ring --}}
-                        <div class="relative flex-shrink-0">
+                        <div class=" relative flex-shrink-0">
                             <div
-                                class="w-[60px] h-[60px] rounded-md bg-gray-100 dark:bg-zinc-850 border border-gray-200/60 dark:border-zinc-800 overflow-hidden flex items-center justify-center">
+                                class="w-[65px] h-[65px] rounded-sm bg-gray-100 dark:bg-zinc-850 border border-gray-200/60 dark:border-zinc-800 overflow-hidden flex items-center justify-center">
                                 @if (!empty($notif->product->image))
                                     <img src="{{ $notif->product->image }}" alt="{{ $notif->product->name }}"
                                         class="w-full h-full object-cover">
@@ -56,50 +56,68 @@
                             </div>
                         </div>
 
-                        {{-- Metadata Content Text Grid Block --}}
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-800 dark:text-zinc-200 leading-snug break-words">
-                                <span
-                                    class="font-bold text-[#0F6E8C] dark:text-[#1389af]">{{ $notif->quantity_requested }}x</span>
-                                <span
-                                    class="font-semibold text-gray-900 dark:text-zinc-100">{{ $notif->product->name }}</span>
-                            </p>
+                        {{-- Container Card Structure --}}
+                        <div
+                            class=" relative pl-3 border-l-2 py-0.5 flex-1 min-w-0
+{{ $notif->status === 'approved' ? 'border-emerald-500' : '' }}
+{{ $notif->status === 'rejected' ? 'border-red-500' : '' }}
+{{ $notif->status === 'on_hold' || $notif->status === 'pending' ? 'border-amber-500' : '' }}">
 
-                            {{-- Color-matched Minimal Text Status Badge --}}
-                            <p
-                                class="text-xs font-normal tracking-normal mt-1
-                                {{ $notif->status === 'approved' ? 'text-green-600 dark:text-green-400' : ($notif->status === 'rejected' ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400') }}">
-                                @if ($notif->status === 'approved')
-                                    Approved
-                                    @if (!is_null($notif->quantity_approved))
-                                        <span class="ml-1 text-gray-700 dark:text-zinc-300">
-                                            Admin gave {{ $notif->quantity_approved }}
+                            {{-- Header Row: Quantity, Name, and Type --}}
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-1.5 text-sm">
+                                    {{-- Slim Badge on Right --}}
+                                    <span
+                                        class="text-[13px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                                        {{ $notif->product_id ? 'Restock' : 'New Products' }}
+                                    </span>
+
+                                    <span class="font-extrabold text-gray-900 dark:text-zinc-100">
+                                        {{ $notif->quantity_requested }}x
+                                    </span>
+                                    <span class="font-medium text-gray-700 dark:text-zinc-300 truncate">
+                                        {{ $notif->product->name ?? ($notif->product_name ?? 'Unknown') }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {{-- Info Subtext Line --}}
+                            <div
+                                class="flex items-center justify-between gap-2 mt-1 text-xs text-gray-400 dark:text-zinc-500">
+                                <div class="flex items-center gap-1.5 truncate">
+                                    @if ($notif->status === 'approved')
+                                        <span
+                                            class="text-emerald-600 dark:text-emerald-500 text-xs font-bold">Approved</span>
+                                        @if ($notif->quantity_approved)
+                                            <span class="font-medium">({{ $notif->quantity_approved }} sent)</span>
+                                        @endif
+                                    @elseif($notif->status === 'rejected')
+                                        <span class="text-red-500 dark:text-red-400 font-bold truncate">
+                                            Rejected: {{ $notif->dispute_reason ?? 'Disputed' }}
                                         </span>
+                                    @elseif($notif->status === 'on_hold')
+                                        <span class="text-amber-600 dark:text-amber-500 font-bold">On Hold</span>
+                                    @else
+                                        <span class="text-amber-600 dark:text-amber-500 font-bold">Pending</span>
                                     @endif
-                                @elseif($notif->status === 'rejected')
-                                    Rejected: {{ $notif->dispute_reason ?? 'Disputed' }}
-                                @elseif($notif->status === 'on_hold')
-                                    On Hold
-                                @else
-                                    Pending Approval
-                                @endif
-                            </p>
 
-                            <p class="text-[12px] text-gray-500 dark:text-zinc-500 font-medium mt-1">
-                                {{ $notif->updated_at->diffForHumans() }}
-                            </p>
+                                    <span>&bull;</span>
+                                    <span>{{ $notif->updated_at->diffForHumans() }}</span>
+                                </div>
+                            </div>
 
 
+                            {{-- Action Anchor --}}
                             @if ($notif->status === 'approved')
                                 <button @click="returnStock({{ $notif->id }})"
-                                    class="text-xs text-red-500 hover:text-red-600 mt-1">
+                                    class="text-[14px] mt-2 font-medium text-red-500 hover:text-red-600 dark:text-red-400 transition-colors shrink-0">
                                     Report Loss
                                 </button>
                             @endif
                         </div>
                     </div>
                 @endforeach
-            </div>
+                </>
         @endif
 
 

@@ -63,12 +63,16 @@
 
             {{-- Totals --}}
             <div class="flex justify-between dark:text-zinc-300">
-            <span class="text-gray-500 dark:text-zinc-300">Subtotal</span>
+                <span class="text-gray-500 dark:text-zinc-300">Subtotal</span>
                 <span>$<span x-text="receiptData.subtotal?.toFixed(2) || '0.00'"></span></span>
             </div>
             <div class="flex justify-between dark:text-zinc-300" x-show="receiptData.discount > 0">
                 <span class="text-gray-500 dark:text-zinc-300">Discount</span>
-                <span>-$<span x-text="receiptData.discount.toFixed(2)"></span></span>
+                <span>-$<span x-text="(receiptData.discount || 0).toFixed(2)"></span></span>
+            </div>
+            <div x-show="receiptData.is_vip" class="flex justify-between text-sm text-yellow-600">
+                <span class="text-gray-500 dark:text-zinc-300">VIP Discount (5%)</span>
+                <span>-$<span x-text="(receiptData.vip_discount || 0).toFixed(2)"></span></span>
             </div>
             <div class="flex justify-between dark:text-zinc-300">
                 <span class="text-gray-500 ">Tax (10%)</span>
@@ -85,7 +89,7 @@
             <span class="dark:text-zinc-300 font-semibold capitalize" x-text="receiptData.payment_method"></span>
             <span class="dark:text-zinc-300" x-show="receiptData.payment_method === 'cash'">$<span
                     x-text="parseFloat(receiptData.amount_received || 0).toFixed(2)"></span></span>
-            <span class="dark:text-zinc-300" x-show="receiptData.change > 0">$<span
+            <span class="dark:text-zinc-300" x-show="receiptData.change > 0">Change $<span
                     x-text="receiptData.change?.toFixed(2)"></span></span>
 
             <div class="border-t border-dashed border-gray-300 dark:border-zinc-700 my-3"></div>

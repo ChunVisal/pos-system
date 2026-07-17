@@ -9,6 +9,7 @@ class StockRequest extends Model
     protected $fillable = [
         'cashier_id',
         'product_id',
+        'product_name',
         'quantity_requested',
         'quantity_approved',
         'status',

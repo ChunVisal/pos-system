@@ -28,6 +28,7 @@
             {{-- Cashier Selection --}}
             <div>
                 <label class="block text-xs text-gray-500 mb-1">Select Cashier</label>
+                
                 <select x-model="dropForm.cashier_id"
                     class="w-full text-sm border border-gray-300 dark:border-zinc-700 rounded-lg px-3 py-2 bg-white dark:bg-zinc-800 text-gray-800 dark:text-zinc-200">
                     <option value="">Choose cashier...</option>

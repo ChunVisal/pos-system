@@ -119,14 +119,29 @@ class CashierController extends Controller
             $orderNumber = 'INV-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
             // In CashierController@checkout
-            $discount = $request->discount ?? 0;
+
+            $isVip = false;
+
+
             $subtotal = 0;
             foreach ($request->items as $item) {
                 $product = Product::find($item['id']);
                 $subtotal += $product->selling_price * $item['qty'];
             }
-            $tax = ($subtotal - $discount) * 0.10;
-            $total = $subtotal - $discount + $tax;
+
+            $discount = $request->discount ?? 0;
+            $vipDiscount = 0;
+            if ($customerId) {
+                $customer = Customer::find($customerId);
+                if ($customer && $customer->segment === 'vip') {
+                    $isVip = true;
+                    $vipDiscount = $subtotal * 0.05;
+                }
+            }
+
+            $totalDiscount = $discount + $vipDiscount;
+            $tax = ($subtotal - $totalDiscount) * 0.10;
+            $total = $subtotal - $totalDiscount  + $tax;
 
             $order = Order::create([
                 'order_number' => $orderNumber,
@@ -135,7 +150,7 @@ class CashierController extends Controller
                 'subtotal' => $subtotal,
                 'discount' => $discount,
                 'tax' => $tax,
-                'total' => $total,  // Now includes discount
+                'total' => $total,
                 'status' => 'completed',
             ]);
 
@@ -207,6 +222,9 @@ class CashierController extends Controller
                     'order_number' => $order->order_number,
                     'total' => $total,
                     'change' => $change,
+                    'discount' => $discount, 
+                    'is_vip' => $isVip,
+                    'vip_discount' => $vipDiscount,
                 ],
             ]);
         } catch (\Exception $e) {

@@ -194,6 +194,7 @@
                                     <p class="max-w-[200px] break-words line-clamp-2" x-text="movement.reason || '-'">
                                     </p>
                                 </td>
+                           
 
                                 {{-- Authorized User Metadata Structure Layout --}}
                                 <td class="py-3.5    text-xs text-left">

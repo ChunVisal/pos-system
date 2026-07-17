@@ -25,6 +25,10 @@
                 note: ''
             },
 
+            // searching all products 
+            allProducts: @json($allProducts),
+            selectedProductName: '',
+
             get filteredProducts() {
                 let result = [...this.products];
 
@@ -50,6 +54,10 @@
             },
 
             submitRequest() {
+                if (!this.requestForm.product_id && !this.requestForm.product_name) {
+                    alert('Please select a product or type a name');
+                    return;
+                }
                 fetch('/cashier/stock-request', {
                         method: 'POST',
                         headers: {
@@ -72,12 +80,8 @@
             },
 
             addNewProductItem() {
-                const lastItem = this.newProductList[this.newProductList.length - 1];
-                if (lastItem && !lastItem.name.trim()) {
-                    alert('Please fill in the product name first');
-                    return;
-                }
                 this.newProductList.push({
+                    product_id: '',
                     name: '',
                     quantity: 1,
                     note: ''
@@ -85,22 +89,9 @@
             },
 
             submitNewProductRequest() {
-                const validItems = this.newProductList.filter(item => item.name.trim());
-                if (validItems.length === 0) return;
-
-                if (validItems.length === 0) {
-                    alert('Please enter at least one product name');
-                    return;
-                }
-
-                // Check for empty names in the list
-                const emptyNames = this.newProductList.some(item => !item.name.trim());
-                if (emptyNames) {
-                    alert('Please fill in all product names or remove empty items');
-                    return;
-                }
-
-
+                console.log('Items:', this.newProductList);
+                const validItems = this.newProductList.filter(item => item.product_id || item.name.trim());
+                if (validItems.length === 0) return alert('Add at least one product');
                 fetch('/cashier/stock-request/bulk', {
                         method: 'POST',
                         headers: {
@@ -116,6 +107,7 @@
                         alert(data.message);
                         this.requestNewProduct = false;
                         this.newProductList = [{
+                            product_id: '',
                             name: '',
                             quantity: 1,
                             note: ''

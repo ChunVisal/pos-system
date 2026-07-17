@@ -96,7 +96,7 @@
 
         {{-- Footer --}}
         <div class="px-5 py-4 border-t border-gray-200 dark:border-zinc-800 flex gap-3">
-            <button @click="customerOpen = false"
+            <button @click="customerOpen = false; selectedCustomer = null"
                 class="flex-1 py-2 text-xs border rounded-lg text-gray-600 dark:text-zinc-300">
                 Skip
             </button>

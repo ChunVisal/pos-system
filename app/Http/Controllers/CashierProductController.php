@@ -42,6 +42,7 @@ class CashierProductController extends Controller
         if ($request->ajax) {
             return response()->json(['products' => $products]);
         }
+        $allProducts = Product::where('status', 'active')->orderBy('name')->get();
 
         $categories = Categories::whereHas('products', function ($q) use ($cashierId) {
             $q->whereHas('cashierStocks', fn($sq) => $sq->where('cashier_id', $cashierId));
@@ -55,6 +56,6 @@ class CashierProductController extends Controller
 
         $summaryCards = CashierProductData::getSummaryCards();
 
-        return view('cashier.products', compact('products', 'summaryCards', 'categories'));
+        return view('cashier.products', compact('products', 'summaryCards', 'categories', 'allProducts'));
     }
 }

@@ -45,6 +45,8 @@
                 items: [],
                 subtotal: 0,
                 tax: this.tax,
+                is_vip: this.isVipCustomer,
+                vip_discount: this.vipDiscount,
                 discount: this.discount,
                 total: 0,
                 payment_method: 'cash',
@@ -71,21 +73,77 @@
             get subtotal() {
                 return this.cartItems.reduce((sum, i) => sum + (i.price * i.qty), 0);
             },
+
             get discount() {
+                let total = 0;
+                // Manual discount
+                if (this.discountValue > 0) {
+                    if (this.discountType === 'percent') {
+                        total += this.subtotal * (this.discountValue / 100);
+                    } else {
+                        total += parseFloat(this.discountValue) || 0;
+                    }
+                }
+                // VIP discount (only if no manual discount)
+                if (total === 0 && this.isVipCustomer) {
+                    total += this.subtotal * 0.05;
+                }
+                return total;
+            },
+
+            get discountedSubtotal() {
+                return Math.max(0, this.subtotal - this.discount);
+            },
+            get tax() {
+                return (this.subtotal - this.manualDiscount - this.vipDiscount) * 0.10;
+            },
+
+            get isVipCustomer() {
+                const vip = this.selectedCustomer?.segment === 'vip';
+                if (vip && this.discountValue > 0 && this.discountValue === parseFloat(this.vipDiscount.toFixed(
+                    2))) {
+                    // If manual discount equals VIP discount, it was auto-set. Reset it.
+                    this.discountValue = 0;
+                }
+                return vip;
+            },
+            get vipDiscount() {
+                if (!this.selectedCustomer || this.selectedCustomer.segment !== 'vip') return 0;
+                return this.subtotal * 0.05;
+            },
+            // Don't auto-fill manual discount with VIP
+            get manualDiscount() {
                 if (!this.discountValue || this.discountValue <= 0) return 0;
                 if (this.discountType === 'percent') {
                     return this.subtotal * (this.discountValue / 100);
                 }
                 return parseFloat(this.discountValue) || 0;
             },
-            get discountedSubtotal() {
-                return Math.max(0, this.subtotal - this.discount);
-            },
-            get tax() {
-                return this.discountedSubtotal * 0.10;
+
+            get totalDiscount() {
+                return this.vipDiscount + this.manualDiscount;
             },
             get total() {
-                return this.discountedSubtotal + this.tax;
+                return this.subtotal + this.tax - this.manualDiscount - this.vipDiscount;
+            },
+
+            init() {
+                this.$watch('discountValue', () => {
+                    if (this.amountReceived) {
+                        this.amountReceived = this.total.toFixed(2);
+                        this.calculateChange();
+                    }
+                });
+                this.discountValue = 0;
+                this.$watch('vipDiscount', () => {
+                    if (this.amountReceived) {
+                        this.amountReceived = this.total.toFixed(2);
+                        this.calculateChange();
+                    }
+                });
+                this.$watch('discountValue', (val) => {
+                    console.log('discountValue changed to:', val, new Error().stack);
+                });
             },
 
             hasProducts() {
@@ -134,9 +192,6 @@
             },
             openCheckout() {
                 if (this.cartItems.length === 0) return;
-                // Reset customer
-                this.selectedCustomer = null;
-                this.customerSaved = false;
                 this.customerForm = {
                     name: '',
                     phone: '',
@@ -146,7 +201,7 @@
                 this.customerResults = [];
 
                 this.checkoutOpen = true;
-                this.amountReceived = 0;
+                this.amountReceived = '';
                 this.change = 0;
                 this.paymentMethod = 'cash';
             },
@@ -165,6 +220,8 @@
 
             selectCustomer(cust) {
                 this.selectedCustomer = cust;
+
+                console.log('Customer selected:', cust.segment);
                 this.customerForm = {
                     name: cust.name,
                     phone: cust.phone,
@@ -185,12 +242,14 @@
             },
 
             saveCustomer() {
+                console.log('saveCustomer called');
                 if (!this.customerForm.name || !this.customerForm.phone) return;
 
                 this.selectedCustomer = {
                     name: this.customerForm.name,
                     phone: this.customerForm.phone,
                     email: this.customerForm.email || null,
+                    segment: this.selectedCustomer?.segment || 'new',
                 };
                 this.customerSaved = true;
                 this.customerOpen = false;
@@ -230,9 +289,11 @@
                             total: this.total,
                             subtotal: this.subtotal,
                             tax: this.tax,
-                            discount: this.discount,
+                            discount: this.manualDiscount,
                             discount_type: this.discountType,
                             discount_value: this.discountValue,
+                            is_vip: this.isVipCustomer,
+                            vip_discount: this.vipDiscount,
                             amount_received: this.paymentMethod === 'cash' ? parseFloat(this
                                 .amountReceived) : this.total,
                             customer: this.selectedCustomer ? {
@@ -254,8 +315,10 @@
                                 items: [...this.cartItems],
                                 subtotal: this.subtotal,
                                 tax: this.tax,
-                                discount: this.discount,
+                                discount: this.manualDiscount,
                                 total: data.order.total,
+                                is_vip: this.isVipCustomer,
+                                vip_discount: this.vipDiscount,
 
                                 payment_method: this.paymentMethod,
                                 amount_received: this.amountReceived,

@@ -30,6 +30,11 @@
                 status: 'active',
             },
 
+            // search product dropstock 
+            cashierOpen: false,
+            selectedCashierName: '',
+            cashiers: @json($cashiers ?? []),
+
             get currentStock() {
                 return this.form.product_code ? (this.stockMap[this.form.product_code] ?? null) : null;
             },
@@ -109,7 +114,7 @@
                                         'Content-Type': 'application/json',
                                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                     }
-                                }); 	
+                                });
                             }
                             window.location.reload();
                         } else {

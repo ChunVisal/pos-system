@@ -11,13 +11,13 @@ class StockRequestController extends Controller
 {
     public function store(Request $request)
     {
-
-        Log::info('Stock request data:', $request->all());
         StockRequest::create([
             'cashier_id' => Auth::id(),
-            'product_id' => $request->product_id,
+            'product_id' => $request->product_id ?: null,
+            'product_name' => $request->product_name ?: null,
             'quantity_requested' => $request->quantity,
             'cashier_notes' => $request->note,
+            'status' => 'pending',
         ]);
         return response()->json(['message' => 'Request sent to admin']);
     }
@@ -27,12 +27,14 @@ class StockRequestController extends Controller
         foreach ($request->items as $item) {
             StockRequest::create([
                 'cashier_id' => Auth::id(),
-                'product_name' => $item['name'],
+                'product_id' => $item['product_id'] ?: null,
+                'product_name' => $item['name'] ?? null,
                 'quantity_requested' => $item['quantity'] ?? 1,
                 'cashier_notes' => $item['note'] ?? null,
                 'status' => 'pending',
             ]);
         }
+        Log::info('Product ID value:', ['id' => $item['product_id'], 'type' => gettype($item['product_id'])]);
         return response()->json(['message' => count($request->items) . ' requests sent']);
     }
 

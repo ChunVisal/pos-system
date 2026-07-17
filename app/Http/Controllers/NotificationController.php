@@ -32,7 +32,6 @@ class NotificationController extends Controller
             ->whereNull('seen_at')
             ->update(['seen_at' => now()]);
 
-
         $notifications = StockRequest::with(['product', 'approver'])
             ->where('cashier_id', Auth::id())
             ->whereIn('status', ['pending', 'approved', 'rejected', 'on_hold'])

@@ -196,21 +196,27 @@ class InventoryController extends Controller
     {
         $request->validate([
             'product_code' => 'required|exists:products,code',
-            'type' => 'required|in:in,out',
-            'quantity' => 'required|integer|min:0',
-            'reason' => 'required|string',
+            'type' => 'nullable|in:in,out',
+            'quantity' => 'nullable|integer|min:0',
+            'reason' => 'nullable|string',
             'notes' => 'nullable|string',
             'low_stock_threshold' => 'nullable|integer|min:0',
             'status' => 'nullable|in:active,inactive',
         ]);
 
         $product = Product::where('code', $request->product_code)->firstOrFail();
+
+        // Stock quantity change
         if ($request->quantity > 0) {
+            if (!$request->reason) {
+                return response()->json(['error' => 'Reason is required for stock adjustment'], 422);
+            }
+
             if ($request->type === 'in') {
                 $product->increment('stock_quantity', $request->quantity);
             } else {
                 if ($product->stock_quantity < $request->quantity) {
-                    return response()->json(['error' => 'Not enough stock to remove that quantity'], 422);
+                   return response()->json(['error' => 'Not enough stock'], 422);
                 }
                 $product->decrement('stock_quantity', $request->quantity);
             }
@@ -225,17 +231,18 @@ class InventoryController extends Controller
             ]);
         }
 
+        // Threshold change
         if ($request->low_stock_threshold !== null) {
             $product->update(['low_stock_threshold' => $request->low_stock_threshold]);
         }
 
-        // Always update status and threshold
-        if ($request->status) {
+        // Status only change (no quantity)
+        if ($request->status && $request->quantity == 0) {
             $product->update(['status' => $request->status]);
         }
 
         return response()->json([
-            'message' => 'Stock adjusted',
+            'message' => 'Updated',
             'new_stock' => $product->stock_quantity,
             'low_stock_threshold' => $product->low_stock_threshold,
         ]);

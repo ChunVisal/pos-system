@@ -110,7 +110,7 @@
                         <div class="notif-card flex items-start gap-3 px-4 py-3 transition-colors
                     {{ empty($notif->seen_at) ? 'bg-blue-50 dark:bg-blue-950/20 border-l-2 border-blue-500' : 'hover:bg-gray-50/60 dark:hover:bg-zinc-800/30' }}"
                             data-notif-id="{{ $notif->id }}" style="cursor:pointer"
-                            @click="markSingleRead({{ $notif->id }}, $event.currentTarget)">
+                            @click.stop="markSingleRead({{ $notif->id }}, $event.target)">
                             <div class="relative flex-shrink-0">
                                 <div
                                     class="w-11 h-11 rounded-sm bg-gray-100 dark:bg-zinc-850 border border-gray-200/60 dark:border-zinc-800 overflow-hidden flex items-center justify-center">
@@ -136,9 +136,9 @@
                             </div>
                             <div class="flex-1 min-w-0 space-y-0.5">
                                 <p class="text-xs text-gray-800 dark:text-zinc-200 leading-snug break-words">
-                                    <span class="font-bold">{{ $notif->quantity_requested }}x</span>
+                                    <span class="font-bold">{{ $notif->quantity_approved }}x</span>
                                     <span
-                                        class="font-medium text-xs text-gray-900 dark:text-zinc-100">{{ $notif->product->name }}</span>
+                                        class="font-medium text-gray-900 dark:text-zinc-100">{{ $notif->product->name ?? ($notif->product_name ?? 'Unknown Product') }}</span>
                                 </p>
                                 <p
                                     class="text-xs font-normal tracking-normal mt-1
@@ -207,12 +207,19 @@
 
                 // gray out every dot
                 document.querySelectorAll('.notif-dot').forEach(dot => {
-                    dot.classList.remove('bg-red-500');
+                    dot.classList.remove('bg-red-500', 'bg-blue-500');
                     dot.classList.add('bg-gray-300', 'dark:bg-zinc-700');
                 });
-                // remove unmark background on notif cards
+                // remove both mark and unmark background classes on notif cards
                 document.querySelectorAll('.notif-card').forEach(card => {
-                    card.classList.remove('bg-red-50', 'dark:bg-zinc-900/30');
+                    card.classList.remove(
+                        'bg-red-50',
+                        'dark:bg-zinc-900/30',
+                        'bg-blue-50',
+                        'dark:bg-blue-950/20',
+                        'border-l-2',
+                        'border-blue-500'
+                    );
                 });
 
                 // clear the bell badge count

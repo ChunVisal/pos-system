@@ -23,6 +23,8 @@
                             tax: parseFloat(order.tax) || 0,
                             total: parseFloat(order.total) || 0,
                             discount: parseFloat(order.discount) || 0,
+                            vip_discount: parseFloat(order.vip_discount) || 0,
+                            is_vip: order.is_vip || false,
                             payment_method: order.payment?.method,
                             amount_received: parseFloat(order.payment?.amount_received) || parseFloat(order
                                 .total) || 0,

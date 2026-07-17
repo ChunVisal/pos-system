@@ -34,7 +34,7 @@
 
             {{-- "All Products" Reset Card --}}
             <div @click="selectedCategory = 'all'"
-                :class="selectedCategory === 'all' ? 'border-[#1063a2]/30 bg-blue-50/50 dark:bg-zinc-600' :
+                :class="selectedCategory === 'all' ? 'border-[#1063a2]/30 bg-blue-50/50 dark:bg-zinc-800' :
                     'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900'"
                 class="w-32 h-32 p-3 border flex-shrink-0 hover:shadow-md transition-all cursor-pointer relative overflow-hidden flex flex-col items-center justify-center">
                 <img src='{{ asset('images/allmenu.png') }}' class="object-cover h-full" alt="">
@@ -45,7 +45,7 @@
             @foreach ($categories as $category)
                 <div @click="selectedCategory = {{ $category->id }}"
                     :class="selectedCategory === {{ $category->id }} ?
-                        'border-[#1063a2]/30 bg-blue-50/50 dark:bg-zinc-600' :
+                        'border-[#1063a2]/30 bg-blue-50/50 dark:bg-zinc-800' :
                         'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900'"
                     class="w-32 h-32 p-3 border flex-shrink-0 hover:shadow-md transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between">
 

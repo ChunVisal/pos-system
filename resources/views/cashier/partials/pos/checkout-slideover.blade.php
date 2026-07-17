@@ -32,23 +32,29 @@
             <div class=" bg-gray-100/60 dark:bg-zinc-800/70 rounded-lg p-4 text-start">
                 <p class="text-xs text-gray-500 dark:text-z dark:text-zinc-300 mb-1">Total Amount</p>
                 <p class="text-4xl font-bold text-[#0F6E8C]">$<span x-text="total.toFixed(2)"></span></p>
-                <div class="flex justify-start gap-4 mt-2 text-xs text-gray-500 dark:text-z dark:text-zinc-300">
+                <div class="flex justify-start gap-4 mt-2 mb-1 text-xs text-gray-500 dark:text-z dark:text-zinc-300">
                     <span>Subtotal: $<span x-text="subtotal.toFixed(2)"></span></span>
                     <span>Tax: $<span x-text="tax.toFixed(2)"></span></span>
                     {{-- Show discount amount (Only displays if active savings are calculated) --}}
                     <div class="flex items-center justify-between text-xs font-bold" x-show="discount > 0" x-cloak>
                         <span class="text-red-600 dark:text-red-400">
-                            -$<span x-text="discount.toFixed(2)"></span>
+                            -$<span x-text="manualDiscount.toFixed(2)"></span>
                         </span>
                     </div>
+                </div>
+
+                {{-- VIP Discount (auto) --}}
+                <div x-show="isVipCustomer"
+                    class="mb-2 flex items-center justify-between text-xs text-yellow-600 bg-yellow-50 dark:bg-yellow-950/30 rounded p-2">
+                    <span><i class="fa-solid fa-crown mr-1"></i> VIP 5% Discount</span>
+                    <span>-$<span x-text="vipDiscount.toFixed(2)"></span></span>
                 </div>
                 {{-- Change --}}
                 <div x-show="paymentMethod === 'cash' && change > 0"
                     class="mt-2 bg-green-50 dark:bg-green-950/30 rounded p-2">
                     <span class="text-sm text-green-700 dark:text-green-400">Change: $<span
                             x-text="change.toFixed(2)"></span></span>
-                </div>
-
+                </div class="">
 
 
             </div>
@@ -62,12 +68,11 @@
                     <div class="flex items-center gap-1.5">
                         {{-- Numerical Discount Input --}}
                         <input type="number" x-model="discountValue" placeholder="0" min="0"
-                            @input="calculateDiscount()"
                             class="w-16 text-xs font-semibold text-right border border-gray-250 dark:border-zinc-800/80 rounded-md px-2 py-1 bg-white dark:bg-zinc-950 text-gray-900 dark:text-zinc-100 focus:outline-none focus:border-[#0F6E8C] dark:focus:border-[#1389af] transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
 
                         {{-- Discount Type Toggle Selector --}}
                         <div class="relative">
-                            <select x-model="discountType" @change="calculateDiscount()"
+                            <select x-model="discountType"
                                 class="text-xs font-semibold border border-gray-250 dark:border-zinc-800/80 rounded-md pl-2 pr-6 py-1 bg-white dark:bg-zinc-950 text-gray-900 dark:text-zinc-100 focus:outline-none focus:border-[#0F6E8C] dark:focus:border-[#1389af] appearance-none transition-colors">
                                 <option value="fixed">$</option>
                                 <option value="percent">%</option>
@@ -158,7 +163,9 @@
                     <div
                         class= "dark:text-zinc-300 dark:bg-zinc-900 rounded-lg p-3 mb-3 border border-gray-200 dark:border-zinc-800">
                         <p class="text-[10px] text-gray-500 dark:text-z mb-0.5">Amount Received</p>
-                        <input type="text" inputmode="decimal" x-model="amountReceived" @input="calculateChange()"
+                        <input type="text" inputmode="decimal" x-model="amountReceived"
+                            @focus="if(!amountReceived) amountReceived = total.toFixed(2); calculateChange()"
+                            @input="calculateChange()"
                             class="w-full text-3xl font-bold text-center
                              text-gray-800 dark:text-zinc-200 border-gray-200 dark:border-zinc-700 focus:ring-0 outline-none bg-transparent"
                             placeholder="0.00">

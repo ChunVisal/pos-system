@@ -104,7 +104,7 @@
                                     <span
                                         class="font-bold text-[#0F6E8C] dark:text-[#1389af]">{{ $notif->quantity_requested }}x</span>
                                     <span
-                                        class="font-medium text-gray-900 dark:text-zinc-100">{{ $notif->product->name }}</span>
+                                        class="font-medium text-gray-900 dark:text-zinc-100">{{ $notif->product->name ?? $notif->product_name ?? 'Unknown Product' }}</span>
                                 </p>
 
                                 <div class="flex items-center gap-1.5 pt-0.5">

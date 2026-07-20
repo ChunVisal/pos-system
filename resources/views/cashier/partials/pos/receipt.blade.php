@@ -9,6 +9,21 @@
         {{-- Receipt Paper --}}
         <div class="p-6 font-mono text-sm">
 
+            {{-- Refund Ribbon --}}
+            <template x-if="receiptData.status === 'refunded'">
+                <div class="pointer-events-none">
+                    <div class="absolute right-[-52px] top-4 w-[170px] transform rotate-45 z-50">
+                        <div class="bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200 py-1 font-bold text-xs text-center shadow-md border border-red-200 dark:border-red-900 select-none">
+                            REFUNDED
+                        </div>
+                    </div>
+                    <div class="absolute right-6 top-[58px] w-[140px] text-center pointer-events-none">
+                        <p class="text-[10px] text-red-500 dark:text-red-300 px-2"
+                           x-text="receiptData.refund_reason"></p>
+                    </div>
+                </div>
+            </template>
+       
             {{-- Header --}}
             <div class=" text-center mb-4">
                 <img src="{{ asset('images/logo.png') }}" alt="POS Technology Logo" class="mx-auto h-12 w-auto mb-2" />
@@ -74,8 +89,8 @@
                 <span class="text-gray-500 dark:text-zinc-300">VIP Discount (5%)</span>
                 <span>-$<span x-text="(receiptData.vip_discount || 0).toFixed(2)"></span></span>
             </div>
-            <div class="flex justify-between dark:text-zinc-300">
-                <span class="text-gray-500 ">Tax (10%)</span>
+            <div class="flex justify-between ">
+                <span class="text-gray-500  dark:text-zinc-300">Tax (10%)</span>
                 <span>$<span x-text="receiptData.tax?.toFixed(2) || '0.00'"></span></span>
             </div>
             <div class="flex justify-between text-base font-bold border-t pt-1 mt-1 dark:text-zinc-200">

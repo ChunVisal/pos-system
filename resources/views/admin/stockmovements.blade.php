@@ -25,19 +25,19 @@
             <div class="relative flex-1" x-data="{
                 reasonOpen: false,
                 reasonResults: [],
-                allReasons: ['All Reasons', 'Restock', 'Customer Return', 'Damaged', 'Stock Count Correction', 'Transfer', 'Initial Stock', 'Other']
+                allReasons: ['All Reasons', 'Restock', 'Customer Return', 'Damaged', 'Stock Count Correction', 'Correction', 'Transfer', 'Initial Stock', 'Lost or Stolen', 'Loss: Theft', 'Accident', 'Other']
             }">
                 <i
                     class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-xs"></i>
                 <input type="text" x-model="searchQuery" @input="applyFilters(); toggleClearButton()"
                     @click="reasonResults = allReasons; reasonOpen = true"
                     @input.debounce.200="
-            const query = $el.value.toLowerCase();
-            reasonResults = query ? allReasons.filter(r => r.toLowerCase().includes(query)) : allReasons;
-            reasonOpen = true;
-            applyFilters();
-        "
-                    placeholder="Search or select reason..."
+    const query = $el.value.toLowerCase();
+    reasonResults = query ? allReasons.filter(r => r.toLowerCase().includes(query)) : allReasons;
+    reasonOpen = true;
+    applyFilters(); 
+"
+                    placeholder="Search products or select reason..."
                     class="w-full pl-8 pr-8 py-1.5 text-xs border border-gray-300 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-[#0F6E8C]">
                 <button type="button" id="clearSearch" style="display:none;"
                     @click="searchQuery = ''; applyFilters(); toggleClearButton()"
@@ -194,7 +194,7 @@
                                     <p class="max-w-[200px] break-words line-clamp-2" x-text="movement.reason || '-'">
                                     </p>
                                 </td>
-                           
+
 
                                 {{-- Authorized User Metadata Structure Layout --}}
                                 <td class="py-3.5    text-xs text-left">

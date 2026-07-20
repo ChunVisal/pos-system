@@ -76,7 +76,7 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
     @foreach ($summaryCards as $card)
         <div
-            class="bg-white dark:bg-zinc-900 p-3 rounded-md shadow-xs border border-gray-200 dark:border-zinc-800/60 flex flex-col justify-between relative overflow-hidden h-32">
+            class="bg-white dark:bg-zinc-900 p-4 rounded-md shadow-xs border border-gray-200 dark:border-zinc-800/60 flex flex-col justify-between relative overflow-hidden h-32">
 
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2">
@@ -84,7 +84,7 @@
                         style="background-color: {{ $card['iconBg'] === 'transparent' ? 'transparent' : $card['iconBg'] . '20' }};">
                         <i class="{{ $card['icon'] }} text-[18px]" style="color: {{ $card['iconColor'] }};"></i>
                     </div>
-                    <p class="text-xs font-bold tracking-wider text-gray-600 dark:text-zinc-400 uppercase">
+                    <p class="text-xs font-extrabold text-gray-600 dark:text-zinc-400 uppercase">
                         {{ $card['title'] }}
                     </p>
                 </div>
@@ -94,19 +94,30 @@
             </div>
 
             <div class="flex flex-col items-start gap-1">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-zinc-100">{{ $card['value'] }}</h2>
+                <h2
+                    class="text-2xl {{ !empty($card['highlight'])
+                        ? 'font-mono tabular-nums font-extrabold text-[1.73rem] tracking-tight bg-gradient-to-r from-emerald-700 to-green-600 dark:from-emerald-400 dark:to-green-300 bg-clip-text text-transparent'
+                        : 'font-bold text-gray-800 dark:text-zinc-100' }}">
+                    {{ $card['value'] }}
+                </h2>
                 <div class="flex items-center gap-1 text-xs">
                     <span
-                        class="font-semibold {{ $card['trend'] === 'up' ? 'text-green-500' : 'text-red-500' }} flex items-center gap-0.5">
+                        class="font-semibold
+                            {{ !empty($card['highlight'])
+                                ? 'text-p dark:text-[#1389af]'
+                                : ($card['trend'] === 'up'
+                                    ? 'text-green-500'
+                                    : 'text-red-500') }}
+                            flex items-center gap-0.5">
                         <i class="fa-solid fa-arrow-trend-{{ $card['trend'] }}"></i> {{ $card['percentage'] }}
                     </span>
                     <span class="text-gray-600 dark:text-zinc-400">{{ $card['period'] }}</span>
+
                 </div>
             </div>
         </div>
     @endforeach
 </div>
-
 <script>
     function dateRangePicker() {
         return {

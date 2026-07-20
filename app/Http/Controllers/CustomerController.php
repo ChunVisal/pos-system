@@ -13,17 +13,20 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
         $customers = Customer::whereHas('orders', function ($q) {
-            $q->where('cashier_id', Auth::id());
+            $q->where('cashier_id', Auth::id())
+                ->where('status', '!=', 'refunded');
         })
             ->when($request->search, function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->search.'%')
-                    ->orWhere('phone', 'like', '%'.$request->search.'%');
+                $q->where('name', 'like', '%' . $request->search . '%')
+                    ->orWhere('phone', 'like', '%' . $request->search . '%');
             })
             ->withCount(['orders as total_orders' => function ($q) {
-                $q->where('cashier_id', Auth::id());
+                $q->where('cashier_id', Auth::id())
+                    ->where('status', '!=', 'refunded');
             }])
             ->withSum(['orders as total_spent' => function ($q) {
-                $q->where('cashier_id', Auth::id());
+                $q->where('cashier_id', Auth::id())
+                    ->where('status', '!=', 'refunded');
             }], 'total')
             ->orderBy('last_order_at', 'desc')
             ->get()
@@ -47,11 +50,11 @@ class CustomerController extends Controller
     {
         $customers = Customer::query()
             ->when($request->search, function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->search.'%')
-                    ->orWhere('phone', 'like', '%'.$request->search.'%');
+                $q->where('name', 'like', '%' . $request->search . '%')
+                    ->orWhere('phone', 'like', '%' . $request->search . '%');
             })
-            ->withCount('orders as total_orders')
-            ->withSum('orders as total_spent', 'total')
+            ->withCount(['orders as total_orders' => fn($q) => $q->where('status', '!=', 'refunded')])
+            ->withSum(['orders as total_spent' => fn($q) => $q->where('status', '!=', 'refunded')], 'total')
             ->orderBy('last_order_at', 'desc')
             ->get();
 
@@ -63,8 +66,8 @@ class CustomerController extends Controller
         $customers = Customer::whereHas('orders', function ($q) {
             $q->where('cashier_id', Auth::id());
         })
-            ->where('name', 'like', '%'.$request->q.'%')
-            ->orWhere('phone', 'like', '%'.$request->q.'%')
+            ->where('name', 'like', '%' . $request->q . '%')
+            ->orWhere('phone', 'like', '%' . $request->q . '%')
             ->limit(10)
             ->get();
 
@@ -135,6 +138,7 @@ class CustomerController extends Controller
         // Calculate stats from filtered orders only
         $totalOrders = $orders->count();
         $totalSpent = $orders->sum('total');
+        $validOrders = $orders->where('status', '!=', 'refunded');
         $customer->total_orders = $totalOrders;
         $customer->total_spent = $totalSpent;
         $customer->avg_order = $totalOrders > 0 ? $totalSpent / $totalOrders : 0;
@@ -149,13 +153,13 @@ class CustomerController extends Controller
     {
         $userId = Auth::id();
 
-        $customers = Customer::whereHas('orders', fn ($q) => $q->where('cashier_id', $userId))
+        $customers = Customer::whereHas('orders', fn($q) => $q->where('cashier_id', $userId))
             ->with(['orders' => function ($q) use ($userId) {
                 $q->where('cashier_id', $userId)->with('items');
             }])
             ->get();
 
-        $filename = 'customers_'.now()->format('Y_m_d').'.csv';
+        $filename = 'customers_' . now()->format('Y_m_d') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
@@ -216,7 +220,7 @@ class CustomerController extends Controller
             ->orderBy('last_order_at', 'desc')
             ->get();
 
-        $filename = 'all_customers_'.now()->format('Y_m_d').'.csv';
+        $filename = 'all_customers_' . now()->format('Y_m_d') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
@@ -252,7 +256,7 @@ class CustomerController extends Controller
 
             fputcsv($file, []);
             fputcsv($file, ['Total Customers', $customers->count()]);
-            fputcsv($file, ['Total Revenue', '$'.number_format($customers->sum('total_spent'), 2)]);
+            fputcsv($file, ['Total Revenue', '$' . number_format($customers->sum('total_spent'), 2)]);
 
             fclose($file);
         };

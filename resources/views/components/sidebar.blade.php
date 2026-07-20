@@ -69,15 +69,12 @@
                 localStorage.setItem('submenu-inventory', this.inventoryOpen ? 'open' : 'closed');
             }
         }">
-            <button @click="toggleSubmenu()"
+            <button @click="open ? toggleSubmenu() : window.location.href = '{{ route('admin.inventory') }}'"
                 class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all {{ request()->routeIs('admin.inventory*') ? 'bg-blue-50 dark:bg-zinc-900 text-p dark:text-zinc-100' : 'text-gray-700 dark:text-zinc-400 hover:bg-gray-200/30 dark:hover:bg-zinc-900/50' }}"
                 :class="open ? '' : 'justify-center'">
                 <x-heroicon-o-archive-box class="w-5 h-5 shrink-0" />
                 <span x-show="open" class="text-sm font-medium whitespace-nowrap flex-1 text-left">Inventory</span>
-                <svg x-show="open" :class="inventoryOpen ? 'rotate-180' : ''" class="w-4 h-4 transition-transform"
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
+                <x-heroicon-o-chevron-down x-show="open" :class="inventoryOpen ? 'rotate-180' : ''" class="w-4 h-4 transition-transform" />
             </button>
 
             {{-- Submenu --}}

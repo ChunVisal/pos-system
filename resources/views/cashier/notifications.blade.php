@@ -102,7 +102,7 @@
                                     @endif
 
                                     <span>&bull;</span>
-                                    <span>{{ $notif->updated_at->diffForHumans() }}</span>
+                                    <span>{{ $notif->created_at->diffForHumans() }}</span>
                                 </div>
                             </div>
 

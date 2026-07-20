@@ -43,15 +43,27 @@ class NotificationController extends Controller
 
     public function approve(Request $request, $id)
     {
-        $request->validate([
-            'quantity' => 'required|integer|min:1',
-        ]);
 
         $stockRequest = StockRequest::with('product')->findOrFail($id);
 
         if ($stockRequest->status !== 'pending') {
             return back()->with('error', 'This request was already processed.');
         }
+
+        // New product - no stock, just approve
+        if (!$stockRequest->product_id) {
+            $stockRequest->update([
+                'status' => 'approved',
+                'approved_by' => Auth::id(),
+                'seen_at' => null,
+            ]);
+            return back()->with('success', 'Request acknowledged');
+        }
+
+
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
 
         $quantity = (int) $request->quantity;
         $product = $stockRequest->product;

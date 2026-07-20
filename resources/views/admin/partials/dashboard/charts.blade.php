@@ -13,7 +13,7 @@
                 <h3 class="text-[15px] font-semibold text-gray-800 dark:text-zinc-100">Sales Overview</h3>
                 <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
                     Total: <span
-                        class="font-semibold text-[#0F6E8C]">${{ number_format(array_sum(array_column($salesChart, 'total')), 2) }}</span>
+                        class="font-semibold text-[#0F6E8C] dark:text-[#1389af] ">${{ number_format($totalRevenue, 2) }}</span>
                     · {{ count($salesChart) }} days
                 </p>
             </div>

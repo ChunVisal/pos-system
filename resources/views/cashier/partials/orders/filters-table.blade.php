@@ -36,25 +36,26 @@
                     Time</button>
             </div>
         </div>
+
         {{-- Payment Filter --}}
         <div class="relative" x-data="{ open: false, selected: 'All Payments' }">
             <button @click="open = !open"
-                class="flex items-center gap-2 px-3 py-1.5 text-xs border border-gray-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 whitespace-nowrap">
-                <i class="fa-solid fa-credit-card text-[#1A1F7C] dark:text-zinc-400 "></i>
+                class="flex items-center gap-2 px-3 py-1.5 text-xs border border-gray-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 whitespace-nowrap">
+                <i class="fa-solid fa-credit-card text-[#1A1F7C] dark:text-zinc-400"></i>
                 <span x-text="selected"></span>
-                <i class="fa-solid fa-chevron-down text-gray-400 text-[10px]"></i>
+                <i class="fa-solid fa-chevron-down text-gray-400 dark:text-zinc-400 text-[10px]"></i>
             </button>
             <div x-show="open" @click.outside="open = false" x-cloak
-                class="absolute right-0 mt-1 w-36 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md shadow-lg z-20 py-1">
+                class="absolute right-0 mt-1 w-36 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md shadow-lg z-20 py-1">
                 <button @click="selected = 'All Payments'; open = false; filterPayment('all')"
-                    class="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-zinc-800">All
+                    class="block w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-700">All
                     Payments</button>
                 <button @click="selected = 'Cash'; open = false; filterPayment('cash')"
-                    class="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-zinc-800">Cash</button>
+                    class="block w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-700">Cash</button>
                 <button @click="selected = 'Card'; open = false; filterPayment('card')"
-                    class="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-zinc-800">Card</button>
+                    class="block w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-700">Card</button>
                 <button @click="selected = 'KHQR'; open = false; filterPayment('khqr')"
-                    class="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-zinc-800">KHQR</button>
+                    class="block w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-700">KHQR</button>
             </div>
         </div>
     </div>
@@ -119,6 +120,12 @@
                                 <button @click="viewOrder(order.id)" class="text-yellow-400 hover:text-yellow-500">
                                     <i class="fa-solid fa-receipt text-lg"></i>
                                 </button>
+                                <button x-show="order.status === 'completed'" @click="refundOrder(order.id)"
+                                    class="text-xs font-medium text-red-500 hover:text-red-600 ml-2">
+                                    Refund
+                                </button>
+                                <span x-show="order.status === 'refunded'"
+                                    class="text-xs ml-1 font-medium text-green-600">Refunded</span>
                             </td>
                         </tr>
                     </template>

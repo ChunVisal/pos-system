@@ -122,32 +122,41 @@
                             <div
                                 class="flex flex-wrap items-center gap-3 bg-gray-50/50 dark:bg-zinc-950/20 p-3 lg:p-0 rounded-md lg:bg-transparent lg:dark:bg-transparent">
 
-                                {{-- Approval Form Component --}}
-                                <form action="{{ route('admin.notifications.approve', $req->id) }}" method="POST"
-                                    class="flex items-center gap-2">
-                                    @csrf
-                                    <input type="number" name="quantity" value="{{ $req->quantity_requested }}"
-                                        min="1"
-                                        max="{{ $req->product_id ? $req->product->stock_quantity ?? 0 : $req->quantity_requested }}"
-                                        class="w-16 text-xs text-center border rounded px-2 py-1 dark:text-gray-200 bg-white dark:bg-zinc-800">
-
-                                    @if (($req->product->stock_quantity ?? 0) <= 0)
-                                        <button type="button" disabled
-                                            class="px-3 py-1.5 text-xs font-medium text-white dark:text-zinc-900 bg-gray-400 rounded-md cursor-not-allowed">
-                                            Out of Stock
-                                        </button>
-                                    @elseif(($req->product->stock_quantity ?? 0) < $req->quantity_requested)
+                                @if (!$req->product_id)
+                                    {{-- New product - simple approve --}}
+                                    <form action="{{ route('admin.notifications.approve', $req->id) }}" method="POST">
+                                        @csrf
                                         <button type="submit"
-                                            class="px-3 py-1.5 text-xs font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600">
-                                            Partial ({{ $req->product->stock_quantity ?? 0 }} available)
-                                        </button>
-                                    @else
-                                        <button type="submit"
-                                            class="px-3 py-1.5 text-xs font-medium text-white bg-green-500 rounded-md hover:bg-green-600">
+                                            class="px-3 py-1 text-xs font-medium text-white bg-green-500 rounded-md hover:bg-green-600">
                                             Approve
                                         </button>
-                                    @endif
-                                </form>
+                                    </form>
+                                @else
+                                    <form action="{{ route('admin.notifications.approve', $req->id) }}" method="POST"
+                                        class="flex items-center gap-2">
+                                        @csrf
+                                        <input type="number" name="quantity" value="{{ $req->quantity_requested }}"
+                                            min="1" max="{{ $req->product->stock_quantity ?? 0 }}"
+                                            class="w-16 text-xs text-center border rounded px-2 py-1 dark:text-gray-200 bg-white dark:bg-zinc-800">
+
+                                        @if (($req->product->stock_quantity ?? 0) <= 0)
+                                            <button type="button" disabled
+                                                class="px-3 py-1.5 text-xs font-medium text-white bg-gray-400 rounded-md cursor-not-allowed">
+                                                Out of Stock
+                                            </button>
+                                        @elseif(($req->product->stock_quantity ?? 0) < $req->quantity_requested)
+                                            <button type="submit"
+                                                class="px-3 py-1.5 text-xs font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600">
+                                                Partial ({{ $req->product->stock_quantity }} available)
+                                            </button>
+                                        @else
+                                            <button type="submit"
+                                                class="px-3 py-1.5 text-xs font-medium text-white bg-green-500 rounded-md hover:bg-green-600">
+                                                Approve
+                                            </button>
+                                        @endif
+                                    </form>
+                                @endif
 
                                 <div class="hidden sm:block w-[1px] h-6 bg-gray-200 dark:bg-zinc-800"></div>
 

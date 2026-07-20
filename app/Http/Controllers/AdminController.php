@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Categories;
 use App\Models\Product;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -13,15 +14,21 @@ class AdminController extends Controller
         $start = $request->start_date ?? now()->subDays(14)->format('Y-m-d');
         $end = $request->end_date ?? now()->format('Y-m-d');
 
+        $totalRevenue = Order::where('status', '!=', 'refunded')
+            ->whereBetween('created_at', [$start, $end])
+            ->sum('total');
+
         return view('admin.dashboard', [
             'start' => $start,
             'end' => $end,
+            'totalRevenue' => $totalRevenue,
             'summaryCards' => DashboardController::getSummaryCards(),
             'topProducts' => DashboardController::getTopProducts(),
             'topCategories' => DashboardController::getTopCategories(),
             'topCashiers' => DashboardController::getTopCashiers(),
             'salesChart' => DashboardController::getSalesChart($start, $end),
             'paymentBreakdown' => DashboardController::getPaymentBreakdown(),
+
         ]);
     }
 

@@ -10,6 +10,7 @@
         <div class="p-5">
             @include('cashier.partials.orders.header-cards')
             @include('cashier.partials.orders.filters-table')
+            @include('cashier.partials.orders.refund')
         </div>
         @include('cashier.partials.pos.receipt')
     </div>

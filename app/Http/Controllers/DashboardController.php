@@ -18,25 +18,24 @@ class DashboardController extends Controller
             $periodStart = Carbon::parse($start)->startOfDay();
             $periodEnd = Carbon::parse($end)->endOfDay();
 
-            $todaySales = Order::whereBetween('created_at', [$periodStart, $periodEnd])->sum('total');
-            $yesterdaySales = Order::whereBetween('created_at', [Carbon::parse($start)->subDay()->startOfDay(), Carbon::parse($end)->subDay()->endOfDay()])->sum('total');
+            $todaySales = Order::where('status', '!=', 'refunded')->whereDate('created_at', today())->sum('total');
+            $yesterdaySales = Order::where('status', '!=', 'refunded')->whereDate('created_at', yesterday())->sum('total');
             $todayOrders = Order::whereBetween('created_at', [$periodStart, $periodEnd])->count();
         } else {
             $today = Carbon::today();
             $yesterday = Carbon::yesterday();
 
-            $todaySales = Order::whereDate('created_at', $today)->sum('total');
-            $yesterdaySales = Order::whereDate('created_at', $yesterday)->sum('total');
-            $todayOrders = Order::whereDate('created_at', $today)->count();
+            $todaySales = Order::where('status', '!=', 'refunded')->whereDate('created_at', $today)->sum('total');
+            $yesterdaySales = Order::where('status', '!=', 'refunded')->whereDate('created_at', $yesterday)->sum('total');
+            $todayOrders = Order::where('status', '!=', 'refunded')->whereDate('created_at', $today)->count();
         }
-
         // Percentage change from yesterday
         $salesChange = $yesterdaySales > 0
             ? round((($todaySales - $yesterdaySales) / $yesterdaySales) * 100, 1)
             : 0;
 
-        $totalRevenue = Order::sum('total');
-        $totalProducts = Product::count();
+        $totalOrders = Order::where('status', '!=', 'refunded')->count();
+        $totalRevenue = Order::where('status', '!=', 'refunded')->sum('total');
         $lowStock = Product::whereColumn('stock_quantity', '<', 'low_stock_threshold')
             ->where('stock_quantity', '>', 0)->count();
         $outOfStock = Product::where('stock_quantity', '<=', 0)->count();
@@ -46,11 +45,12 @@ class DashboardController extends Controller
                 'title' => 'Total Revenue',
                 'value' => '$' . number_format($totalRevenue, 2),
                 'icon' => 'fa-solid fa-dollar-sign',
-                'iconBg' => '#10B981',
-                'iconColor' => '#10B981',
+                'iconBg' => '#FFD700', // gold color
+                'iconColor' => '#FFD700', // gold color
                 'trend' => 'up',
                 'percentage' => 'All time',
                 'period' => 'Lifetime earnings',
+                'highlight' => true,
             ],
             [
                 'title' => 'Sales Today',
@@ -63,14 +63,14 @@ class DashboardController extends Controller
                 'period' => 'Yesterday: $' . number_format($yesterdaySales, 2),
             ],
             [
-                'title' => 'Total Products',
-                'value' => $totalProducts,
-                'icon' => 'fa-solid fa-cube',
+                'title' => 'Total Orders',
+                'value' => $totalOrders,
+                'icon' => 'fa-solid fa-receipt',
                 'iconBg' => '#8B5CF6',
                 'iconColor' => '#8B5CF6',
                 'trend' => 'up',
-                'percentage' => $lowStock . ' low',
-                'period' => $outOfStock . ' out of stock',
+                'percentage' => Order::whereDate('created_at', today())->count() . ' today',
+                'period' => 'All time',
             ],
             [
                 'title' => 'Low Stock Alert',
@@ -80,23 +80,24 @@ class DashboardController extends Controller
                 'iconColor' => '#EF4444',
                 'trend' => 'down',
                 'percentage' => $outOfStock . ' items',
-                'period' => 'Need restock',
+                'period' => 'Out Of Stock',
             ],
         ];
     }
 
     public static function getTopProducts($limit = 5)
     {
-        $items = OrderItem::select(
-            'name',
-            'product_id',
-            DB::raw('SUM(quantity) as total_qty'),
-            DB::raw('SUM(total) as total_revenue'),
-            DB::raw('COUNT(DISTINCT order_id) as order_count'),
-            DB::raw('ROUND(SUM(total) / SUM(quantity), 2) as avg_sale_price')
-        )
+        $items = OrderItem::whereHas('order', fn($q) => $q->where('status', '!=', 'refunded'))
+            ->select(
+                'name',
+                'product_id',
+                DB::raw('SUM(quantity) as total_qty'),
+                DB::raw('SUM(total) as total_revenue'),
+                DB::raw('COUNT(DISTINCT order_id) as order_count'),
+                DB::raw('ROUND(SUM(total) / SUM(quantity), 2) as avg_sale_price')
+            )
             ->groupBy('name', 'product_id')
-            ->orderByDesc('total_qty')
+            ->orderByDesc('total_revenue')
             ->limit($limit)
             ->get();
 
@@ -123,6 +124,7 @@ class DashboardController extends Controller
     {
         $items = OrderItem::join('products', 'order_items.product_id', '=', 'products.id')
             ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->whereHas('order', fn($q) => $q->where('status', '!=', 'refunded'))
             ->select(
                 'categories.id',
                 'categories.name',
@@ -160,10 +162,10 @@ class DashboardController extends Controller
         })->toArray();
     }
 
-    // DashboardController.php
     public static function getTopCashiers($limit = 5)
     {
-        return Order::join('users', 'orders.cashier_id', '=', 'users.id')
+        return Order::where('orders.status', '!=', 'refunded')
+            ->join('users', 'orders.cashier_id', '=', 'users.id')
             ->select(
                 'users.id',
                 'users.name',
@@ -181,7 +183,8 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($cashier) {
                 $cashier->total_items_sold = OrderItem::whereHas('order', function ($q) use ($cashier) {
-                    $q->where('cashier_id', $cashier->id);
+                    $q->where('cashier_id', $cashier->id)
+                        ->where('orders.status', '!=', 'refunded');
                 })->sum('quantity');
 
                 return $cashier;
@@ -199,7 +202,9 @@ class DashboardController extends Controller
             $data[] = [
                 'label_short' => $current->format('M d'),
                 'label_full' => $current->format('M d, Y'),
-                'total' => Order::whereDate('created_at', $current)->sum('total') ?: 0,
+                'total' => Order::where('status', '!=', 'refunded')
+                    ->whereDate('created_at', $current)
+                    ->sum('total') ?: 0,
             ];
             $current->addDay();
         }

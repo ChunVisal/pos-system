@@ -11,26 +11,38 @@ class OrderData
     {
         $userId = Auth::id();
 
-        $totalSales = Order::where('cashier_id', $userId)->sum('total');
-        $totalOrders = Order::where('cashier_id', $userId)->count();
-        $avgOrder = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
+        $totalSales = Order::where('cashier_id', $userId)
+            ->where('status', '!=', 'refunded')
+            ->sum('total');
+        $todaySales = Order::where('cashier_id', $userId)
+            ->where('status', '!=', 'refunded')
+            ->whereDate('created_at', now()->toDateString())
+            ->sum('total');
+
+        $totalOrders = Order::where('cashier_id', $userId)
+            ->where('status', '!=', 'refunded')
+            ->count();
+
         $totalItems = Order::where('cashier_id', $userId)
+            ->where('status', '!=', 'refunded')
             ->join('order_items', 'orders.id', '=', 'order_items.order_id')
             ->sum('order_items.quantity');
+
+        $avgOrder = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
 
         return [
             [
                 'title' => 'Total Sales',
-                'value' => '$'.number_format($totalSales, 2),
+                'value' => '$' . number_format($totalSales, 2),
                 'icon' => 'fa-solid fa-dollar-sign',
                 'iconBg' => '#10B981',
                 'iconColor' => '#10B981',
                 'dot' => '#10B981',
-                'subtitle' => $totalOrders.' orders',
+                'subtitle' => '$' . number_format($todaySales, 2) . ' Today',
             ],
             [
                 'title' => 'Average Order',
-                'value' => '$'.number_format($avgOrder, 2),
+                'value' => '$' . number_format($avgOrder, 2),
                 'icon' => 'fa-solid fa-chart-line',
                 'iconBg' => '#0F6E8C',
                 'iconColor' => '#0F6E8C',

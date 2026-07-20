@@ -48,11 +48,8 @@ class CashierController extends Controller
             })
             ->get()
             ->map(function ($product) use ($cashierId) {
-                $stock = $product->cashierStocks()
-                    ->where('cashier_id', $cashierId)
-                    ->first();
-                $product->available_stock = $stock ? $stock->allocated_quantity - $stock->sold_quantity : 0;
-
+                $stocks = $product->cashierStocks()->where('cashier_id', $cashierId)->get();
+                $product->available_stock = $stocks->sum('allocated_quantity') - $stocks->sum('sold_quantity');
                 return $product;
             });
 
@@ -222,7 +219,7 @@ class CashierController extends Controller
                     'order_number' => $order->order_number,
                     'total' => $total,
                     'change' => $change,
-                    'discount' => $discount, 
+                    'discount' => $discount,
                     'is_vip' => $isVip,
                     'vip_discount' => $vipDiscount,
                 ],

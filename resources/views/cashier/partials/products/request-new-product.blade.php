@@ -59,7 +59,7 @@
                             <div @click="open = !open"
                                 class="w-full text-xs border border-gray-200 dark:border-zinc-800 rounded-md px-3 py-2 bg-white dark:bg-zinc-950 cursor-pointer flex items-center justify-between text-gray-900 dark:text-zinc-100">
                                 <span x-text="selectedProductName || 'Choose product...'"
-                                    :class="!selectedProductName && 'text-gray-400 dark:text-zinc-500'"></span>
+                                    :class="!item.name && 'text-gray-400 dark:text-zinc-500'"></span>
                                 <svg class="w-3.5 h-3.5 text-gray-400 dark:text-zinc-500" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -76,7 +76,7 @@
                                 <template
                                     x-for="product in allProducts.filter(p => !searchTerm || p.name.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 20)"
                                     :key="product.id">
-                                    <div @click="item.product_id = product.id; selectedProductName = product.name; item.name = product.name; open = false"
+                                    <div @click="item.product_id = product.id; item.name = product.name; open = false"
                                         class="px-3 py-1.5 text-xs text-gray-900 dark:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer">
                                         <span x-text="product.name"></span>
                                         <span class="text-gray-400 dark:text-zinc-500 ml-2"

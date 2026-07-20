@@ -11,9 +11,12 @@ class CustomerData
     {
         $userId = Auth::id();
 
-        $customers = Customer::whereHas('orders', fn ($q) => $q->where('cashier_id', $userId))
-            ->withCount(['orders as total_orders' => fn ($q) => $q->where('cashier_id', $userId)])
-            ->withSum(['orders as total_spent' => fn ($q) => $q->where('cashier_id', $userId)], 'total')
+        $customers = Customer::whereHas('orders', fn($q) => $q->where('cashier_id', $userId)
+            ->where('status', '!=', 'refunded'))
+            ->withCount(['orders as total_orders' => fn($q) => $q->where('cashier_id', $userId)
+                ->where('status', '!=', 'refunded')])
+            ->withSum(['orders as total_spent' => fn($q) => $q->where('cashier_id', $userId)
+                ->where('status', '!=', 'refunded')], 'total')
             ->get();
 
         return [
@@ -29,7 +32,7 @@ class CustomerData
             ],
             [
                 'title' => 'VIP Members',
-                'value' => $customers->filter(fn ($c) => $c->total_orders >= 6 || $c->total_spent >= 5000)->count(),
+                'value' => $customers->filter(fn($c) => $c->total_orders >= 6 || $c->total_spent >= 5000)->count(),
                 'icon' => 'fa-solid fa-crown',
                 'iconBg' => '#EAB308',
                 'iconColor' => '#EAB308',
@@ -39,7 +42,7 @@ class CustomerData
             ],
             [
                 'title' => 'Regular',
-                'value' => $customers->filter(fn ($c) => ($c->total_orders >= 3 || $c->total_spent >= 2000) && $c->total_orders < 6 && $c->total_spent < 5000)->count(),
+                'value' => $customers->filter(fn($c) => ($c->total_orders >= 3 || $c->total_spent >= 2000) && $c->total_orders < 6 && $c->total_spent < 5000)->count(),
                 'icon' => 'fa-solid fa-repeat',
                 'iconBg' => '#2563EB',
                 'iconColor' => '#2563EB',
@@ -49,7 +52,7 @@ class CustomerData
             ],
             [
                 'title' => 'New Customers',
-                'value' => $customers->filter(fn ($c) => $c->total_orders < 3 && $c->total_spent < 2000)->count(),
+                'value' => $customers->filter(fn($c) => $c->total_orders < 3 && $c->total_spent < 2000)->count(),
                 'icon' => 'fa-solid fa-walking',
                 'iconBg' => '#16A34A',
                 'iconColor' => '#16A34A',
@@ -65,13 +68,13 @@ class CustomerData
         $totalCustomers = Customer::count('*');
 
         // Calculate segments based on actual order data
-        $customers = Customer::withCount('orders as total_orders')
-            ->withSum('orders as total_spent', 'total')
+        $customers = Customer::withCount(['orders as total_orders' => fn($q) => $q->where('status', '!=', 'refunded')])
+            ->withSum(['orders as total_spent' => fn($q) => $q->where('status', '!=', 'refunded')], 'total')
             ->get();
 
-        $vip = $customers->filter(fn ($c) => $c->total_orders >= 6 || $c->total_spent >= 5000)->count();
-        $regular = $customers->filter(fn ($c) => ($c->total_orders >= 3 || $c->total_spent >= 2000) && $c->total_orders < 6 && $c->total_spent < 5000)->count();
-        $new = $customers->filter(fn ($c) => $c->total_orders < 3 && $c->total_spent < 2000)->count();
+        $vip = $customers->filter(fn($c) => $c->total_orders >= 6 || $c->total_spent >= 5000)->count();
+        $regular = $customers->filter(fn($c) => ($c->total_orders >= 3 || $c->total_spent >= 2000) && $c->total_orders < 6 && $c->total_spent < 5000)->count();
+        $new = $customers->filter(fn($c) => $c->total_orders < 3 && $c->total_spent < 2000)->count();
 
         return [
             [

@@ -8,6 +8,10 @@ class Order extends Model
 {
     protected $fillable = ['order_number', 'cashier_id', 'customer_id', 'subtotal', 'tax', 'total', 'discount', 'status', 'notes'];
 
+    protected $casts = [
+        'refunded_at' => 'datetime',
+    ];
+
     public function items()
     {
         return $this->hasMany(OrderItem::class);

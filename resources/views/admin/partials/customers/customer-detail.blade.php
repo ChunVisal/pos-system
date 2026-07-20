@@ -103,10 +103,19 @@
                                 <span class="text-xs font-bold text-[#0F6E8C]">$<span
                                         x-text="parseFloat(order.total).toFixed(2)"></span></span>
                             </div>
+                            add this top right corner ribbon <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs font-semibold" x-text="order.order_number"></span>
+                                <div class="flex items-center gap-2">
+                                    <span x-show="order.status === 'refunded'"
+                                        class="text-[10px] px-1.5 py-0.5 bg-red-100 text-red-700 rounded-full">Refunded</span>
+                                    <span class="text-xs font-bold text-[#0F6E8C]">$<span
+                                            x-text="parseFloat(order.total).toFixed(2)"></span></span>
+                                </div>
+                            </div>
                             <div class="flex justify-between text-[11px] text-gray-500 mb-2">
-                                {{-- <span
+                                <span
                                     x-text="new Date(order.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'})"></span>
-                                <span class="capitalize px-2 py-0.5 rounded-full text-[10px]" --}}
+                                <span class="capitalize px-2 py-0.5 rounded-full text-[10px]"
                                     :class="order.payment?.method === 'cash' ? 'bg-green-100 text-green-700' : order.payment
                                         ?.method === 'card' ? 'bg-blue-100 text-blue-700' :
                                         'bg-purple-100 text-purple-700'"

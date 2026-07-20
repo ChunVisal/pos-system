@@ -19,6 +19,11 @@
             tabProducts.classList.toggle('font-semibold', isProducts);
             tabProducts.classList.toggle('text-gray-500', !isProducts);
             tabProducts.classList.toggle('font-medium', !isProducts);
+            tabProducts.classList.toggle('text-blue-500', isProducts);
+            tabProducts.classList.toggle('text-[#0F6E8C]', isProducts);
+
+            tabProducts.classList.toggle('text-blue-500', !isProducts && false); // To clear if previously set
+       
 
             tabCategories.classList.toggle('text-[#0F6E8C]', isCategories);
             tabCategories.classList.toggle('font-semibold', isCategories);

@@ -95,6 +95,7 @@ Route::middleware(['auth', 'role:cashier'])->group(function () {
     Route::get('/cashier/orders/export', [OrderController::class, 'export'])->name('cashier.orders.export');
     Route::get('/cashier/orders', [OrderController::class, 'index'])->name('cashier.orders');
     Route::get('/cashier/orders/{id}', [OrderController::class, 'show'])->name('cashier.orders.show');
+    Route::post('/cashier/orders/{id}/refund', [OrderController::class, 'refund']);
 });
 
 // Auth routes (already there)

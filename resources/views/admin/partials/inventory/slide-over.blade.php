@@ -17,15 +17,16 @@
         </div>
 
         <form class="flex-1 overflow-y-auto px-5 py-4 space-y-5">
-            <div x-data="{ search: '', open: false, selectedName: '' }">
+            <div x-data="{ search: '', open: false }">
                 <label
                     class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 mb-1">Product</label>
 
                 {{-- Click to open --}}
                 <div @click="open = !open"
                     class="w-full text-sm px-3 py-2 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 cursor-pointer flex items-center justify-between transition-colors">
-                    <span x-text="selectedName || 'Select product'"
-                        :class="!selectedName && 'text-gray-500 dark:text-zinc-400'"></span>
+                    <span
+                        x-text="products.find(p => p.code === form.product_code) ? (products.find(p => p.code === form.product_code).name + ' (' + form.product_code + ')') : 'Select product'"
+                        :class="!form.product_code && 'text-gray-500 dark:text-zinc-400'"></span>
                     <x-heroicon-o-chevron-down class="w-4 h-4 text-gray-400 dark:text-zinc-400" />
                 </div>
 
@@ -38,7 +39,8 @@
 
                     @foreach ($products as $product)
                         <div x-show="!search || '{{ strtolower($product->name) }} {{ strtolower($product->code) }}'.includes(search.toLowerCase())"
-                            @click="form.product_code = '{{ $product->code }}'; selectedName = '{{ $product->name }} ({{ $product->code }})'; open = false"
+                            @click="form.product_code = '{{ $product->code }}'; open = false"
+                            selectedName = '{{ $product->name }} ({{ $product->code }})'; open=false"
                             class="px-3 w-[400px] py-2 text-sm text-gray-850 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-700 cursor-pointer">
                             {{ $product->name }} <span
                                 class="text-gray-500 dark:text-zinc-500 text-xs">({{ $product->code }})</span>
@@ -57,11 +59,7 @@
                         :class="form.type === 'in' ?
                             'bg-green-50 dark:bg-green-950/40 border-green-300 dark:border-green-800 text-green-700 dark:text-green-400' :
                             'border-gray-300 dark:border-zinc-700 text-gray-500 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800'">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="w-3.5 h-3.5">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 19.5V4.5m0 0L5.25 11.25M12 4.5l6.75 6.75" />
-                        </svg>
+                        <x-heroicon-o-arrow-long-up class="w-3.5 h-3.5" />
                         Stock In
                     </button>
                     <button type="button" @click="form.type = 'out'"
@@ -69,13 +67,10 @@
                         :class="form.type === 'out' ?
                             'bg-red-50 dark:bg-red-950/40 border-red-300 dark:border-red-800 text-red-700 dark:text-red-400' :
                             'border-gray-300 dark:border-zinc-700 text-gray-500 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800'">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="w-3.5 h-3.5">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75" />
-                        </svg>
+                        <x-heroicon-o-arrow-long-down class="w-3.5 h-3.5" />
                         Stock Out
                     </button>
+           
                 </div>
             </div>
 

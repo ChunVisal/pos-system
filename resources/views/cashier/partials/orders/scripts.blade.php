@@ -15,9 +15,7 @@
             restockItems: true,
 
             refundOrder(id) {
-                console.log('refundOrder called', id);
                 const order = this.orders.find(o => o.id === id);
-                console.log('found order:', order);
                 if (!order) return;
                 this.refundOrderId = id;
                 this.refundOrderNumber = order.order_number;

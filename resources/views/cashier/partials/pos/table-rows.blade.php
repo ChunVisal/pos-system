@@ -1,7 +1,7 @@
 <div x-show="selectedCategory === 'all' || selectedCategory === {{ $product->category_id }}"
     class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 overflow-hidden hover:shadow-md transition-all group flex flex-col rounded-sm h-full">
     {{-- Image --}}
-    <div class="w-full h-[160px] bg-gray-50 dark:bg-zinc-600 overflow-hidden">
+    <div class="w-full h-[175px] bg-gray-50 dark:bg-zinc-600 overflow-hidden">
         <img src="{{ $product->image ?? 'https://res.cloudinary.com/dexr27qho/image/upload/v1782723706/8fc9e618-ca35-4366-a173-ae4d15ec0aef_vyjksv.png' }}"
             alt="{{ $product->name }}" class="w-full h-full object-cover">
     </div>

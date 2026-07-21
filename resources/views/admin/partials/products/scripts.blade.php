@@ -15,8 +15,9 @@
                         search: query,
                         ajax: 1
                     }, function(data) {
-                        $('#productsTableBody').html(data.table);
-                        $('#productsGridBody').html(data.grid);
+                        const alpine = document.querySelector(
+                            '[x-data="productPage()"]').__x.$data;
+                        alpine.products = data.products;
                     });
                 }, 400);
             });
@@ -270,6 +271,19 @@
             submitting: false,
             selectedCategoryId: null,
             pendingName: '',
+            products: @json($products),
+            searchQuery: '',
+
+            get filteredProducts() {
+                if (!this.searchQuery) return this.products;
+                const q = this.searchQuery.toLowerCase();
+                return this.products.filter(p =>
+                    (p.name || '').toLowerCase().includes(q) ||
+                    (p.code || '').toLowerCase().includes(q) ||
+                    (p.barcode || '').toLowerCase().includes(q) ||
+                    (p.category?.name || '').toLowerCase().includes(q)
+                );
+            },
 
             form: {
                 id: null,

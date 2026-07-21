@@ -10,7 +10,7 @@
             Clear All
         </button>
     </div>
-    
+
     {{-- Cart Items - Scrollable --}}
     <div class="flex-1 overflow-y-auto tab-container p-3 space-y-2">
         <template x-for="(item, index) in cartItems" :key="index">
@@ -75,9 +75,16 @@
             <span class="text-[#0F6E8C]" x-text="'$' + total.toFixed(2)"></span>
         </div>
 
-        <button @click="openCheckout()" :disabled="cartItems.length === 0"
-            class="w-full py-2.5 text-sm font-semibold text-white bg-[#0F6E8C] rounded-lg hover:bg-[#0c5972] disabled:opacity-50 disabled:cursor-not-allowed transition">
-            Checkout
-        </button>
+        <div class="flex gap-2 items-center">
+            {{-- Hold Cart Button (High Contrast UI/UX) --}}
+            <button @click="holdCart()" :disabled="cartItems.length === 0"
+                class="flex-1 py-2.5 px-4 text-sm font-semibold text-white bg-amber-400 hover:bg-amber-500  dark:text-white dark:bg-amber-600 dark:hover:bg-amber-500 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                <i class="fa-solid fa-pause mr-1"></i> Hold Cart
+            </button>
+            <button @click="openCheckout()" :disabled="cartItems.length === 0"
+                class="flex-1  py-2.5 text-sm font-semibold text-white bg-[#0F6E8C] rounded-lg hover:bg-[#0c5972] disabled:opacity-50 disabled:cursor-not-allowed transition">
+                Checkout
+            </button>
+        </div>
     </div>
 </div>

@@ -10,6 +10,7 @@
         @include('cashier.partials.customer.header-cards')
         @include('cashier.partials.customer.filters-table')
         @include('cashier.partials.customer.customer-detail')
+        @include('cashier.partials.pos.receipt')
     </div>
     @push('head-scripts')
         @include('cashier.partials.customer.scripts')

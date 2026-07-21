@@ -13,20 +13,24 @@
             <template x-if="receiptData.status === 'refunded'">
                 <div class="pointer-events-none">
                     <div class="absolute right-[-52px] top-4 w-[170px] transform rotate-45 z-50">
-                        <div class="bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200 py-1 font-bold text-xs text-center shadow-md border border-red-200 dark:border-red-900 select-none">
+                        <div
+                            class="bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200 py-1 font-bold text-xs text-center shadow-md border border-red-200 dark:border-red-900 select-none">
                             REFUNDED
                         </div>
                     </div>
                     <div class="absolute right-6 top-[58px] w-[140px] text-center pointer-events-none">
-                        <p class="text-[10px] text-red-500 dark:text-red-300 px-2"
-                           x-text="receiptData.refund_reason"></p>
+                        <p class="text-[10px] text-red-500 dark:text-red-300 px-2" x-text="receiptData.refund_reason">
+                        </p>
                     </div>
                 </div>
             </template>
-       
+
             {{-- Header --}}
             <div class=" text-center mb-4">
-                <img src="{{ asset('images/logo.png') }}" alt="POS Technology Logo" class="mx-auto h-12 w-auto mb-2" />
+                <img src="{{ asset('images/logo.png') }}" alt="POS Technology Logo"
+                    class="mx-auto h-12 w-auto mb-2 dark:hidden" />
+                <img src="{{ asset('images/logodarkmode.png') }}" alt="POS Technology Logo"
+                    class="mx-auto h-12 w-auto mb-2 hidden dark:block" />
 
                 <p class="text-[10px] text-gray-500 dark:text-zinc-300 mt-0.5">123 Monivong Blvd, Phnom Penh</p>
                 <p class="text-[10px] text-gray-500 dark:text-zinc-300">Tel: 012 345 678</p>
@@ -91,7 +95,7 @@
             </div>
             <div class="flex justify-between ">
                 <span class="text-gray-500  dark:text-zinc-300">Tax (10%)</span>
-                <span>$<span x-text="receiptData.tax?.toFixed(2) || '0.00'"></span></span>
+                <span class="dark:text-zinc-200">$<span x-text="receiptData.tax?.toFixed(2) || '0.00'"></span></span>
             </div>
             <div class="flex justify-between text-base font-bold border-t pt-1 mt-1 dark:text-zinc-200">
                 <span>TOTAL</span>

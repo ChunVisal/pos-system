@@ -88,14 +88,14 @@
                     Orders</h4>
                 <div class="space-y-2">
                     <template x-for="order in customerOrders" :key="order.id">
-                        <div class="relative bg-gray-50 dark:bg-zinc-800 rounded-lg p-3 overflow-hidden">
+                        <div @click="viewOrder(order.id)"
+                            class="relative bg-gray-50 dark:bg-zinc-800 rounded-lg p-3 overflow-hidden">
 
-                            <!-- Corner Ribbon for refunded orders -->
+                            <!-- Top Right Ribbon for refunded orders -->
                             <template x-if="order.status === 'refunded'">
-                                <div
-                                    class="absolute top-2 right-[-40px] w-[120px] pointer-events-none select-none z-10">
-                                    <div class="bg-red-100 text-red-700 text-[9px] font-semibold px-0 py-0 h-4 w-full flex items-center justify-center shadow"
-                                        style="transform: rotate(45deg); border-radius: 0 0 6px 6px;">
+                                <div class="absolute top-0 right-0 w-[90px] pointer-events-none select-none z-10">
+                                    <div
+                                        class="bg-red-100 text-red-700 text-[11px] font-semibold h-5 w-full flex items-center justify-center shadow rounded-bl-md">
                                         Refunded
                                     </div>
                                 </div>
@@ -106,8 +106,10 @@
                                     x-text="order.order_number"></span>
                             </div>
                             <div class="flex justify-between text-[11px] text-gray-500 dark:text-zinc-300 mb-1">
-                                <span x-text="new Date(order.created_at).toLocaleDateString()"></span>
+                                <span
+                                    x-text="new Date(order.created_at).toLocaleDateString() + ' ' + new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })"></span>
                                 <span class="capitalize" x-text="order.payment?.method || '-'"></span>
+
                             </div>
                             {{-- Order Items --}}
                             <div class="mt-1 pt-1 border-t border-gray-200 dark:border-zinc-700">

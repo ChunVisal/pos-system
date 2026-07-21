@@ -31,14 +31,13 @@ class ProductController extends Controller
             ->with('category')
             ->get();
 
-        $categories = Categories::all();
-
-        if ($request->ajax === '1') {
+        if ($request->ajax) {
             return response()->json([
-                'table' => view('admin.partials.products.table-rows', compact('products'))->render(),
-                'grid' => view('admin.partials.products.grid-rows', compact('products'))->render(),
+                'products' => $products,
             ]);
         }
+
+        $categories = Categories::all();
 
         return view('admin.products', compact('products', 'categories'));
     }
@@ -48,7 +47,7 @@ class ProductController extends Controller
         try {
             $product = Product::findOrFail($id);
 
-            $imageUrl = $product->image; // keep existing by default
+            $imageUrl = $product->avatar; // keep existing by default
             if ($request->hasFile('image_file')) {
                 $imageUrl = $this->uploadToCloudinary($request->file('image_file')); // ← use private method
             } elseif ($request->image_url) {
@@ -63,7 +62,7 @@ class ProductController extends Controller
                 'status' => $request->status ?? $product->status,
                 'cost_price' => $request->cost_price ?? $product->cost_price,
                 'brand' => $request->brand ?? $product->brand,
-                'image' => $imageUrl,
+                'avatar' => $imageUrl,
                 'low_stock_threshold' => $request->low_stock_threshold ?? $product->low_stock_threshold,
                 // code and barcode intentionally omitted — never change them on update
             ]);

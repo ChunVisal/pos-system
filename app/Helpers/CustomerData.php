@@ -37,6 +37,7 @@ class CustomerData
                 'iconBg' => '#EAB308',
                 'iconColor' => '#EAB308',
                 'trend' => '+5%',
+                'badge' => '5% OFF',
                 'trendColor' => 'text-green-500',
                 'subtitle' => 'Spent over $5,000',
             ],
@@ -91,6 +92,7 @@ class CustomerData
                 'icon' => 'fa-solid fa-crown',
                 'iconBg' => '#EAB308',
                 'iconColor' => '#EAB308',
+                'badge' => '5% OFF',
                 'subtitle' => '6+ orders or $5,000+',
             ],
             [

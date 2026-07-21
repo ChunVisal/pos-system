@@ -79,20 +79,24 @@
                                 <div class="min-w-0">
                                     <p class="font-medium text-gray-800 dark:text-zinc-200 truncate"
                                         x-text="customer.name"></p>
+                                    <p class="text-xs text-gray-400 truncate" x-text="customer.email"></p>
                                     <p class="text-xs text-gray-400 truncate" x-text="customer.phone"></p>
                                 </div>
                             </div>
+
                         </td>
                         <td class="py-3 px-4">
-                            <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full"
+                            <span class="px-2 py-0.5 text-[11px] font-semibold rounded-full shadow-sm transition-colors"
                                 :class="(customer.total_orders >= 6 || customer.total_spent >= 5000) ?
-                                'bg-yellow-100 text-yellow-700 dark:text-yellow-300 dark:bg-yellow-500/30' :
+                                'bg-yellow-200/70 text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-300' :
                                 (customer.total_orders >= 3 || customer.total_spent >= 2000) ?
-                                'bg-blue-100 dark:bg-blue-300/50 text-blue-700 dark:text-blue-900' :
-                                'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400'"
+                                'bg-blue-200/60 text-blue-900 dark:bg-blue-600/20 dark:text-blue-400' :
+                                'bg-green-200/70 text-green-800 dark:bg-green-700/30 dark:text-green-400'"
                                 x-text="(customer.total_orders >= 6 || customer.total_spent >= 5000) ? 'VIP' : 
-                           (customer.total_orders >= 3 || customer.total_spent >= 2000) ? 'REGULAR' : 'NEW'"></span>
+                                   (customer.total_orders >= 3 || customer.total_spent >= 2000) ? 'REGULAR' : 'NEW'"></span>
                         </td>
+
+
                         <td class="py-3 px-2 text-center font-medium text-gray-700 dark:text-zinc-300"
                             x-text="customer.total_orders"></td>
                         <td class="py-3 px-4 font-semibold text-gray-700 dark:text-zinc-300">$<span
@@ -129,7 +133,7 @@
         <div class="flex items-center gap-1">
             <button @click="prevPage()" :disabled="currentPage === 1" type="button"
                 class="px-3 py-1 text-xs border border-gray-300 dark:border-zinc-700 rounded-md text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition">Previous</button>
-        <template x-for="page in pageNumbers" :key="page">
+            <template x-for="page in pageNumbers" :key="page">
                 <button x-show="page !== '...'" @click="goToPage(page)" type="button"
                     :class="currentPage === page ? 'bg-[#0F6E8C] text-white' :
                         'border border-gray-300 dark:border-zinc-700 text-gray-600 dark:text-zinc-300'"

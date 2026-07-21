@@ -25,6 +25,69 @@
                 <i class="bi bi-upc-scan text-base"></i>
                 <span class="hidden sm:inline">Scan</span>
             </button>
+            {{-- Held Carts Dropdown Section --}}
+            <div x-show="heldCartsList.length > 0" class="relative" x-data="{ open: false }">
+
+                {{-- Trigger Button --}}
+                <button @click="open = !open"
+                    class="w-full flex items-center justify-between px-3 py-2 rounded-full text-xs font-bold text-gray-800 dark:text-zinc-200 bg-gray-100 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-pause text-gray-600 dark:text-zinc-400 text-[11px]"></i>
+                        <span>Held Orders</span>
+                        <span
+                            class="px-2.5 py-1 text-[10px] font-bold text-gray-100 bg-gray-700 dark:bg-zinc-600 rounded-full"
+                            x-text="heldCartsList.length"></span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down text-[10px] px-1 rounded-full text-gray-500 dark:text-zinc-400 transition-transform duration-200"
+                        :class="open ? 'rotate-180' : ''"></i>
+                </button>
+
+                {{-- Dropdown Menu Container --}}
+                <div x-show="open" @click.outside="open = false" x-cloak
+                    class="absolute right-0 mt-1 w-[380px] sm:w-[420px] bg-white dark:bg-zinc-700 rounded-lg shadow-xl z-30 overflow-hidden max-h-72 overflow-y-auto divide-y divide-gray-100 dark:divide-zinc-800">
+
+                    <template x-for="cart in heldCartsList" :key="cart.id">
+                        <div
+                            class="group flex items-center justify-between p-3.5 hover:bg-gray-50 dark:hover:bg-zinc-800/60 transition-colors">
+
+                            {{-- Left Info Block --}}
+                            <div class="flex-1 min-w-0 pr-3">
+                                {{-- Top Row: Customer Name & Item Badge --}}
+                                <div class="flex items-center gap-2">
+                                    <p class="text-xs font-bold text-gray-900 dark:text-white truncate">
+                                        <span x-text="cart.note || 'Note to remember'"></span>
+                                    </p>
+                                    <span
+                                        class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-200 shrink-0"
+                                        x-text="cart.items.length + ' items'"></span>
+                                </div>
+
+                                {{-- Timestamp --}}
+                                <div
+                                    class="flex items-center gap-1.5 mt-1 text-[12px] text-gray-400 dark:text-zinc-300">
+                                    <i class="fa-regular fa-clock text-[9px]"></i>
+                                    <span x-text="cart.createdAt"></span>
+                                </div>
+                            </div>
+
+                            {{-- Right Actions Block --}}
+                            <div class="flex items-center gap-2 shrink-0">
+                                {{-- Note Edit Button --}}
+                                <button @click="cart.note = prompt('Add note:', cart.note || '')" title="Edit Note"
+                                    class="p-2 text-gray-400 dark:text-zinc-300 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors">
+                                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                </button>
+
+                                {{-- Resume Button --}}
+                                <button @click="resumeCart(cart); open = false"
+                                    class="px-3 py-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/80 border border-blue-200 dark:border-blue-800/80 rounded-md transition-colors shadow-sm">
+                                    Resume
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -1,21 +1,8 @@
 <nav
     class="bg-white dark:bg-black border-b border-gray-300 dark:border-zinc-800 px-5 py-2 pb-[10px] flex items-center justify-between sticky top-0 z-40 transition-colors duration-200">
 
-    <img x-data="{
-        isDark: document.documentElement.classList.contains('dark'),
-        init() {
-            this.$watch('isDark', () => {
-                this.isDark = document.documentElement.classList.contains('dark');
-            });
-            // Listen for dark mode changes
-            const observer = new MutationObserver(() => {
-                this.isDark = document.documentElement.classList.contains('dark');
-            });
-            observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-        }
-    }"
-        :src="isDark ? '{{ asset('images/logodarkmode.png') }}' : '{{ asset('images/logo.png') }}'" alt="Logo"
-        class="w-[90px]">
+    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-[90px] dark:hidden">
+    <img src="{{ asset('images/logodarkmode.png') }}" alt="Logo" class="w-[90px] hidden dark:block">
 
     <div class="flex items-center gap-3">
         <div class="hidden md:block relative">
@@ -104,7 +91,7 @@
                                     <span
                                         class="font-bold text-[#0F6E8C] dark:text-[#1389af]">{{ $notif->quantity_requested }}x</span>
                                     <span
-                                        class="font-medium text-gray-900 dark:text-zinc-100">{{ $notif->product->name ?? $notif->product_name ?? 'Unknown Product' }}</span>
+                                        class="font-medium text-gray-900 dark:text-zinc-100">{{ $notif->product->name ?? ($notif->product_name ?? 'Unknown Product') }}</span>
                                 </p>
 
                                 <div class="flex items-center gap-1.5 pt-0.5">

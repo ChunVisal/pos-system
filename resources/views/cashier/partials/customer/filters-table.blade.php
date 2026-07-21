@@ -78,8 +78,8 @@
                                 <div>
                                     <p class="font-medium text-gray-800 dark:text-zinc-200" x-text="customer.name">
                                     </p>
-                                    <p class="text-xs text-gray-400 dark:text-zinc-500" x-text="customer.email"></p>
-                                    <p class="text-xs text-gray-400 dark:text-zinc-500" x-text="customer.phone"></p>
+                                    <p class="text-xs truncate text-gray-400 dark:text-zinc-500" x-text="customer.email"></p>
+                                    <p class="text-xs truncate text-gray-400 dark:text-zinc-500" x-text="customer.phone"></p>
                                 </div>
 
                             </div>

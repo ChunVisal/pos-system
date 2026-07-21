@@ -68,6 +68,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/customers', [CustomerController::class, 'adminIndex'])->name('admin.customers');
     Route::get('/customers/{id}', [CustomerController::class, 'adminShow'])->name('admin.customers.show');
     Route::get('/customers/export/all', [CustomerController::class, 'adminExport'])->name('admin.customers.export');
+    Route::get('/customers/{customer}/order/{order}', [CustomerController::class, 'getOrder']);
 
     Route::get('/activitylog', [AdminController::class, 'activitylog'])->name('admin.activitylog');
 });

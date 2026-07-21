@@ -13,11 +13,9 @@
 
          @include('admin.partials.customers.filters-table')
 
-         @include('admin.partials.customers.slide-over')
-
-         @include('admin.partials.customers.detail-panel')
-
          @include('cashier.partials.customer.customer-detail')
+         
+         @include('cashier.partials.pos.receipt')
          {{-- </x-skeleton.userCustomers> --}}
      </div>
      @include('admin.partials.customers.scripts')

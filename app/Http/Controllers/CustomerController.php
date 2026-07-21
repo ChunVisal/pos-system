@@ -149,6 +149,15 @@ class CustomerController extends Controller
         ]);
     }
 
+    public function getOrder($customerId, $orderId)
+    {
+        $order = Order::with(['items', 'payment', 'customer'])
+            ->where('customer_id', $customerId)
+            ->findOrFail($orderId);
+
+        return response()->json(['order' => $order]);
+    }
+
     public function export()
     {
         $userId = Auth::id();

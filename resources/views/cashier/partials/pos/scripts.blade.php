@@ -70,6 +70,8 @@
             selectedCustomer: null,
             customerSaved: false,
 
+            heldCartsList: JSON.parse(localStorage.getItem('heldCarts') || '[]'),
+
             get subtotal() {
                 return this.cartItems.reduce((sum, i) => sum + (i.price * i.qty), 0);
             },
@@ -101,7 +103,7 @@
             get isVipCustomer() {
                 const vip = this.selectedCustomer?.segment === 'vip';
                 if (vip && this.discountValue > 0 && this.discountValue === parseFloat(this.vipDiscount.toFixed(
-                    2))) {
+                        2))) {
                     // If manual discount equals VIP discount, it was auto-set. Reset it.
                     this.discountValue = 0;
                 }
@@ -259,7 +261,37 @@
                 return this.total >= 700;
             },
 
+            holdCart() {
+                if (this.cartItems.length === 0) return;
+
+                const cart = {
+                    id: Date.now(),
+                    items: [...this.cartItems],
+                    customer: this.selectedCustomer ? {
+                        name: this.selectedCustomer.name
+                    } : null,
+                    note: '',
+                    createdAt: new Date().toLocaleString(),
+                };
+
+                this.heldCartsList.push(cart);
+                localStorage.setItem('heldCarts', JSON.stringify(this.heldCartsList));
+                this.cartItems = [];
+                this.selectedCustomer = null;
+            },
+
+            resumeCart(cart) {
+                if (this.cartItems.length > 0 && !confirm('Replace current cart?')) return;
+                this.cartItems = cart.items;
+                this.selectedCustomer = cart.customer;
+                this.heldCartsList = this.heldCartsList.filter(c => c.id !== cart.id);
+                localStorage.setItem('heldCarts', JSON.stringify(this.heldCartsList));
+            },
+
             processPayment() {
+
+                const received = Math.round(parseFloat(this.amountReceived || 0) * 100) / 100;
+                const total = Math.round(this.total * 100) / 100;
 
                 if (this.paymentMethod === 'cash' && (!this.amountReceived || parseFloat(this.amountReceived) < this
                         .total)) {

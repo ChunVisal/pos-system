@@ -36,7 +36,7 @@
     <div class="flex">
         @include('components.sidebar')
 
-        <main class="bg-gray-100 dark:bg-black transition-colors duration-300 flex-1 min-w-0  min-h-screen">
+        <main class="tab-container bg-gray-100 dark:bg-black transition-colors duration-300 flex-1 min-w-0  min-h-screen">
             @yield('content')
         </main>
     </div>

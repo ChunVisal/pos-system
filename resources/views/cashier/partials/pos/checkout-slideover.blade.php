@@ -302,8 +302,8 @@
                     Cancel
                 </button>
                 <button @click="processPayment()"
-                    :disabled="submitting || (paymentMethod === 'cash' && (!amountReceived || parseFloat(amountReceived) <
-                        total))"
+                    :disabled="submitting || (paymentMethod === 'cash' && (Math.round(parseFloat(amountReceived || 0) * 100) /
+                        100) < (Math.round(total * 100) / 100))"
                     class="flex-[2] py-2.5 text-sm font-bold text-white bg-[#0F6E8C] rounded-lg hover:bg-[#0c5972] disabled:opacity-50 transition">
                     <span
                         x-text="submitting ? 'Processing...' : requiresCustomer && !selectedCustomer ? 'Customer Info Required' : 'Complete Payment'"></span>

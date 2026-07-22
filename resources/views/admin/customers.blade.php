@@ -14,7 +14,7 @@
          @include('admin.partials.customers.filters-table')
 
          @include('cashier.partials.customer.customer-detail')
-         
+
          @include('cashier.partials.pos.receipt')
          {{-- </x-skeleton.userCustomers> --}}
      </div>

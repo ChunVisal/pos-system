@@ -27,9 +27,6 @@
             });
         });
 
-        var categoryFilter = document.getElementById('categoryFilter');
-        var statusFilter = document.getElementById('statusFilter');
-        var stockFilter = document.getElementById('stockFilter');
         var emptyRow = document.getElementById('noCategoryRow');
         var emptyGrid = document.getElementById('noFilterResultsGrid');
 
@@ -271,18 +268,45 @@
             submitting: false,
             selectedCategoryId: null,
             pendingName: '',
+
+            // search query
             products: @json($products),
             searchQuery: '',
+            categoryFilter: '',
+            statusFilter: 'all',
+            stockFilter: 'all',
 
             get filteredProducts() {
-                if (!this.searchQuery) return this.products;
-                const q = this.searchQuery.toLowerCase();
-                return this.products.filter(p =>
-                    (p.name || '').toLowerCase().includes(q) ||
-                    (p.code || '').toLowerCase().includes(q) ||
-                    (p.barcode || '').toLowerCase().includes(q) ||
-                    (p.category?.name || '').toLowerCase().includes(q)
-                );
+                let result = [...this.products];
+
+                if (this.searchQuery) {
+                    const q = this.searchQuery.toLowerCase();
+                    result = result.filter(p =>
+                        p.name.toLowerCase().includes(q) ||
+                        (p.code || '').toLowerCase().includes(q) ||
+                        (p.barcode || '').toLowerCase().includes(q) ||
+                        (p.category?.name || '').toLowerCase().includes(q)
+                    );
+                }
+
+                if (this.categoryFilter) {
+                    result = result.filter(p => p.category?.name === this.categoryFilter);
+                }
+
+                if (this.statusFilter && this.statusFilter !== 'all') {
+                    result = result.filter(p => p.status === this.statusFilter.toLowerCase());
+                }
+
+                if (this.stockFilter === 'out') {
+                    result = result.filter(p => p.stock_quantity <= 0);
+                } else if (this.stockFilter === 'low') {
+                    result = result.filter(p => p.stock_quantity > 0 && p.stock_quantity <= (p
+                        .low_stock_threshold || 5));
+                } else if (this.stockFilter === 'in') {
+                    result = result.filter(p => p.stock_quantity > (p.low_stock_threshold || 5));
+                }
+
+                return result;
             },
 
             form: {

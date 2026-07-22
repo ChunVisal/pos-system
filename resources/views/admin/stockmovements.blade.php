@@ -25,7 +25,7 @@
             <div class="relative flex-1" x-data="{
                 reasonOpen: false,
                 reasonResults: [],
-                allReasons: ['All Reasons', 'Restock', 'Customer Return', 'Damaged', 'Stock Count Correction', 'Correction', 'Transfer', 'Initial Stock', 'Lost or Stolen', 'Loss: Theft', 'Accident', 'Other']
+                allReasons: ['All Reasons', 'Restock', 'Customer Return', 'Damaged', 'Stock Count Correction', 'Transfer', 'Initial Stock', 'Lost or Stolen', 'Loss: Theft', 'Accident', 'Other']
             }">
                 <i
                     class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-xs"></i>
@@ -95,14 +95,14 @@
                             <input type="hidden" name="type" value="{{ request('type') }}">
                             <input type="hidden" name="product_id" value="{{ request('product_id') }}">
                             <input type="date" name="start_date" value="{{ request('start_date') }}"
-                                class="w-full text-xs border border-gray-300 dark:border-zinc-800 rounded-md px-2 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:border-[#0F6E8C]">
+                                class="[&::-webkit-calendar-picker-indicator]:dark:invert w-full text-xs border border-gray-300 dark:border-zinc-800 rounded-md px-2 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:border-[#0F6E8C]">
                             <input type="date" name="end_date" value="{{ request('end_date') }}"
-                                class="w-full text-xs border border-gray-300 dark:border-zinc-800 rounded-md px-2 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:border-[#0F6E8C]">
+                                class="[&::-webkit-calendar-picker-indicator]:dark:invert w-full text-xs border border-gray-300 dark:border-zinc-800 rounded-md px-2 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:border-[#0F6E8C]">
                             <button type="submit"
                                 class="w-full px-3 py-1.5 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition-colors">
                                 Apply
                             </button>
-                        </form>
+                    </form>
                     </div>
                 </div>
             </div>

@@ -223,7 +223,6 @@
             selectCustomer(cust) {
                 this.selectedCustomer = cust;
 
-                console.log('Customer selected:', cust.segment);
                 this.customerForm = {
                     name: cust.name,
                     phone: cust.phone,
@@ -290,13 +289,15 @@
 
             processPayment() {
 
-                const received = Math.round(parseFloat(this.amountReceived || 0) * 100) / 100;
-                const total = Math.round(this.total * 100) / 100;
+                if (this.paymentMethod === 'cash') {
+                    const received = Math.round((parseFloat(this.amountReceived) || 0) * 100) / 100;
+                    const total = Math.round(this.total * 100) / 100;
 
-                if (this.paymentMethod === 'cash' && (!this.amountReceived || parseFloat(this.amountReceived) < this
-                        .total)) {
-                    alert('Insufficient amount');
-                    return;
+                    if (!this.amountReceived || received < total) {
+                        alert('Insufficient amount. Need: $' + total.toFixed(2) + ', Received: $' + received.toFixed(
+                            2));
+                        return;
+                    }
                 }
                 if (this.requiresCustomer && !this.selectedCustomer) {
                     alert('Orders over $700 require customer information. Please add customer details.');

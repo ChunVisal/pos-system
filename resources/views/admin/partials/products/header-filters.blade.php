@@ -52,9 +52,9 @@
 
     {{-- Category --}}
     <div class="relative">
-        <select id="categoryFilter"
+        <select x-model="categoryFilter"
             class="bg-white dark:bg-zinc-900 bg-none appearance-none text-xs text-gray-800 dark:text-zinc-200 border border-gray-300 dark:border-zinc-800 rounded-md pl-3 pr-8 py-1.5 focus:outline-none focus:ring-1 focus:ring-p cursor-pointer">
-            <option value="all">All Categories</option>
+            <option value="">All Categories</option>
             @foreach ($categories as $category)
                 <option value="{{ $category->name }}">
                     {{ $category->name }} ({{ (int) $category->total_stock }})
@@ -70,7 +70,7 @@
 
     {{-- Status --}}
     <div class="relative">
-        <select id="statusFilter"
+        <select x-model="statusFilter"
             class="bg-white dark:bg-zinc-900 appearance-none text-xs text-gray-800 dark:text-zinc-200 border border-gray-300 dark:border-zinc-800 rounded-md pl-3 pr-8 py-1.5 focus:outline-none focus:ring-1 focus:ring-p cursor-pointer">
             <option value="all">All Status</option>
             <option value="Active">Active</option>
@@ -85,7 +85,7 @@
 
     {{-- Stock --}}
     <div class="relative">
-        <select id="stockFilter"
+        <select x-model="stockFilter"
             class="bg-white dark:bg-zinc-900 appearance-none text-xs text-gray-800 dark:text-zinc-200 border border-gray-300 dark:border-zinc-800 rounded-md pl-3 pr-8 py-1.5 focus:outline-none focus:ring-1 focus:ring-p cursor-pointer">
             <option value="all">All Stock</option>
             <option value="out">Out of Stock</option>
@@ -171,19 +171,19 @@
                             <td class="py-3 px-3 text-center whitespace-nowrap">
                                 <template x-if="product.stock_quantity <= 0">
                                     <span
-                                        class="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400">
+                                        class="px-2 py-0.5 text-[12px] font-semibold rounded-full bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400">
                                         Out of stock
                                     </span>
                                 </template>
                                 <template
                                     x-if="product.stock_quantity > 0 && product.stock_quantity < product.low_stock_threshold">
                                     <span
-                                        class="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400"
+                                        class="px-2 py-0.5 text-[12px] font-semibold rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400"
                                         x-text="product.stock_quantity + ' Low'"></span>
                                 </template>
                                 <template x-if="product.stock_quantity >= product.low_stock_threshold">
                                     <span
-                                        class="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400"
+                                        class="px-2 py-0.5 text-[12px] font-semibold rounded-full bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400"
                                         x-text="product.stock_quantity"></span>
                                 </template>
                             </td>
@@ -194,7 +194,7 @@
 
                             {{-- Status Badge --}}
                             <td class="py-3 text-center">
-                                <span class="px-2 py-0.5 text-[11px] font-semibold rounded-full capitalize"
+                                <span class="px-2 py-0.5 text-[12px] font-semibold rounded-full capitalize"
                                     :class="product.status === 'active' ?
                                         'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400' :
                                         'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500'"
@@ -206,11 +206,11 @@
                             <td class="py-3 px-4 text-xs whitespace-nowrap">
                                 <p class="text-gray-500 dark:text-zinc-500">Created
                                     <label class="text-gray-600 dark:text-zinc-500 font-semibold"
-                                        x-text="product.created_at_formatted"></label>
+                                        x-text="product.created_at ? new Date(product.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '-'"></label>
                                 </p>
                                 <p class="text-gray-500 dark:text-zinc-500">Updated
                                     <label class="text-gray-600 dark:text-zinc-500 font-semibold"
-                                        x-text="product.updated_at_formatted"></label>
+                                        x-text="product.updated_at ? new Date(product.updated_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '-'"></label>
                                 </p>
                             </td>
 
@@ -307,7 +307,7 @@
 
                             {{-- Product Code Badge --}}
                             <span
-                                class="absolute top-2 right-2 bg-zinc-950/75 backdrop-blur-xs text-white text-[10px] px-2 py-0.5 rounded font-mono font-medium tracking-wide"
+                                class="absolute top-0.5 right-1 bg-zinc-900/90 backdrop-blur-xs text-white text-[10px] px-2 py-0.5 rounded font-mono font-medium tracking-wide"
                                 x-text="product.code">
                             </span>
                         </div>
@@ -319,23 +319,28 @@
                             <div class="space-y-0.5">
                                 <p class="text-xs font-semibold text-gray-900 dark:text-zinc-100 line-clamp-2 leading-snug"
                                     x-text="product.name"></p>
-                                <p class="text-[11px] text-gray-500 dark:text-zinc-400 truncate"
-                                    x-text="product.category?.name || 'Unassigned'"></p>
+                                <div class="flex items-center gap-1  font-medium">
+                                    <p class="text-[12px] text-gray-500 dark:text-zinc-400 truncate"
+                                        x-text="product.category?.name || 'Unassigned'"></p>
+                                    <span class="ml-1 whitespace-nowrap text-[12px] text-gray-500 dark:text-zinc-400  "
+                                        x-text="'(' + (product.stock_quantity ?? 0) + ' in stock)'"></span>
+                                </div>
                             </div>
 
+
                             {{-- Price & Date --}}
-                            <div class="mt-2 space-y-0.5">
+                            <div class="mt-auto pt-2">
                                 <p class="text-sm font-bold text-[#0F6E8C] dark:text-[#188cb3]"
                                     x-text="'$' + Number(product.selling_price).toFixed(2)"></p>
-                                <p class="text-[10px] text-gray-400 dark:text-zinc-500">
-                                    Created: <span class="text-gray-600 dark:text-zinc-400 font-medium"
-                                        x-text="product.created_at_formatted"></span>
+                                <p class="text-[10px] text-gray-500 dark:text-zinc-500">
+                                    Created: <span class="font-medium"
+                                        x-text="product.created_at ? new Date(product.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '-'"></span>
                                 </p>
                             </div>
 
                             {{-- Footer: Stock & Actions --}}
                             <div
-                                class="flex items-center justify-between mt-auto pt-2.5 border-t border-gray-200/60 dark:border-zinc-800">
+                                class="flex items-center justify-between mt-1 pt-1.5 border-t border-gray-200/60 dark:border-zinc-800">
 
                                 {{-- Stock Status Badge --}}
                                 <template x-if="product.stock_quantity <= 0">

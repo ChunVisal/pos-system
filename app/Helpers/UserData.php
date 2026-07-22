@@ -4,52 +4,62 @@ namespace App\Helpers;
 
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class UserData
 {
     public static function getSummaryCards()
     {
+        $totalUsers = User::count();
+        $activeUsers = User::where('status', 'active')->count();
+        $admins = User::where('role', 'admin')->count();
+        $cashiers = User::where('role', 'cashier')->count();
+        $onlineNow = User::get()->filter(fn($u) => Cache::has('user-online-' . $u->id))->count();
+        // Today vs yesterday
+        $todayNew = User::whereDate('created_at', today())->count();
+        $yesterdayNew = User::whereDate('created_at', Carbon::yesterday())->count();
+        $userChange = $yesterdayNew > 0 ? round((($todayNew - $yesterdayNew) / $yesterdayNew) * 100) : ($todayNew > 0 ? 100 : 0);
 
         return [
             [
                 'title' => 'Total Users',
-                'value' => User::count(),
+                'value' => $totalUsers,
                 'icon' => 'fa-solid fa-users',
                 'iconBg' => '#0F6E8C',
                 'iconColor' => '#0F6E8C',
-                'trend' => 'up',
-                'percentage' => '2.0%',
-                'period' => 'last month',
+                'trend' => $todayNew > 0 ? 'up' : ($yesterdayNew > 0 ? 'down' : ''),
+                'percentage' => $todayNew > 0 ? '+' . $todayNew : '',
+                'period' => $admins . ' admin · ' . $cashiers . ' cashier',
+            ],
+            [
+                'title' => 'Online Now',
+                'value' => $onlineNow,
+                'icon' => 'fa-solid fa-wifi',
+                'iconBg' => '#10B981',
+                'iconColor' => '#10B981',
+                'trend' => $onlineNow > 0 ? 'up' : 'down',
+                'percentage' => round(($onlineNow / max($activeUsers, 1)) * 100) . '%',
+                'period' => 'of ' . $activeUsers . ' active',
             ],
             [
                 'title' => 'Admins',
-                'value' => User::where('role', 'admin')->count(),
+                'value' => $admins,
                 'icon' => 'fa-solid fa-user-shield',
                 'iconBg' => '#8B5CF6',
                 'iconColor' => '#8B5CF6',
                 'trend' => 'up',
-                'percentage' => '0.0%',
-                'period' => 'no change',
+                'percentage' => round(($admins / max($totalUsers, 1)) * 100) . '%',
+                'period' => 'of total',
             ],
             [
                 'title' => 'Cashiers',
-                'value' => User::where('role', 'cashier')->count(),
+                'value' => $cashiers,
                 'icon' => 'fa-solid fa-cash-register',
-                'iconBg' => '#10B981',
-                'iconColor' => '#10B981',
-                'trend' => 'up',
-                'percentage' => '3.5%',
-                'period' => 'last month',
-            ],
-            [
-                'title' => 'Active Today',
-                'value' => User::where('status', 'active')->count(),
-                'icon' => 'fa-solid fa-circle-check',
                 'iconBg' => '#F59E0B',
                 'iconColor' => '#D97706',
-                'trend' => 'down',
-                'percentage' => '1.2%',
-                'period' => 'yesterday',
+                'trend' => 'up',
+                'percentage' => round(($cashiers / max($totalUsers, 1)) * 100) . '%',
+                'period' => 'of total',
             ],
         ];
     }

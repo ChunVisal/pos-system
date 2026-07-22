@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StockRequestController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NotificationController;
@@ -26,6 +27,8 @@ Route::get('/', function () {
 
     return redirect('/login');
 });
+
+Route::post('/cashier/pin-login', [AuthenticatedSessionController::class, 'pinLogin'])->name('cashier.pin-login');
 
 // Admin Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
@@ -74,6 +77,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 });
 // Cashier Routes
 Route::middleware(['auth', 'role:cashier'])->group(function () {
+
     Route::get('/cashier/pos', [CashierController::class, 'pos'])->name('cashier.pos');
     Route::post('/cashier/checkout', [CashierController::class, 'checkout'])->name('cashier.checkout');
 

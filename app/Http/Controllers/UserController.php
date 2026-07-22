@@ -34,10 +34,8 @@ class UserController extends Controller
             ->orderByRaw("FIELD(role, 'admin', 'cashier')")
             ->get();
 
-        if ($request->ajax == '1') {
-            $html = view('admin.partials.users.table-rows', compact('users'))->render();
-
-            return response()->json(['html' => $html]);
+        if ($request->ajax) {
+            return response()->json(['users' => $users]);
         }
 
         return view('admin.users', compact('users', 'summaryCards'));

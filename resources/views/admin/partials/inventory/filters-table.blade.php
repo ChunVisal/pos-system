@@ -4,7 +4,7 @@
         <i
             class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-xs"></i>
         <input id="search" type="text" value="{{ request('search') }}"
-            placeholder="Search by name, categories, code, or barcode..."
+            placeholder="Search by name, categories or code..."
             class="w-full pl-8 pr-8 py-1.5 text-xs bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200 border border-gray-300 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-1 focus:ring-p placeholder-gray-400 dark:placeholder-zinc-500">
         <button type="button" id="clearSearch" style="display:none;"
             class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 z-10">
@@ -84,12 +84,6 @@
                             Try adjusting your search or filter to find what you're looking for.
                         </p>
 
-                        {{-- Optional: Add Product button --}}
-                        <button @click="openAdd()"
-                            class="mt-4 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition">
-                            <i class="fa-solid fa-plus text-[10px]"></i>
-                            Add Your First Product
-                        </button>
                     </div>
                 </td>
             </tr>

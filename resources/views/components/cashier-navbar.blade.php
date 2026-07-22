@@ -136,9 +136,14 @@
                             </div>
                             <div class="flex-1 min-w-0 space-y-0.5">
                                 <p class="text-xs text-gray-800 dark:text-zinc-200 leading-snug break-words">
-                                    <span class="font-bold">{{ $notif->quantity_approved }}x</span>
+                                    @if ($notif->quantity_approved)
+                                        <span class="font-extrabold">({{ $notif->quantity_approved }} sent)</span>
+                                        <span class="font-medium">{{ $notif->quantity_requested }}x</span>
+                                    @else
+                                        <span class="font-bold">{{ $notif->quantity_requested }}x</span>
+                                    @endif
                                     <span
-                                        class="font-medium text-gray-900 dark:text-zinc-100">{{ $notif->product->name ?? ($notif->product_name ?? 'Unknown Product') }}</span>
+                                        class="font-medium">{{ $notif->product->name ?? ($notif->product_name ?? 'Unknown') }}</span>
                                 </p>
                                 <p
                                     class="text-xs font-normal tracking-normal mt-1
@@ -155,6 +160,7 @@
                                 title="Mark as read" aria-label="Mark as read" type="button">
                             </button>
                         </div>
+
                     @empty
                         <div class="px-4 py-12 text-center text-xs font-medium text-gray-400 dark:text-zinc-500">
                             <x-heroicon-o-bell-slash class="w-6 h-6 mx-auto mb-2 opacity-60" />

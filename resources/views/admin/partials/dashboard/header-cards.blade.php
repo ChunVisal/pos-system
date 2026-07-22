@@ -84,7 +84,7 @@
                         style="background-color: {{ $card['iconBg'] === 'transparent' ? 'transparent' : $card['iconBg'] . '20' }};">
                         <i class="{{ $card['icon'] }} text-[18px]" style="color: {{ $card['iconColor'] }};"></i>
                     </div>
-                    <p class="text-xs font-extrabold text-gray-600 dark:text-zinc-400 uppercase">
+                    <p class="text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">
                         {{ $card['title'] }}
                     </p>
                 </div>

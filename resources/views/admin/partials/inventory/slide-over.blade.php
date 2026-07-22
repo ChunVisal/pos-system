@@ -9,7 +9,7 @@
         class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-zinc-900 shadow-xl flex flex-col border-l border-gray-400 dark:border-zinc-800">
 
         <div class="flex items-center justify-between px-5 py-4 border-b border-gray-400 dark:border-zinc-800">
-            <h2 class="text-base font-semibold text-gray-800 dark:text-zinc-100">Stock Adjustment</h2>
+            <h2 class="font-medium text-gray-800 tracking-tighter uppercase dark:text-zinc-100">Stock Adjustment</h2>
             <button @click="closePanel()"
                 class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300">
                 <i class="fa-solid fa-xmark text-lg"></i>

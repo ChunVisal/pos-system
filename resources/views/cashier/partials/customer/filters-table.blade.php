@@ -78,8 +78,10 @@
                                 <div>
                                     <p class="font-medium text-gray-800 dark:text-zinc-200" x-text="customer.name">
                                     </p>
-                                    <p class="text-xs truncate text-gray-400 dark:text-zinc-500" x-text="customer.email"></p>
-                                    <p class="text-xs truncate text-gray-400 dark:text-zinc-500" x-text="customer.phone"></p>
+                                    <p class="text-xs truncate text-gray-400 dark:text-zinc-500"
+                                        x-text="customer.email"></p>
+                                    <p class="text-xs truncate text-gray-400 dark:text-zinc-500"
+                                        x-text="customer.phone"></p>
                                 </div>
 
                             </div>
@@ -100,7 +102,7 @@
                         <td class="py-3 px-4 text-center text-gray-600 dark:text-zinc-400"
                             x-text="customer.total_orders"></td>
                         <td class="py-3 px-4 text-right font-semibold text-gray-800 dark:text-zinc-200"
-                            x-text="'$' + parseFloat(customer.total_spent || 0).toFixed(2)"></td>
+                            x-text="'$' + parseFloat(customer.total_spent, 2 || 0).toFixed(2)"></td>
                         <td class="py-3 pl-10 text-gray-500 dark:text-zinc-400 text-xs"
                             x-text="customer.last_order_at ? new Date(customer.last_order_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '-'">
                         </td>
@@ -121,7 +123,7 @@
                         <div class="flex flex-col items-center justify-center">
                             <div
                                 class="w-16 h-16 mb-4 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center">
-                            <i class="fa-solid fa-users text-2xl text-gray-400 dark:text-zinc-500"></i>
+                                <i class="fa-solid fa-users text-2xl text-gray-400 dark:text-zinc-500"></i>
                             </div>
                             <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-1">No customers
                                 found</h3>

@@ -25,7 +25,6 @@ class InventoryController extends Controller
                 return $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', '%' . $search . '%')
                         ->orWhere('code', 'like', '%' . $search . '%')
-                        ->orWhere('barcode', 'like', '%' . $search . '%')
                         ->orWhereHas('category', function ($cat) use ($search) {
                             $cat->where('name', 'like', '%' . $search . '%');
                         });
@@ -216,7 +215,7 @@ class InventoryController extends Controller
                 $product->increment('stock_quantity', $request->quantity);
             } else {
                 if ($product->stock_quantity < $request->quantity) {
-                   return response()->json(['error' => 'Not enough stock'], 422);
+                    return response()->json(['error' => 'Not enough stock'], 422);
                 }
                 $product->decrement('stock_quantity', $request->quantity);
             }

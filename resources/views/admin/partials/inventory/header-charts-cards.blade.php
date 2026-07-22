@@ -44,9 +44,9 @@
                     <p class="text-[11px] font-semibold text-gray-500 dark:text-zinc-400 mb-2">Custom range</p>
                     <form action="{{ route('admin.inventory') }}" method="GET" class="space-y-2">
                         <input type="date" name="start_date" value="{{ request('start_date') }}"
-                            class="w-full text-xs border border-gray-300 dark:border-zinc-800 rounded-md px-2 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:border-[#0F6E8C]">
+                            class="[&::-webkit-calendar-picker-indicator]:dark:invert w-full text-xs border border-gray-300 dark:border-zinc-800 rounded-md px-2 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:border-[#0F6E8C]">
                         <input type="date" name="end_date" value="{{ request('end_date') }}"
-                            class="w-full text-xs border border-gray-300 dark:border-zinc-800 rounded-md px-2 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:border-[#0F6E8C]">
+                            class="[&::-webkit-calendar-picker-indicator]:dark:invert w-full text-xs border border-gray-300 dark:border-zinc-800 rounded-md px-2 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:border-[#0F6E8C]">
                         <button type="submit"
                             class="w-full px-3 py-1.5 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition-colors">
                             Apply
@@ -67,7 +67,7 @@
 <div class="flex gap-2 w-full min-w-0 mb-4">
     <!-- Stock Movement Overview (chart) -->
     <div
-        class="w-[65%] min-w-0 bg-white dark:bg-zinc-900 rounded-md shadow-sm border border-gray-200 dark:border-zinc-800/60 p-4">
+        class="w-[63%] min-w-0 bg-white dark:bg-zinc-900 rounded-md shadow-sm border border-gray-200 dark:border-zinc-800/60 p-4">
         <div class="flex items-center justify-between mb-2">
             <div>
                 <h3 class="text-sm font-semibold text-gray-800 dark:text-zinc-100">Stock Movement Overview</h3>
@@ -92,7 +92,7 @@
     </div>
 
     <!-- Summary Cards (2 col x 2 row)  inventory -->
-    <div class="w-[35%] min-w-0 grid grid-cols-2 grid-rows-2 gap-2">
+    <div class="w-[37%] min-w-0 grid grid-cols-2 grid-rows-2 gap-2">
         @foreach ($summaryCards as $card)
             <div
                 class="bg-white dark:bg-zinc-900 p-3 rounded-md shadow-xs border border-gray-200 dark:border-zinc-800/60 flex flex-col justify-between relative overflow-hidden">
@@ -108,9 +108,9 @@
                 <div class="flex flex-col items-start gap-1">
                     <h2 class="text-xl font-bold text-gray-800 dark:text-zinc-100">
                         @if ($card['title'] === 'Stock Value')
-                            ${{ number_format($card['value'], 2) }}
+                            {{ $card['value'] }}
                         @else
-                            {{ number_format($card['value']) }}
+                            {{ $card['value'] }}
                         @endif
                     </h2>
                     <div class="flex items-start gap-1 text-[12px]">

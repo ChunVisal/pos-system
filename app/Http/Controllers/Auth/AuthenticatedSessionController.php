@@ -21,6 +21,25 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
+    public function pinLogin(Request $request)
+    {
+        $request->validate(['pin' => 'required|digits:4']);
+
+        $user = User::where('pin', $request->pin)
+            ->where('role', 'cashier')
+            ->where('status', 'active')
+            ->first();
+
+        if (!$user) {
+            return back()->with('error', 'Invalid PIN');
+        }
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect('/cashier/pos');
+    }
+
     public function authenticated(Request $request, $user)
     {
         $user->update([
@@ -60,7 +79,7 @@ class AuthenticatedSessionController extends Controller
             'last_login' => now(),
         ]);
 
-        Cache::put('user-online-'.Auth::id(), true, now()->addMinutes(1));
+        Cache::put('user-online-' . Auth::id(), true, now()->addMinutes(1));
 
         // Redirect based on role
         if (Auth::user()->role === 'admin') {
@@ -77,7 +96,7 @@ class AuthenticatedSessionController extends Controller
     {
         $user = Auth::user();
         if ($user) {
-            Cache::forget('user-online-'.$user->id);
+            Cache::forget('user-online-' . $user->id);
         }
 
         Auth::guard('web')->logout();

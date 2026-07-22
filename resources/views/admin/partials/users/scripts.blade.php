@@ -1,70 +1,25 @@
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const roleFilter = document.getElementById('roleFilter');
-        const statusFilter = document.getElementById('statusFilter');
-        const emptyRow = document.getElementById('noUsersRow');
+    // searching filter 
+    $(document).ready(function() {
+        let searchTimer;
 
-        function filterTable() {
-            const roleValue = roleFilter.value;
-            const statusValue = statusFilter.value;
+        $('#search').on('input', function() {
+            clearTimeout(searchTimer);
+            const query = $(this).val();
+            $('#clearSearch').toggle(query.length > 0);
 
-            const rows = document.querySelectorAll('tbody tr');
-            let anyVisible = false;
+            searchTimer = setTimeout(function() {
+                $.get('{{ route('admin.users') }}', {
+                    search: query,
+                    ajax: 1
+                }, function(data) {
+                    $('#usersTableBody').html(data.html);
+                });
+            }, 400);
+        });
 
-            rows.forEach(function(row) {
-                // Skip empty state row
-                const firstCell = row.querySelector('td');
-                if (firstCell && firstCell.getAttribute('colspan')) return;
-
-                const cells = row.querySelectorAll('td');
-                if (cells.length < 6) retufrn;
-
-                // Role is in cells[1] - get the span text
-                const roleSpan = cells[1]?.querySelector('span');
-                const roleText = roleSpan ? roleSpan.textContent.trim().toLowerCase() : '';
-
-                // Status is in cells[2] - get the span text  
-                const statusSpan = cells[2]?.querySelector('span');
-                const statusText = statusSpan ? statusSpan.textContent.trim().toLowerCase() : '';
-
-                const roleMatch = !roleValue || roleText === roleValue;
-                const statusMatch = !statusValue || statusText === statusValue;
-
-                if (roleMatch && statusMatch) {
-                    row.style.display = '';
-                    anyVisible = true;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-            if (emptyRow) emptyRow.style.display = anyVisible ? 'none' : '';
-        }
-
-        roleFilter.addEventListener('change', filterTable);
-        statusFilter.addEventListener('change', filterTable);
-
-        // searching filter 
-        $(document).ready(function() {
-            let searchTimer;
-
-            $('#search').on('input', function() {
-                clearTimeout(searchTimer);
-                const query = $(this).val();
-                $('#clearSearch').toggle(query.length > 0);
-
-                searchTimer = setTimeout(function() {
-                    $.get('{{ route('admin.users') }}', {
-                        search: query,
-                        ajax: 1
-                    }, function(data) {
-                        $('#usersTableBody').html(data.html);
-                    });
-                }, 400);
-            });
-
-            $('#clearSearch').on('click', function() {
-                $('#search').val('').trigger('input');
-            });
+        $('#clearSearch').on('click', function() {
+            $('#search').val('').trigger('input');
         });
     });
 </script>
@@ -171,6 +126,31 @@
             },
 
             users: @json($users),
+            searchQuery: '',
+            roleFilter: 'all',
+            statusFilter: 'all',
+
+            get filteredUsers() {
+                let result = [...this.users];
+
+                if (this.searchQuery) {
+                    const q = this.searchQuery.toLowerCase();
+                    result = result.filter(u =>
+                        u.name.toLowerCase().includes(q) ||
+                        (u.email || '').toLowerCase().includes(q)
+                    );
+                }
+
+                if (this.roleFilter && this.roleFilter !== 'all') {
+                    result = result.filter(u => u.role === this.roleFilter);
+                }
+
+                if (this.statusFilter && this.statusFilter !== 'all') {
+                    result = result.filter(u => u.status === this.statusFilter);
+                }
+
+                return result;
+            },
 
             openDetail(userId) {
                 const user = this.users.find(u => u.id == userId);
@@ -232,7 +212,7 @@
             openAdd() {
                 this.editMode = false;
                 this.form = this.emptyForm();
-                this.avaavatar_urltarPreview = '';
+                this.avatarPreview = '';
                 this.open = true;
             },
 
@@ -286,7 +266,7 @@
 
                 const isEdit = this.editMode;
                 const url = isEdit ? `/admin/users/${this.form.id}` : '/admin/users';
-                
+
                 console.log('avatar_file:', this.form.avatar_file);
                 console.log('avatar_url:', this.form.avatar_url);
                 // Use FormData for file upload

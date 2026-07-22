@@ -8,6 +8,7 @@ use App\Models\StockMovement;
 use App\Models\CashierStock;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -15,18 +16,19 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
+
         $orders = Order::with(['items', 'payment', 'customer'])
             ->where('cashier_id', Auth::id())
-            ->when($request->range && $request->range !== 'all', function ($q) use ($request) {
-                $range = $request->range;
-                if ($range === 'today') {
-                    $q->whereDate('created_at', now()->toDateString());
-                } elseif ($range === 'yesterday') {
-                    $q->whereDate('created_at', now()->subDay()->toDateString());
-                } elseif ($range === '7days') {
-                    $q->whereDate('created_at', '>=', now()->subDays(6));
-                } elseif ($range === '30days') {
-                    $q->whereDate('created_at', '>=', now()->subDays(29));
+            ->when($request->filter, function ($q) use ($request) {
+                $filter = $request->filter;
+                if ($filter === 'today') {
+                    $q->whereDate('created_at', Carbon::today());
+                } elseif ($filter === 'yesterday') {
+                    $q->whereDate('created_at', Carbon::yesterday());
+                } elseif ($filter === 'last_7_days') {
+                    $q->whereDate('created_at', '>=', Carbon::now()->subDays(6));
+                } elseif ($filter === 'last_30_days') {
+                    $q->whereDate('created_at', '>=', Carbon::now()->subDays(29));
                 }
             })
             ->when($request->payment && $request->payment !== 'all', function ($q) use ($request) {
@@ -40,11 +42,23 @@ class OrderController extends Controller
                 });
             })
             ->latest()
-            ->paginate(10);
+            ->get();
 
         if ($request->has('ajax')) {
             return response()->json(['orders' => $orders->items()]);
         }
+
+
+        $currentFilter = $request->filter ?? 'all_time';
+        $filterLabels = [
+            'today' => 'Today',
+            'yesterday' => 'Yesterday',
+            'last_7_days' => 'Last 7 Days',
+            'last_30_days' => 'Last 30 Days',
+            'all_time' => 'All Time',
+        ];
+        $selectedFilter = $filterLabels[$currentFilter] ?? 'All Time';
+
 
         $todayTotal = Order::where('cashier_id', Auth::id())
             ->whereDate('created_at', today())->sum('total');
@@ -60,7 +74,7 @@ class OrderController extends Controller
         $todayKhqr = Payment::whereHas('order', fn($q) => $q->where('cashier_id', Auth::id())->whereDate('created_at', today()))
             ->where('method', 'khqr')->sum('amount');
 
-        return view('cashier.orders', compact('orders', 'todayTotal', 'todayCount', 'todayAvg', 'todayCash', 'todayCard', 'todayKhqr'));
+        return view('cashier.orders', compact('orders', 'todayTotal', 'todayCount', 'selectedFilter', 'todayAvg', 'todayCash', 'todayCard', 'todayKhqr'));
     }
 
     public function show($id)

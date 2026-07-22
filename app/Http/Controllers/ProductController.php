@@ -47,7 +47,7 @@ class ProductController extends Controller
         try {
             $product = Product::findOrFail($id);
 
-            $imageUrl = $product->avatar; // keep existing by default
+            $imageUrl = $product->image; // keep existing by default
             if ($request->hasFile('image_file')) {
                 $imageUrl = $this->uploadToCloudinary($request->file('image_file')); // ← use private method
             } elseif ($request->image_url) {
@@ -62,7 +62,7 @@ class ProductController extends Controller
                 'status' => $request->status ?? $product->status,
                 'cost_price' => $request->cost_price ?? $product->cost_price,
                 'brand' => $request->brand ?? $product->brand,
-                'avatar' => $imageUrl,
+                'image' => $imageUrl,
                 'low_stock_threshold' => $request->low_stock_threshold ?? $product->low_stock_threshold,
                 // code and barcode intentionally omitted — never change them on update
             ]);

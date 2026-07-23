@@ -16,13 +16,20 @@ class NotificationController extends Controller
     public function index()
     {
         $stockRequests = StockRequest::with(['cashier', 'product'])
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'loss_reported'])
             ->latest()
-            ->get();
+            ->get()
+            ->groupBy(function ($req) {
+                $days = $req->created_at->diffInDays(now());
+                if ($days == 0) return 'Today';
+                if ($days == 1) return 'Yesterday';
+                if ($days >= 2 && $days <= 6) return $days . ' days ago';
+                if ($days >= 7 && $days <= 13) return '1 week ago';
+                if ($days >= 14 && $days <= 20) return '2 weeks ago';
+                return 'Older';
+            });
 
-        $pendingCount = $stockRequests->count();
-
-        return view('admin.notifications', compact('stockRequests', 'pendingCount'));
+        return view('admin.notifications', compact('stockRequests'));
     }
 
     public function cashierIndex()
@@ -36,7 +43,15 @@ class NotificationController extends Controller
             ->where('cashier_id', Auth::id())
             ->whereIn('status', ['pending', 'approved', 'rejected', 'on_hold'])
             ->latest()
-            ->get();
+            ->get()
+            ->groupBy(function ($notif) {
+                $days = $notif->created_at->diffInDays(now());
+                if ($days == 0) return 'Today';
+                if ($days == 1) return 'Yesterday';
+                if ($days >= 2 && $days <= 6) return $days . ' days ago';
+                if ($days >= 7 && $days <= 13) return '1 week ago';
+                return 'Older';
+            });
 
         return view('cashier.notifications', compact('notifications'));
     }
@@ -59,7 +74,6 @@ class NotificationController extends Controller
             ]);
             return back()->with('success', 'Request acknowledged');
         }
-
 
         $request->validate([
             'quantity' => 'required|integer|min:1',
@@ -125,27 +139,54 @@ class NotificationController extends Controller
         return back()->with('success', 'Request rejected');
     }
 
+    public function markAllRead()
+    {
+        StockRequest::whereIn('status', ['pending', 'loss_reported'])
+            ->whereNull('seen_at')
+            ->update(['seen_at' => now()]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function markSingle($id)
+    {
+        StockRequest::where('id', $id)->update(['seen_at' => now()]);
+        return response()->json(['success' => true]);
+    }
+
     public function returnStock(Request $request)
     {
-        $req = StockRequest::findOrFail($request->request_id);
-
         $cashierStock = CashierStock::where('cashier_id', Auth::id())
-            ->where('product_id', $req->product_id)
+            ->where('product_id', $request->product_id)
             ->first();
 
         if ($cashierStock) {
+            $remaining = $cashierStock->allocated_quantity - $cashierStock->sold_quantity;
+            if ($request->quantity > $remaining) {
+                return response()->json(['message' => 'Cannot report more than available'], 422);
+            }
             $cashierStock->decrement('allocated_quantity', $request->quantity);
         }
 
         StockMovement::create([
-            'product_id' => $req->product_id,
+            'product_id' => $request->product_id,
             'type' => 'out',
             'quantity' => $request->quantity,
             'reason' => 'Loss: ' . $request->reason . ' - ' . Auth::user()->name,
             'user_id' => Auth::id(),
         ]);
 
-        return response()->json(['message' => 'Broken stock reported.']);
+        // Notify admin
+        StockRequest::create([
+            'cashier_id' => Auth::id(),
+            'product_id' => $request->product_id,
+            'quantity_requested' => $request->quantity,
+            'status' => 'loss_reported',
+            'cashier_notes' => $request->reason,
+            'seen_at' => null,
+        ]);
+
+        return response()->json(['message' => 'Loss reported']);
     }
 
     public function markSingleRead($id)

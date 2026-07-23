@@ -1,33 +1,44 @@
 <nav
-    class="bg-white dark:bg-black border-b border-gray-300 dark:border-zinc-800 px-5 py-2 pb-[10px] flex items-center justify-between sticky top-0 z-40 transition-colors duration-200">
+    class="bg-white dark:bg-black border-b border-gray-300 dark:border-zinc-800 px-4 py-2 flex items-center justify-between sticky top-0 z-40 transition-colors duration-200">
 
-    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-[90px] dark:hidden">
-    <img src="{{ asset('images/logodarkmode.png') }}" alt="Logo" class="w-[90px] hidden dark:block">
+    <!-- Logo Section -->
+    <div class="flex items-center gap-4 min-w-0">
+        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-[90px] dark:hidden shrink-0">
+        <img src="{{ asset('images/logodarkmode.png') }}" alt="Logo" class="w-[90px] hidden dark:block shrink-0">
+    </div>
 
-    <div class="flex items-center gap-3">
-        <div class="hidden md:block relative">
+    <!-- Center Section: Search & Actions  -->
+    <div class="flex-1 flex items-center justify-end gap-4 min-w-0">
+
+        <!-- Search Bar (Hidden on small) -->
+        <div class="hidden md:flex relative flex-1 max-w-[400px]">
             <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-zinc-400"></i>
             <input type="search" placeholder="Quick search inventory, invoices... (Press '/' to search)"
-                class="w-96 pl-9 py-1.5 border border-gray-400 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-100 rounded-full text-sm focus:ring-2 focus:ring-[#0F6E8C] outline-none transition-colors">
+                class="w-full pl-9 py-1.5 border border-gray-400 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-100 rounded-full text-sm focus:ring-2 focus:ring-[#0F6E8C] outline-none transition-colors">
         </div>
 
+        <!-- Dark Mode Toggle -->
         <x-dark-mode-toggle />
 
-        {{-- Bell Icon with Dropdown --}}
-        <div class="relative" x-data="{ open: false }">
+        <!-- Notifications Dropdown -->
+        <div class="relative flex-shrink-0" x-data="{ open: false }">
             <button @click="open = !open"
-                class="relative p-2 text-gray-700 dark:text-zinc-300 hover:text-[#0F6E8C] dark:hover:text-[#138cb3] hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-full transition-colors">
+                class="relative p-2 text-gray-700 dark:text-zinc-300 hover:text-[#0F6E8C] dark:hover:text-[#138cb3] hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-full transition-colors focus:outline-none">
                 <i class="fa-solid fa-bell text-xl"></i>
-                @php $pendingCount = \App\Models\StockRequest::where('status', 'pending')->count(); @endphp
+                @php
+                    $pendingCount = \App\Models\StockRequest::whereIn('status', ['pending', 'loss_reported'])
+                        ->whereNull('seen_at')
+                        ->count();
+                @endphp
                 @if ($pendingCount > 0)
                     <span
-                        class="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                        class="absolute top-1 right-1 bell-badge bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                         {{ $pendingCount }}
                     </span>
                 @endif
             </button>
 
-            {{-- Dropdown --}}
+            <!-- Dropdown List -->
             <div x-show="open" @click.outside="open = false" x-cloak
                 x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 scale-95 translate-y-[-10px]"
@@ -36,33 +47,44 @@
                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                 x-transition:leave-end="opacity-0 scale-95 translate-y-[-10px]"
                 class="absolute right-0 mt-2 w-80 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-xl dark:shadow-zinc-950/50 z-50 overflow-hidden">
-
-                {{-- Premium Minimal Header Segment Layout --}}
+                <!-- Dropdown Header -->
                 <div
                     class="px-4 py-3 bg-gray-50/50 dark:bg-zinc-900/40 border-b border-gray-100 dark:border-zinc-800/60 flex items-center justify-between">
                     <h3 class="text-xs font-bold tracking-tight text-gray-900 dark:text-zinc-100 uppercase">
-                        Notifications</h3>
-                    <a href="{{ route('admin.notifications') }}"
-                        class="text-[11px] font-bold text-[#0F6E8C] dark:text-[#1389af] hover:underline uppercase tracking-wider">
-                        View All
-                    </a>
+                        Notifications
+                    </h3>
+                    <div class="flex items-center gap-3">
+                        <button type="button" @click="markAllRead()"
+                            class="text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 text-[#0F6E8C] dark:text-[#1389af] hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors"
+                            title="Mark all notifications as read">
+                            <x-heroicon-s-check-circle class="w-3.5 h-3.5" />
+                            <span>Mark read</span>
+                        </button>
+                        <span class="w-[1px] h-3 bg-gray-200 dark:bg-zinc-800"></span>
+                        <a href="{{ route('admin.notifications') }}"
+                            class="text-[11px] font-bold text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:underline uppercase tracking-wider transition-colors">
+                            View All
+                        </a>
+                    </div>
                 </div>
 
-                {{-- Notification List Feed Container Block --}}
-                <div class="max-h-[320px] overflow-y-auto divide-y divide-gray-100 dark:divide-zinc-800/40">
+                <!-- Notification List -->
+                <div
+                    class="max-h-[320px] tab-container overflow-y-auto divide-y divide-gray-100 dark:divide-zinc-800/40">
                     @php
                         $notifications = \App\Models\StockRequest::with(['cashier', 'product'])
-                            ->where('status', 'pending')
+                            ->whereIn('status', ['pending', 'loss_reported'])
                             ->latest()
                             ->limit(6)
                             ->get();
                     @endphp
 
                     @forelse($notifications as $notif)
-                        <a href="{{ route('admin.notifications') }}"
-                            class="flex items-start gap-3 px-4 py-3.5 hover:bg-gray-50/60 dark:hover:bg-zinc-800/30 transition-colors">
-
-                            {{-- Product Thumbnail Image Container With Dynamic Indicator Badge --}}
+                        <div class="notif-card flex items-start gap-3 px-4 py-3 transition-colors
+                    {{ empty($notif->seen_at) ? 'bg-blue-50 dark:bg-blue-950/20 border-l-2 border-blue-500' : 'hover:bg-gray-50/60 dark:hover:bg-zinc-800/30' }}"
+                            data-notif-id="{{ $notif->id }}" style="cursor:pointer"
+                            @click.stop="markSingleRead({{ $notif->id }}, $event.target)">
+                            <!-- Product Image -->
                             <div class="relative flex-shrink-0">
                                 <div
                                     class="w-11 h-11 rounded-md bg-gray-100 dark:bg-zinc-850 border border-gray-200/60 dark:border-zinc-800 overflow-hidden flex items-center justify-center">
@@ -74,39 +96,56 @@
                                             alt="Placeholder" class="w-full h-full object-cover">
                                     @endif
                                 </div>
-
-                                {{-- Pending Status Badge Dynamic Overlay Ring Element --}}
-                                <div
-                                    class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-900 bg-amber-500">
-                                    <x-heroicon-s-clock class="w-2.5 h-2.5 text-white" />
-                                </div>
+                                @if ($notif->status === 'loss_reported')
+                                    <div
+                                        class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-900 bg-red-500">
+                                        <x-heroicon-s-x-circle class="w-3.5 h-3.5 text-white" />
+                                    </div>
+                                @else
+                                    <div
+                                        class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-900 bg-amber-500">
+                                        <x-heroicon-s-clock class="w-2.5 h-2.5 text-white" />
+                                    </div>
+                                @endif
                             </div>
 
-                            {{-- Text Content Meta Data Block Layout --}}
-                            <div class="flex-1 min-w-0 space-y-0.5">
-                                <p class="text-xs text-gray-800 dark:text-zinc-200 leading-snug break-words">
-                                    <span
-                                        class="font-bold text-gray-950 dark:text-zinc-50">{{ $notif->cashier->name }}</span>
-                                    <span class="text-gray-500 dark:text-zinc-400">requested</span>
-                                    <span
-                                        class="font-bold text-[#0F6E8C] dark:text-[#1389af]">{{ $notif->quantity_requested }}x</span>
-                                    <span
-                                        class="font-medium text-gray-900 dark:text-zinc-100">{{ $notif->product->name ?? ($notif->product_name ?? 'Unknown Product') }}</span>
-                                </p>
-
-                                <div class="flex items-center gap-1.5 pt-0.5">
-                                    <span
-                                        class="text-[10px] font-bold tracking-normal bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-950/40 px-1 py-0.5 rounded">
-                                        Pending
-                                    </span>
-                                    <span class="text-[10px] text-gray-400 dark:text-zinc-500 font-medium">
-                                        {{ $notif->created_at->diffForHumans() }}
-                                    </span>
+                            <!-- Notification Text & Actions -->
+                            <div class="flex flex-1 min-w-0 justify-between items-center gap-2">
+                                <div class="flex-1 min-w-0 space-y-0.5">
+                                    <p class="text-xs text-gray-800 dark:text-zinc-200 leading-snug break-words">
+                                        <span
+                                            class="font-bold text-gray-950 dark:text-zinc-50">{{ $notif->cashier->name }}</span>
+                                        @if ($notif->status === 'loss_reported')
+                                            <span class="text-red-600 dark:text-red-400">reported loss of</span>
+                                        @else
+                                            <span class="text-amber-600 dark:text-amber-400">requested</span>
+                                        @endif
+                                        <span
+                                            class="font-bold text-[#0F6E8C] dark:text-[#1389af]">{{ $notif->quantity_requested }}x</span>
+                                        <span
+                                            class="font-medium text-gray-900 dark:text-zinc-100">{{ $notif->product->name ?? ($notif->product_name ?? 'Unknown Product') }}</span>
+                                    </p>
+                                    <div class="flex items-center gap-1.5 pt-0.5 flex-wrap">
+                                        @if ($notif->status !== 'loss_reported')
+                                            <span
+                                                class="text-[10px] font-bold tracking-normal bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-950/40 px-1 py-0.5 rounded">
+                                                Pending
+                                            </span>
+                                        @endif
+                                        <span class="text-[10px] text-gray-400 dark:text-zinc-500 font-medium">
+                                            {{ $notif->created_at->diffForHumans() }}
+                                        </span>
+                                    </div>
                                 </div>
+                                <button @click.stop="markSingleRead({{ $notif->id }}, $event.target)"
+                                    class="notif-dot ml-2 w-2.5 h-2.5 rounded-full shrink-0
+                                        {{ $notif->seen_at ? 'bg-gray-300 dark:bg-zinc-700' : 'bg-red-500' }}"
+                                    title="Mark as read" aria-label="Mark as read" type="button">
+                                </button>
                             </div>
-                        </a>
+                        </div>
                     @empty
-                        {{-- Empty Placeholder Visual Representation Block --}}
+                        <!-- Empty Placeholder Visual Representation Block -->
                         <div class="px-4 py-12 text-center text-xs font-medium text-gray-400 dark:text-zinc-500">
                             <x-heroicon-o-check-circle class="w-6 h-6 mx-auto mb-2 opacity-60" />
                             No pending requests
@@ -116,7 +155,8 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <!-- User Avatar & Info -->
+        <div class="flex items-center gap-2 flex-shrink-0">
             <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold overflow-hidden"
                 style="background-color: {{ auth()->user()->role === 'admin' ? '#8B5CF6' : '#0F6E8C' }};">
                 @if (auth()->user()->avatar)
@@ -142,4 +182,84 @@
             sidebar.__x.$data.open = !sidebar.__x.$data.open;
         }
     });
+
+    function markAllRead() {
+        fetch('/admin/notifications/mark-all-read', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+
+                // gray out every dot
+                document.querySelectorAll('.notif-dot').forEach(dot => {
+                    dot.classList.remove('bg-red-500', 'bg-blue-500');
+                    dot.classList.add('bg-gray-300', 'dark:bg-zinc-700');
+                });
+                // remove both mark and unmark background classes on notif cards
+                document.querySelectorAll('.notif-card').forEach(card => {
+                    card.classList.remove(
+                        'bg-red-50',
+                        'dark:bg-zinc-900/30',
+                        'bg-blue-50',
+                        'dark:bg-blue-950/20',
+                        'border-l-2',
+                        'border-blue-500'
+                    );
+                });
+
+                // clear the bell badge count
+                const badge = document.querySelector('.bell-badge');
+                if (badge) badge.remove();
+            });
+    }
+
+    function markSingleRead(id, el) {
+        fetch(`/admin/notifications/${id}/mark-read`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+
+                let notifCard, notifDot;
+
+                if (el.classList.contains('notif-dot')) {
+                    notifDot = el;
+                    notifCard = el.closest('.notif-card');
+                } else if (el.classList.contains('notif-card')) {
+                    notifCard = el;
+                    notifDot = notifCard.querySelector('.notif-dot');
+                } else {
+                    notifCard = document.querySelector(`.notif-card[data-notif-id="${id}"]`);
+                    notifDot = notifCard ? notifCard.querySelector('.notif-dot') : null;
+                }
+
+                if (notifDot) {
+                    notifDot.classList.remove('bg-blue-500');
+                    notifDot.classList.add('bg-gray-300', 'dark:bg-zinc-700');
+                }
+                if (notifCard) {
+                    notifCard.classList.remove('bg-blue-50', 'dark:bg-blue-950/20', 'border-l-2',
+                        'border-blue-500');
+                }
+
+                const badge = document.querySelector('.bell-badge');
+                if (badge) {
+                    const newCount = parseInt(badge.textContent.trim()) - 1;
+                    if (newCount <= 0) {
+                        badge.remove();
+                    } else {
+                        badge.textContent = newCount;
+                    }
+                }
+            });
+    }
 </script>

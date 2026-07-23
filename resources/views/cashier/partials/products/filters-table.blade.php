@@ -66,11 +66,12 @@
                 <th class="py-3 px-2 font-medium text-right">Revenue</th>
                 <th class="py-3 font-medium text-center">Last Drop</th>
                 <th class="py-3 pr-4 pl-2 font-medium text-center">Status</th>
+                <th class="py-3 pr-4 pl-2 font-medium text-center">Report</th>
             </tr>
         </thead>
         <tbody>
             <template x-for="product in filteredProducts" :key="product.id">
-                <tr class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition">
+                <tr class="tab-container overflow-x-auto hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition">
                     <td class="py-3 pl-4">
                         <div class="flex items-center gap-3">
                             <img :src="product.image ??
@@ -104,6 +105,12 @@
                                     'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400')"
                             x-text="product.remaining > 5 ? 'In Stock' : (product.remaining > 0 ? 'Low Stock' : 'Out of Stock')">
                         </span>
+                    </td>
+                    <td>
+                        <button @click="reportLoss(product.id, product.name, product.remaining)"
+                            class="text-[14px] font-medium text-red-500 hover:text-red-600 transition-colors shrink-0">
+                            Report Loss
+                        </button>
                     </td>
                 </tr>
             </template>

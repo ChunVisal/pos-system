@@ -25,6 +25,16 @@
                 note: ''
             },
 
+            returnOpen: false,
+            returnForm: {
+                request_id: null,
+                product_id: null,
+                product_name: '',
+                quantity: 1,
+                maxQuantity: 1,
+                reason: '',
+            },
+
             // searching all products 
             allProducts: @json($allProducts),
             selectedProductName: '',
@@ -76,6 +86,7 @@
                             quantity: 1,
                             note: ''
                         };
+                        window.location.reload();
                     });
             },
 
@@ -112,6 +123,42 @@
                             quantity: 1,
                             note: ''
                         }];
+                        window.location.reload();
+                    });
+            },
+
+            reportLoss(productId, productName, maxQty) {
+                this.returnForm = {
+                    request_id: null,
+                    product_id: productId,
+                    product_name: productName,
+                    quantity: 1,
+                    maxQuantity: maxQty,
+                    reason: '',
+                };
+                this.returnOpen = true;
+            },
+
+            submitReturn() {
+                if (this.returnForm.quantity > this.returnForm.maxQuantity) {
+                    alert('Cannot report more than available: ' + this.returnForm.maxQuantity);
+                    return;
+                }
+
+                fetch('/cashier/stock-return', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify(this.returnForm)
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message);
+                        this.returnOpen = false;
+                        window.location.reload();
                     });
             },
 

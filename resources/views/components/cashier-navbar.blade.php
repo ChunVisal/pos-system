@@ -1,21 +1,11 @@
 <nav
     class="bg-white dark:bg-black border-b border-gray-300 dark:border-zinc-800 px-5 py-2 flex items-center justify-between sticky top-0 z-40 transition-colors duration-200">
 
-    <img x-data="{
-        isDark: document.documentElement.classList.contains('dark'),
-        init() {
-            this.$watch('isDark', () => {
-                this.isDark = document.documentElement.classList.contains('dark');
-            });
-            // Listen for dark mode changes
-            const observer = new MutationObserver(() => {
-                this.isDark = document.documentElement.classList.contains('dark');
-            });
-            observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-        }
-    }"
-        :src="isDark ? '{{ asset('images/logodarkmode.png') }}' : '{{ asset('images/logo.png') }}'" alt="Logo"
-        class="w-[100px]">
+    <!-- Logo Section -->
+    <div class="flex items-center gap-4 min-w-0">
+        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-[90px] dark:hidden shrink-0">
+        <img src="{{ asset('images/logodarkmode.png') }}" alt="Logo" class="w-[90px] hidden dark:block shrink-0">
+    </div>
 
     <div class="flex items-center gap-3">
 

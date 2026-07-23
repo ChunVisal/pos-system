@@ -79,6 +79,7 @@
                                     <div @click="item.product_id = product.id; item.name = product.name; open = false"
                                         class="px-3 py-1.5 text-xs text-gray-900 dark:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer">
                                         <span x-text="product.name"></span>
+                                        
                                         <span class="text-gray-400 dark:text-zinc-500 ml-2"
                                             x-text="'(' + product.stock_quantity + ')'"></span>
                                     </div>

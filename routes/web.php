@@ -38,7 +38,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/admin/notifications', [NotificationController::class, 'index'])->name('admin.notifications');
     Route::post('/admin/notifications/{id}/approve', [NotificationController::class, 'approve'])->name('admin.notifications.approve');
     Route::post('/admin/notifications/{id}/reject', [NotificationController::class, 'reject'])->name('admin.notifications.reject');
-
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+    Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markSingle']);
     Route::get('/admin/stock-requests', [StockRequestController::class, 'index'])->name('admin.stock-requests');
 
     Route::get('/products', [AdminController::class, 'products'])->name('admin.products');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CashierProductData;
 use App\Models\Categories;
+use App\Models\StockMovement;
 use App\Models\Product;
 use App\Models\CashierStock;
 use Illuminate\Http\Request;
@@ -58,4 +59,5 @@ class CashierProductController extends Controller
 
         return view('cashier.products', compact('products', 'summaryCards', 'categories', 'allProducts'));
     }
+  
 }

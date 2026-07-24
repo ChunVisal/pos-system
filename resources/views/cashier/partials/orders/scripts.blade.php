@@ -13,7 +13,7 @@
             refundTotal: 0,
             refundReason: '',
             restockItems: true,
-            
+
             refundOrder(id) {
                 const order = this.orders.find(o => o.id === id);
                 if (!order) return;
@@ -76,6 +76,19 @@
                             order_number: order.order_number
                         };
                         this.receiptOpen = true;
+                        this.$nextTick(() => {
+                            if (this.receiptData.order_number) {
+                                JsBarcode("#barcode", this.receiptData.order_number, {
+                                    format: "CODE128",
+                                    width: 1.5,
+                                    height: 40,
+                                    displayValue: false,
+                                    margin: 0,
+                                    background: "transparent",
+                                    lineColor: "#000",
+                                });
+                            }
+                        });
                     });
             },
         };

@@ -29,101 +29,6 @@
 
         var emptyRow = document.getElementById('noCategoryRow');
         var emptyGrid = document.getElementById('noFilterResultsGrid');
-
-        function filterTable() {
-            var categoryVal = categoryFilter ? categoryFilter.value : 'all';
-            var statusVal = statusFilter ? statusFilter.value : 'all';
-            var stockVal = stockFilter ? stockFilter.value : 'all';
-
-            var anyVisible = false;
-
-            document.querySelectorAll('tbody tr').forEach(function(row) {
-                if (row === emptyRow) return;
-
-                var cells = row.getElementsByTagName('td');
-                if (cells.length < 6) return;
-
-                var catText = cells[1].textContent.trim();
-                var stockText = cells[3].textContent.trim();
-                var statusText = cells[5].textContent.trim();
-
-
-                var categoryMatch = (categoryVal === 'all' || catText === categoryVal);
-                var statusMatch = (statusVal === 'all' || statusText === statusVal);
-
-                var stockMatch = true;
-                if (stockVal === 'out') stockMatch = stockText.includes('Out');
-                else if (stockVal === 'low') stockMatch = stockText.includes('Low');
-                else if (stockVal === 'in') stockMatch = !stockText.includes('Out') && !stockText
-                    .includes('Low');
-
-                if (categoryMatch && statusMatch && stockMatch) {
-                    row.style.display = '';
-                    anyVisible = true;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            // ── Grid cards ──
-            // Find all product cards inside the grid view
-            var gridContainer = document.querySelector('[x-show="viewMode === \'grid\'"]');
-            if (gridContainer) {
-                var cards = gridContainer.querySelectorAll('.grid > div'); // Gets all direct children of grid
-
-                cards.forEach(function(card) {
-                    // Skip empty state divs (they don't have product data)
-                    if (card.querySelector('img') === null && card.querySelector('svg') !== null)
-                        return;
-
-                    // Get data from the card's content
-                    var nameEl = card.querySelector('p:first-of-type'); // First paragraph is name
-                    var catEl = card.querySelectorAll('p')[1]; // Second paragraph is category
-                    var stockEl = card.querySelector('span.rounded'); // Stock badge
-                    var statusText = stockEl ? stockEl.textContent.trim() : '';
-
-                    if (!catEl) return;
-
-                    var catText = catEl.textContent.trim();
-                    var stock = parseInt(card.dataset.stock) || 0;
-                    var threshold = parseInt(card.dataset.threshold) || 0;
-                    var status = card.dataset.status || '';
-
-                    // If data attributes are missing, try to extract from content
-                    if (!status) {
-                        // Status might be in a span - look for it
-                        var statusEls = card.querySelectorAll('span');
-                        statusEls.forEach(function(span) {
-                            var text = span.textContent.trim();
-                            if (text === 'Active' || text === 'Inactive') {
-                                status = text;
-                            }
-                        });
-                    }
-
-                    var categoryMatch = (categoryVal === 'all' || catText === categoryVal);
-                    var statusMatch = (statusVal === 'all' || status === statusVal);
-
-                    var stockMatch = true;
-                    if (stockVal === 'out') stockMatch = stock <= 0;
-                    else if (stockVal === 'low') stockMatch = stock > 0 && stock < threshold;
-                    else if (stockVal === 'in') stockMatch = stock >= threshold;
-
-                    if (categoryMatch && statusMatch && stockMatch) {
-                        card.style.display = '';
-                        anyVisible = true;
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            }
-            if (emptyRow) emptyRow.style.display = anyVisible ? 'none' : '';
-            if (emptyGrid) emptyGrid.style.display = anyVisible ? 'none' : 'flex';
-        }
-
-        if (categoryFilter) categoryFilter.addEventListener('change', filterTable);
-        if (statusFilter) statusFilter.addEventListener('change', filterTable);
-        if (stockFilter) stockFilter.addEventListener('change', filterTable);
     });
 
     function deleteProduct(id, button) {
@@ -145,13 +50,15 @@
                     'Accept': 'application/json'
                 }
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.message === 'Deleted') {
-                    window.location.reload();
-                } else {
-                    alert(data.message);
+            .then(res => {
+                if (res.status === 422) {
+                    return res.json().then(data => {
+                        alert(data.message);
+                        return;
+                    });
                 }
+                window.location.reload();
+                if (!res.ok) throw new Error('Error');
             })
             .catch(err => alert('Error: ' + err.message));
     }

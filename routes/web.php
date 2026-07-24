@@ -35,7 +35,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/dashboard/export', [DashboardController::class, 'exportDashboard'])->name('admin.dashboard.export');
 
-    Route::get('/admin/notifications', [NotificationController::class, 'index'])->name('admin.notifications');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications');
     Route::post('/admin/notifications/{id}/approve', [NotificationController::class, 'approve'])->name('admin.notifications.approve');
     Route::post('/admin/notifications/{id}/reject', [NotificationController::class, 'reject'])->name('admin.notifications.reject');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);

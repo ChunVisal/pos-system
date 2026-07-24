@@ -51,7 +51,7 @@
 
 {{-- table customer --}}
 <div class="bg-white dark:bg-zinc-900 p-4 rounded-md shadow-sm border border-gray-200 dark:border-zinc-800/60">
-    <div class="scroll-smooth table-scroll overflow-auto max-h-[600px]" x-ref="tableBody">
+    <div class="tab-container overflow-auto max-h-[600px]" x-ref="tableBody">
         <table class="w-full text-sm">
             <thead class="sticky top-0 bg-white dark:bg-zinc-900">
                 <tr
@@ -61,7 +61,7 @@
                     <th class="pb-2 px-4 font-medium text-center">Orders</th>
                     <th class="pb-2 px-4 font-medium">Total Spent</th>
                     <th class="pb-2 px-4 font-medium">Last Order</th>
-                    <th class="pb-2 pl-4 font-medium text-right">Actions</th>
+                    <th class="pb-2 pl-4 font-medium text-left">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-zinc-800/50">
@@ -104,7 +104,7 @@
                         <td class="py-3 px-2 text-xs text-gray-500 dark:text-zinc-400"
                             x-text="customer.last_order_at ? new Date(customer.last_order_at).toLocaleDateString('en-US', {hour: 'numeric', minute: 'numeric', month:'short', day:'numeric', year:'numeric'}) : '-'">
                         </td>
-                        <td class="py-3 pr-4 pl-2 text-right">
+                        <td class="py-3 pr-4 pl-2 text-center">
                             <button @click="openCustomerDetail(customer.id)"
                                 class="text-yellow-400 hover:text-yellow-500">
                                 <i class="fa-solid fa-receipt text-lg"></i>
@@ -132,18 +132,39 @@
         <p class="text-xs text-gray-500 dark:text-zinc-400" x-text="showingText"></p>
         <div class="flex items-center gap-1">
             <button @click="prevPage()" :disabled="currentPage === 1" type="button"
-                class="px-3 py-1 text-xs border border-gray-300 dark:border-zinc-700 rounded-md text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition">Previous</button>
+                class="px-3 py-1 text-xs border border-gray-300 dark:border-zinc-700 rounded-md 
+                text-gray-600 dark:text-zinc-300 
+                bg-white dark:bg-zinc-900 
+                transition
+                hover:bg-[#0F6E8C] hover:text-white hover:border-[#0F6E8C]
+                dark:hover:bg-[#173f4b] dark:hover:text-yellow-200 dark:hover:border-[#0F6E8C]
+                disabled:opacity-60 disabled:cursor-not-allowed">
+                Previous
+            </button>
             <template x-for="page in pageNumbers" :key="page">
-                <button x-show="page !== '...'" @click="goToPage(page)" type="button"
-                    :class="currentPage === page ? 'bg-[#0F6E8C] text-white' :
-                        'border border-gray-300 dark:border-zinc-700 text-gray-600 dark:text-zinc-300'"
-                    class="px-3 py-1 text-xs rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
-                    <span x-text="page"></span>
-                </button>
-                <span x-show="page === '...'" class="px-2 text-gray-400">...</span>
+                <div>
+                    <button x-show="page !== '...'" @click="goToPage(page)" type="button"
+                        :class="[
+                            'px-3 py-1 text-xs rounded-md border transition focus:outline-none',
+                            currentPage === page ?
+                            'bg-[#0F6E8C] text-white border-[#0F6E8C] dark:bg-[#0F6E8C] dark:border-[#0F6E8C] dark:text-yellow-200' :
+                            'border-gray-300 dark:border-zinc-700 text-gray-600 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-[#f3fbfd] hover:text-[#0F6E8C] hover:border-[#0F6E8C] dark:hover:bg-[#173f4b] dark:hover:text-yellow-200 dark:hover:border-[#0F6E8C]'
+                        ]">
+                        <span x-text="page"></span>
+                    </button>
+                    <span x-show="page === '...'" class="px-2 text-gray-400 dark:text-zinc-600 select-none">...</span>
+                </div>
             </template>
             <button @click="nextPage()" type="button" :disabled="currentPage === totalPages"
-                class="px-3 py-1 text-xs border border-gray-300 dark:border-zinc-700 rounded-md text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition">Next</button>
+                class="px-3 py-1 text-xs border border-gray-300 dark:border-zinc-700 rounded-md 
+                text-gray-600 dark:text-zinc-300 
+                bg-white dark:bg-zinc-900 
+                transition 
+                hover:bg-[#0F6E8C] hover:text-white hover:border-[#0F6E8C]
+                dark:hover:bg-[#173f4b] dark:hover:text-yellow-200 dark:hover:border-[#0F6E8C]
+                disabled:opacity-60 disabled:cursor-not-allowed">
+                Next
+            </button>
         </div>
     </div>
 </div>

@@ -3,7 +3,7 @@
     <div class="relative flex-1 min-w-[200px]">
         <i
             class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-xs"></i>
-        <input type="text" x-model="searchQuery" @input="filterUsers()" placeholder="Search by name, email or role..."
+        <input type="text" x-model="searchQuery" placeholder="Search by name, email or role..."
             class="bg-white dark:bg-zinc-900 w-full pl-8 pr-3 py-1.5 text-xs bg-transparent border border-gray-300 dark:border-zinc-700 rounded-md focus:outline-none focus:ring-1 focus:ring-[#0F6E8C] text-gray-800 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500">
         <button type="button" x-show="searchQuery" @click="searchQuery = ''; filterUsers()"
             class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 z-10">
@@ -134,9 +134,8 @@
 
                         {{-- Last Login --}}
                         <td class="py-3 px-4 text-xs text-gray-500 dark:text-zinc-400"
-                            x-text="user.last_login_formatted || 'Never'">
+                            x-text="user.last_login ? new Date(user.last_login).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Never'">
                         </td>
-
                         {{-- Online / Offline Status Badge --}}
                         <td class="py-3 px-4">
                             <template x-if="user.is_online">

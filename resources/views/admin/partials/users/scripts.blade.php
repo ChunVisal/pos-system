@@ -130,6 +130,16 @@
             roleFilter: 'all',
             statusFilter: 'all',
 
+            getInitials(name) {
+                if (!name) return '';
+
+                return name
+                    .split(' ')
+                    .map(word => word.charAt(0))
+                    .join('')
+                    .toUpperCase();
+            },
+
             get filteredUsers() {
                 let result = [...this.users];
 

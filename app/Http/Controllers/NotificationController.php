@@ -13,27 +13,34 @@ use Illuminate\Support\Facades\DB;
 
 class NotificationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = $request->per_page ?? 3;
+
         $stockRequests = StockRequest::with(['cashier', 'product'])
             ->whereIn('status', ['pending', 'loss_reported'])
             ->latest()
             ->get()
             ->groupBy(function ($req) {
-                $days = $req->created_at->diffInDays(now());
-                if ($days == 0) return 'Today';
-                if ($days == 1) return 'Yesterday';
-                if ($days >= 2 && $days <= 6) return $days . ' days ago';
-                if ($days >= 7 && $days <= 13) return '1 week ago';
-                if ($days >= 14 && $days <= 20) return '2 weeks ago';
-                return 'Older';
+                return $req->created_at->format('l, M d, Y');
             });
 
-        return view('admin.notifications', compact('stockRequests'));
+        $totalGroups = $stockRequests->count();
+        $stockRequests = $stockRequests->slice(0, $perPage);
+        $hasMore = $totalGroups > $perPage;
+
+        // Handle ajax request for loading more notification groups
+        if ($request->ajax()) {
+            return view('admin.partials.notifications.list', compact('stockRequests', 'hasMore', 'perPage', 'totalGroups'))->render();
+        }
+
+        $pendingCount = StockRequest::whereIn('status', ['pending', 'loss_reported'])->whereNull('seen_at')->count();
+        return view('admin.notifications', compact('stockRequests', 'pendingCount', 'hasMore', 'perPage', 'totalGroups'));
     }
 
-    public function cashierIndex()
+    public function cashierIndex(Request $request)
     {
+        $perPage = $request->per_page ?? 3;
         // Mark all as seen
         StockRequest::where('cashier_id', Auth::id())
             ->whereNull('seen_at')
@@ -44,16 +51,18 @@ class NotificationController extends Controller
             ->whereIn('status', ['pending', 'approved', 'rejected', 'on_hold'])
             ->latest()
             ->get()
-            ->groupBy(function ($notif) {
-                $days = $notif->created_at->diffInDays(now());
-                if ($days == 0) return 'Today';
-                if ($days == 1) return 'Yesterday';
-                if ($days >= 2 && $days <= 6) return $days . ' days ago';
-                if ($days >= 7 && $days <= 13) return '1 week ago';
-                return 'Older';
+            ->groupBy(function ($req) {
+                return $req->created_at->format('l, M d, Y');
             });
 
-        return view('cashier.notifications', compact('notifications'));
+        $totalGroups = $notifications->count();
+        $notifications = $notifications->slice(0, $perPage);
+        $hasMore = $totalGroups > $perPage;
+
+        if ($request->ajax) {
+            return view('cashier.partials.notifications.list', compact('notifications', 'hasMore', 'perPage', 'totalGroups'))->render();
+        }
+        return view('cashier.notifications', compact('notifications', 'perPage', 'hasMore', 'totalGroups'));
     }
 
     public function approve(Request $request, $id)

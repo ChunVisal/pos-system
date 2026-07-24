@@ -105,6 +105,19 @@
                             order_number: order.order_number
                         };
                         this.receiptOpen = true;
+                        this.$nextTick(() => {
+                            if (this.receiptData.order_number) {
+                                JsBarcode("#barcode", this.receiptData.order_number, {
+                                    format: "CODE128",
+                                    width: 1.5,
+                                    height: 40,
+                                    displayValue: false,
+                                    margin: 0,
+                                    background: "transparent",
+                                    lineColor: "#000",
+                                });
+                            }
+                        });
                     });
             },
 
@@ -214,7 +227,6 @@
                     this.currentPage = page;
                     this.$nextTick(() => {
                         const el = this.$refs.tableBody;
-                        if (el) el.scrollTop = 0;
                     });
                 }
             },
@@ -222,8 +234,8 @@
             get pageNumbers() {
                 const pages = [];
                 for (let i = 1; i <= this.totalPages; i++) {
-                    if (i === 1 || i === this.totalPages || (i >= this.currentPage - 1 && i <= this.currentPage +
-                            1)) {
+                    if (i === 1 || i === this.totalPages || (i >= this.currentPage - 2 && i <= this.currentPage +
+                            2)) {
                         pages.push(i);
                     } else if (pages[pages.length - 1] !== '...') {
                         pages.push('...');

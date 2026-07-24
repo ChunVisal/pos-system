@@ -102,7 +102,7 @@
                                 class="w-full px-3 py-1.5 text-xs font-semibold text-white bg-[#0F6E8C] rounded-md hover:bg-[#0c5972] transition-colors">
                                 Apply
                             </button>
-                    </form>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -140,7 +140,7 @@
         {{-- Premium Scannable Table Component Container Block --}}
         <div
             class="bg-white dark:bg-zinc-900 pb-4 px-4 rounded-md shadow-sm border border-gray-200 dark:border-zinc-800/60">
-            <div class="overflow-x-auto scroll-smooth table-scroll overflow-auto max-h-[600px]">
+            <div class=" scroll-smooth table-scroll overflow-auto max-h-[600px]" x-ref="tableBody">
                 <table class="w-full text-sm">
                     <thead class="sticky top-0 z-10 bg-white dark:bg-zinc-900">
                         <tr
@@ -246,14 +246,17 @@
                     <button @click="prevPage()" :disabled="currentPage === 1" type="button"
                         class="px-3 py-1 text-xs border border-gray-300 dark:border-zinc-700 rounded-md text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition disabled:opacity-50">Previous</button>
                     <template x-for="page in pageNumbers" :key="page">
-                        <button x-show="page !== '...'" @click="goToPage(page)" type="button"
-                            :class="currentPage === page ? 'bg-[#0F6E8C] text-white' :
-                                'border border-gray-300 dark:border-zinc-700 text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-700'"
-                            class="px-3 py-1 text-xs rounded-md transition">
-                            <span x-text="page"></span>
-                        </button>
-                        <span x-show="page === '...'" class="px-2 text-gray-400">...</span>
+                        <div>
+                            <button x-show="page !== '...'" @click="goToPage(page)" type="button"
+                                :class="currentPage === page ? 'bg-[#0F6E8C] text-white' :
+                                    'border border-gray-300 dark:border-zinc-700 text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-700'"
+                                class="px-3 py-1 text-xs rounded-md transition">
+                                <span x-text="page"></span>
+                            </button>
+                            <span x-show="page === '...'" class="px-2 text-gray-400">...</span>
+                        </div>
                     </template>
+
                     <button @click="nextPage()" :disabled="currentPage === totalPages" type="button"
                         class="px-3 py-1 text-xs border border-gray-300 dark:border-zinc-700 rounded-md text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition disabled:opacity-50">Next</button>
                 </div>
@@ -305,8 +308,8 @@
             get pageNumbers() {
                 const pages = [];
                 for (let i = 1; i <= this.totalPages; i++) {
-                    if (i === 1 || i === this.totalPages || (i >= this.currentPage - 1 && i <= this.currentPage +
-                            1)) pages.push(i);
+                    if (i === 1 || i === this.totalPages || (i >= this.currentPage - 2 && i <= this.currentPage +
+                            2)) pages.push(i);
                     else if (pages[pages.length - 1] !== '...') pages.push('...');
                 }
                 return pages;
@@ -322,6 +325,10 @@
             },
             goToPage(page) {
                 if (typeof page === 'number') this.currentPage = page;
+                this.$nextTick(() => {
+                    const el = this.$refs.tableBody;
+                    if (el) el.scrollTop = 0;
+                });
             },
         };
     }

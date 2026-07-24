@@ -17,7 +17,7 @@
                 class="relative p-2 text-gray-500 dark:text-zinc-400 hover:text-[#0F6E8C] dark:hover:text-[#138cb3] hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-full transition-colors"
                 title="Notifications">
                 {{-- Use correct FontAwesome bell icon (solid style) --}}
-                <i class="fa-solid fa-bell text-xl"></i>
+                <i class="fa-solid fa-bell text-xl text-gray-700 dark:text-gray-200"></i>
                 @php
                     $cashierNotifCount = \App\Models\StockRequest::where('cashier_id', auth()->id())
                         ->where('created_at', '>=', now()->subDays(15))

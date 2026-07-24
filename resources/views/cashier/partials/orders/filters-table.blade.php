@@ -245,7 +245,7 @@
             get pageNumbers() {
                 const pages = [];
                 for (let i = 1; i <= this.totalPages; i++) {
-                    if (i === 1 || i === this.totalPages || (i >= this.currentPage - 1 && i <= this.currentPage +
+                    if (i === 1 || i === this.totalPages || (i >= this.currentPage - 2 && i <= this.currentPage +
                             2)) {
                         pages.push(i);
                     } else if (pages[pages.length - 1] !== '...') {

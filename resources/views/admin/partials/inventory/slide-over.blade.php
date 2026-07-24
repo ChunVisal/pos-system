@@ -32,21 +32,29 @@
 
                 {{-- Dropdown Menu --}}
                 <div x-show="open" @click.outside="open = false" x-cloak
-                    class="absolute z-20 w-[400px] tab-container overflow-x-hidden mt-1 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md shadow-lg max-h-[450px] overflow-y-auto">
+                    class="absolute z-20 w-[390px] tab-container overflow-x-hidden mt-1 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md shadow-lg max-h-[450px] overflow-y-auto">
 
                     <input type="text" x-model="search" placeholder="Search product..."
-                        class="sticky top-0 w-[400px] text-sm border-b border-gray-200 dark:border-zinc-700 px-3 py-2 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 placeholder-gray-500 dark:placeholder-zinc-400 focus:outline-none">
+                        class="sticky top-0 w-[390px] text-sm border-b border-gray-200 dark:border-zinc-700 px-3 py-2 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 placeholder-gray-500 dark:placeholder-zinc-400 focus:outline-none">
 
+                    @php
+                        $hasProductMatch = false;
+                    @endphp
                     @foreach ($products as $product)
                         <div x-show="!search || '{{ strtolower($product->name) }} {{ strtolower($product->code) }}'.includes(search.toLowerCase())"
                             @click="form.product_code = '{{ $product->code }}'; open = false"
-                            selectedName = '{{ $product->name }} ({{ $product->code }})'; open=false"
-                            class="px-3 w-[400px] py-2 text-sm text-gray-850 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-700 cursor-pointer">
+                            class="px-3 w-[390px] py-2 text-sm text-gray-850 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-700 cursor-pointer">
                             {{ $product->name }} <span
                                 class="text-gray-500 dark:text-zinc-500 text-xs">({{ $product->code }})</span>
                         </div>
                     @endforeach
+                    {{-- Not found message --}}
+                    <div x-show="search && !Array.from($el.parentNode.querySelectorAll('div[ x-show ]')).some(div => div.offsetParent !== null)"
+                        class="px-3 py-4 text-center text-gray-400 dark:text-zinc-500 text-sm select-none">
+                        No product found.
+                    </div>
                 </div>
+
             </div>
 
             <div>
@@ -70,7 +78,7 @@
                         <x-heroicon-o-arrow-long-down class="w-3.5 h-3.5" />
                         Stock Out
                     </button>
-           
+
                 </div>
             </div>
 

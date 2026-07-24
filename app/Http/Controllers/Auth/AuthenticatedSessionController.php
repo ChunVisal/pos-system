@@ -74,10 +74,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
         // Set user online
-        Auth::user()->update([
-            'is_online' => true,
-            'last_login' => now(),
-        ]);
+
+        Auth::user()->update(['last_login' => now()]);
 
         Cache::put('user-online-' . Auth::id(), true, now()->addMinutes(1));
 

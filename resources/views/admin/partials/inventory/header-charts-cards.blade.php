@@ -108,11 +108,12 @@
                 <div class="flex flex-col items-start gap-1">
                     <h2 class="text-xl font-bold text-gray-800 dark:text-zinc-100">
                         @if ($card['title'] === 'Stock Value')
-                            {{ $card['value'] }}
+                            {{ $card['value'] }}.00
                         @else
                             {{ $card['value'] }}
                         @endif
                     </h2>
+               
                     <div class="flex items-start gap-1 text-[12px]">
                         <span
                             class="font-semibold {{ $card['trend'] === 'up' ? 'text-green-500' : 'text-red-500' }} flex items-center gap-0.5">
